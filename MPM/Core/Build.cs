@@ -10,5 +10,6 @@ namespace MPM.Core {
 		public InterfaceDependency[] InterfaceRequirements { get; set; }
 		public PackageDependency[] Dependencies { get; set; }
 		public PackageConflict[] Conflicts { get; set; }
+		public bool Recommended { get; set; }
 	}
 }

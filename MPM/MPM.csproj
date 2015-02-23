@@ -98,7 +98,6 @@
     <Compile Include="Core\PackageDependency.cs" />
     <Compile Include="Core\InterfaceDependency.cs" />
     <Compile Include="Core\Package.cs" />
-    <Compile Include="Net\DTO\BuildRequest.cs" />
     <Compile Include="Net\DTO\PackagesRequest.cs" />
     <Compile Include="Net\DTO\PackageRequest.cs" />
     <Compile Include="Core\VersionIdentifier.cs" />
