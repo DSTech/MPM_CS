@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using MPM.Core;
 
-namespace MPM.Net.DTO {
+namespace MPM.Core {
 	public class Build {
 		public string PackageName { get; set; }
 		public VersionIdentifier Version { get; set; }

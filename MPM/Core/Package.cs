@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using MPM.Core;
 
-namespace MPM.Net.DTO {
+namespace MPM.Core {
 	public class Package {
 		public string Name { get; set; }
 		public string[] Authors { get; set; }

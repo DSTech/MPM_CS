@@ -1,6 +1,6 @@
 using System;
 
-namespace MPM.Net.DTO {
+namespace MPM.Core {
 	public class PackageConflict {
 		public string Name { get; set; }
 	}
