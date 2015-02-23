@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core;
 using PowerArgs;
 
 namespace MPM.CLI {
@@ -32,6 +33,17 @@ namespace MPM.CLI {
 		}
 
 		[ArgActionMethod]
+		[ArgShortcut("uf"), ArgShortcut("--uf"), ArgShortcut("--updateforge")]
+		public void UpdateForge(UpdateForgeArgs args) {
+			Console.WriteLine("UpdateForge called, directory was " + args.ForgeDirectory);
+			IServerManager manager = new ForgeServerManager(args.ForgeDirectory);
+			Console.WriteLine("Current version is {0}", manager.Version);
+			foreach(var update in manager.FindUpdates()) {
+				Console.WriteLine(update);
+			}
+		}
+
+		[ArgActionMethod]
 		[ArgShortcut("l"), ArgShortcut("-l"), ArgShortcut("--launch")]
 		public void LaunchMinecraft(LaunchMinecraftArgs args) {
 			using (var minecraftLauncher = args.ToConfiguredLauncher()) {
@@ -45,6 +57,14 @@ namespace MPM.CLI {
 		[ArgPosition(1)]
 		[ArgExistingFile]
 		public string CauldronFile { get; set; }
+	}
+	public class UpdateForgeArgs {
+		[ArgRequired(PromptIfMissing = true)]
+		[ArgDescription("The Forge Directory to update")]
+		[ArgPosition(1)]
+		[ArgExistingDirectory]
+		[DefaultValue(".")]
+		public string ForgeDirectory { get; set; }
 	}
 	public class LaunchMinecraftArgs {
 		[ArgDescription("The username of the profile to use")]
