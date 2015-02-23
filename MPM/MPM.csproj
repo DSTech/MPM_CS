@@ -76,6 +76,15 @@
     <Compile Include="ActionProviders\MinecraftLauncher.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\IServerManager.cs" />
+    <Compile Include="Core\VersionSpecification.cs" />
+    <Compile Include="Net\DTO\InterfaceProvision.cs" />
+    <Compile Include="Net\DTO\Build.cs" />
+    <Compile Include="Net\DTO\PackageConflict.cs" />
+    <Compile Include="Net\DTO\PackageDependency.cs" />
+    <Compile Include="Net\DTO\InterfaceDependency.cs" />
+    <Compile Include="Net\DTO\Package.cs" />
+    <Compile Include="Net\IRepositoryAPI.cs" />
+    <Compile Include="Core\VersionIdentifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RefitStubs.cs" />
