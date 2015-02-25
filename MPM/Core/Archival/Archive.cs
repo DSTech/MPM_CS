@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MPM.Net.Archival {
+namespace MPM.Core.Archival {
 	public class Archive : IList<EncryptedChunk> {
 		public Archive(IEnumerable<EncryptedChunk> chunks) {
 			this.chunks = new List<EncryptedChunk>(chunks);

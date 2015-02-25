@@ -93,11 +93,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionProviders\MinecraftLauncher.cs" />
+    <Compile Include="CLI\LaunchMinecraftArgs.cs" />
+    <Compile Include="CLI\UpdateForgeArgs.cs" />
+    <Compile Include="CLI\UpdateCauldronArgs.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Core\VersionSpecification.cs" />
-    <Compile Include="Net\Archival\ArchiveChunk.cs" />
-    <Compile Include="Net\Archival\Archive.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="CLI\LaunchArgs.cs" />
+    <Compile Include="Core\Archival\ArchiveChunk.cs" />
+    <Compile Include="Core\Archival\Archive.cs" />
     <Compile Include="Net\DTO\InterfaceProvision.cs" />
     <Compile Include="Net\DTO\Build.cs" />
     <Compile Include="Net\DTO\PackageConflict.cs" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace MPM.Net.Archival {
+namespace MPM.Core.Archival {
 	public class RawChunk : IEnumerable<byte> {
 		public RawChunk(IEnumerable<byte> contents) {
 			this.contents = contents.ToArray();
