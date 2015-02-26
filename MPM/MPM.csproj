@@ -103,6 +103,13 @@
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Core\Archival\ArchiveChunk.cs" />
     <Compile Include="Core\Archival\Archive.cs" />
+    <Compile Include="Net\DTO\ConflictResolution.cs" />
+    <Compile Include="Net\DTO\ConflictCondition.cs" />
+    <Compile Include="Net\DTO\DeclinedDependency.cs" />
+    <Compile Include="Net\DTO\DependencyResolution.cs" />
+    <Compile Include="Net\DTO\ForcedDependency.cs" />
+    <Compile Include="Net\DTO\InstallationResolution.cs" />
+    <Compile Include="Net\PackageConflictExtensions.cs" />
     <Compile Include="Net\DTO\InterfaceProvision.cs" />
     <Compile Include="Net\DTO\Build.cs" />
     <Compile Include="Net\DTO\PackageConflict.cs" />
