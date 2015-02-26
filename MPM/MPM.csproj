@@ -109,6 +109,7 @@
     <Compile Include="Net\DTO\DependencyResolution.cs" />
     <Compile Include="Net\DTO\ForcedDependency.cs" />
     <Compile Include="Net\DTO\InstallationResolution.cs" />
+    <Compile Include="Net\DTO\PackageSide.cs" />
     <Compile Include="Net\PackageConflictExtensions.cs" />
     <Compile Include="Net\DTO\InterfaceProvision.cs" />
     <Compile Include="Net\DTO\Build.cs" />
