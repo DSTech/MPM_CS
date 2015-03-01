@@ -67,6 +67,26 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\PowerArgs.2.3.1.0\lib\net40\PowerArgs.dll</HintPath>
     </Reference>
+    <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="QuickGraph.Data, Version=3.6.61114.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Interactive">
@@ -96,9 +116,12 @@
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
+    <Compile Include="Core\Dependency\Configuration.cs" />
+    <Compile Include="Core\Dependency\Package.cs" />
+    <Compile Include="Core\Dependency\Reconfiguration.cs" />
+    <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\IServerManager.cs" />
-    <Compile Include="Core\VersionSpecification.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Core\Archival\ArchiveChunk.cs" />
@@ -119,7 +142,6 @@
     <Compile Include="Net\DTO\Package.cs" />
     <Compile Include="Net\DTO\PackagesRequest.cs" />
     <Compile Include="Net\DTO\PackageRequest.cs" />
-    <Compile Include="Core\VersionIdentifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
