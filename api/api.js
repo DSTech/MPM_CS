@@ -247,6 +247,7 @@ add_route( function( conn, package_name ) {
                 grab_interfaces();
                 grab_package_dependencies();
                 grab_interface_dependencies();
+                grab_hashes();
             }
         );
     }
@@ -320,6 +321,25 @@ add_route( function( conn, package_name ) {
         );
     }
 
+    function grab_hashes() {
+        conn.sql.query(
+            "SELECT buildid, HEX( hash ) AS hash " +
+            "FROM BuildHash "                      +
+            "WHERE buildid IN (?) "                +
+            "ORDER BY hashid ASC",
+            [ build_ids ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    builds_by_id[ x.buildid ].hashes.push( x.hash );
+                } );
+                finish();
+            }
+        );
+    }
+
     //Called when finished
     function finish() {
         //The following functions must complete before we can output the data:
@@ -327,7 +347,8 @@ add_route( function( conn, package_name ) {
         //grab_interfaces()
         //grab_package_dependencies()
         //grab_interface_dependencies()
-        if( ++count != 4 )
+        //grab_hashes()
+        if( ++count != 5 )
             return;
 
         //Finished; output results
@@ -387,4 +408,6 @@ http.createServer( function( req, res ) {
     if( !try_routes( conn ) )
         return conn.error( "Route not found.", 404 );
 } ).listen( port );
+
 log.out( "Server started on port " + port + "." );
+console.log( "Press CTRL+C to exit." );
