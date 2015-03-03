@@ -130,6 +130,18 @@ function try_routes( conn ) {
 |*   ROUTES   *|
 \**************/
 
+//Returns /robots.txt
+//Robots are instructed not to index anything the API returns.
+var robots_headers = { "Content-Type": "text/plain" };
+add_route( function( conn ) {
+    conn.end(
+        "User-agent: *\n" +
+        "Disallow: /\n",
+        200,
+        robots_headers
+    );
+}, /^\/robots.txt$/);
+
 //List of all packages.
 //Examples: "/packages" or "/packages/"
 add_route( function( conn ) {
@@ -146,68 +158,189 @@ add_route( function( conn ) {
 
 //Describe a specific package.
 //Examples: "/packages/forge" or "/packages/forge/"
-add_route( function( conn, package ) {
+add_route( function( conn, package_name ) {
     var results = {
         "name":    "",
         "authors": [],
         "builds":  []
     };
     var package_id;
+    var builds_by_id = {};
+    var build_ids;
 
-    //Attempt to find the id and official name of a package with the given name.
-    //Note: Prepared statements will automatically .escape() provided parameters.
-    conn.sql.query(
-        "SELECT id, name "    +
-            "FROM Package "   +
-            "WHERE name = ? " +
-            "LIMIT 1",
-        [ package ],
-        function( err, rows, fields ) {
-            if( err )
-                return conn.mysql_error( err );
-            if( rows.length == 0 )
-                return conn.error( "Package not found.", 404 );
+    var count = 0;
 
-            //This package exists.
-            //Grab the official name & id, then find builds and authors.
-            results.name = rows[0].name;
-            package_id   = rows[0].id;
+    function grab_name() {
+        //Attempt to find the id and official name of a package with the given name.
+        //Note: Prepared statements will automatically .escape() provided parameters.
+        conn.sql.query(
+            "SELECT id, name "    +
+                "FROM Package "   +
+                "WHERE name = ? " +
+                "LIMIT 1",
+            [ package_name ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+                if( rows.length == 0 )
+                    return conn.error( "Package not found.", 404 );
 
-            conn.sql.query(
-                "SELECT ver, given, flags " +
-                    "FROM Build "           +
-                    "WHERE packageid = ?",
-                [ package_id ],
-                function( err, rows, fields ) {
-                    if( err )
-                        return con.mysql_error( err );
+                //This package exists. Grab the official name & id.
+                results.name = rows[0].name;
+                packageid    = rows[0].id;
 
-                    for( var i = 0; i < rows.length; ++i ) {
-                        results.builds.push( {
-                            "version":      rows[i].ver,
-                            "givenVersion": rows[i].given,
-                            "recommended":  Boolean( rows[i].flags & FLAG_RECOMMENDED ),
-                            "interfaces":   [],
-                            "dependencies": {
-                                "packages":   [],
-                                "interfaces": []
-                            },
-                            "conflicts":    [],
-                            "hashes":       []
-                        } );
-                    }
+                grab_authors();
+                grab_builds();
+            }
+        );
+    }
 
-                    conn.end( JSON.stringify( results ) );
-                }
-            );
-        }
-    );
+    //Get authors
+    function grab_authors() {
+        conn.sql.query(
+            "SELECT author "          +
+                "FROM PackageAuthor " +
+                "WHERE packageid = ?",
+            [ packageid ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    results.authors.push( x.author );
+                } );
+
+                finish();
+            }
+        );
+    }
+
+    //Get builds
+    function grab_builds() {
+        conn.sql.query(
+            "SELECT id, ver, given, flags " +
+                "FROM Build "               +
+                "WHERE packageid = ?",
+            [ packageid ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    var build = {
+                        "version":      x.ver,
+                        "givenVersion": x.given,
+                        "recommended":  Boolean( x.flags & FLAG_RECOMMENDED ),
+                        "interfaces":   [],
+                        "dependencies": {
+                            "packages":   [],
+                            "interfaces": []
+                        },
+                        "conflicts":    [],
+                        "hashes":       []
+                    };
+                    results.builds.push( build );
+                    builds_by_id[ x.id ] = build;
+                } );
+                build_ids = Object.keys( builds_by_id );
+
+                grab_interfaces();
+                grab_package_dependencies();
+                grab_interface_dependencies();
+            }
+        );
+    }
+
+    //Interfaces
+    function grab_interfaces() {
+        conn.sql.query(
+            "SELECT biv.buildid, i.name, iv.ver "           +
+                "FROM       BuildInterfaceVersion AS biv "  +
+                "INNER JOIN InterfaceVersion      AS iv "   +
+                    "ON biv.ifverid = iv.id "               +
+                "INNER JOIN Interface             AS i "    +
+                    "ON iv.interfaceid = i.id "             +
+                "WHERE biv.buildid IN (?)",
+            [ build_ids ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    builds_by_id[ x.buildid ].interfaces.push( {
+                        "name": x.name, "version": x.ver
+                    } );
+                } );
+                finish();
+            }
+        );
+    }
+
+    function grab_package_dependencies() {
+        conn.sql.query(
+            "SELECT pd.buildid, p.name, pd.version_range AS version " +
+            "FROM       PackageDependency AS pd "                     +
+            "INNER JOIN Package           AS p "                      +
+                "ON pd.packageid = p.id "                             +
+            "WHERE pd.buildid IN (?)",
+            [ build_ids ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    builds_by_id[ x.buildid ].dependencies.packages.push( {
+                        "name": x.name, "version": x.version
+                    } );
+                } );
+                finish();
+            }
+        );
+    }
+
+    function grab_interface_dependencies() {
+        conn.sql.query(
+            "SELECT idp.buildid, i.name, idp.version_range AS version " +
+            "FROM       InterfaceDependency AS idp "                    +
+            "INNER JOIN Interface           AS i "                      +
+                "ON idp.interfaceid = i.id "                            +
+            "WHERE idp.buildid IN (?)",
+            [ build_ids ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                rows.forEach( function( x ) {
+                    builds_by_id[ x.buildid ].dependencies.interfaces.push( {
+                        "name": x.name, "version": x.version
+                    } );
+                } );
+                finish();
+            }
+        );
+    }
+
+    //Called when finished
+    function finish() {
+        //The following functions must complete before we can output the data:
+        //grab_authors()
+        //grab_interfaces()
+        //grab_package_dependencies()
+        //grab_interface_dependencies()
+        if( ++count != 4 )
+            return;
+
+        //Finished; output results
+        conn.end( JSON.stringify( results ) );
+    }
+
+    grab_name();
 }, /^\/packages\/([^/]+)\/?$/ );
 
 //Describe a specific version of a package.
 //Examples: "/packages/forge/1.2.3" or "/packages/forge/1.2.3/"
-add_route( function( connection, package, version ) {
-    connection.end( "{ \"route\": \"package_version\", \"package\": \"" + package + "\", \"version\": \"" + version + "\" }" );
+add_route( function( connection, package_name, version ) {
+    connection.end( "{ \"route\": \"package_version\", \"package\": \"" + package_name + "\", \"version\": \"" + version + "\" }" );
 }, /^\/packages\/([^/]+)\/(\d+\.\d+\.\d+)\/?$/ );
 
 

@@ -14,6 +14,8 @@ function Connection( req, res ) {
     this.res = res;
     this.url = null;
     this.sql = null;
+
+    this._ended = false;
 }
 module.exports = Connection;
 
@@ -45,11 +47,15 @@ Connection.prototype.mysql_error = function( error ) {
 /**
  * Finalize and terminate the connection.
  * Closes the connection with the MySQL server and closes the HTTP connection.
+ * If the connection has already been closed, does nothing.
  * @param {String} body - The body of the document to return to the user.
  * @param {Number} code - Response code to return to the user. Defaults to 200 (OK).
  * @param {Object} headers - Response headers to return to the user. Defaults to default_headers.
  */
 Connection.prototype.end = function( body, code, headers ) {
+    if( this._ended )
+        return;
+
     if( code    == undefined ) { code    = 200;             }
     if( headers == undefined ) { headers = default_headers; }
 
@@ -62,4 +68,6 @@ Connection.prototype.end = function( body, code, headers ) {
     //Write headers and send the body of the message back to the client
     this.res.writeHeader( code, headers );
     this.res.end( body );
+
+    this._ended = true;
 }
