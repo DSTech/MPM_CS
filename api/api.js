@@ -159,11 +159,7 @@ add_route( function( conn ) {
 //Describe a specific package.
 //Examples: "/packages/forge" or "/packages/forge/"
 add_route( function( conn, package_name ) {
-    var results = {
-        "name":    "",
-        "authors": [],
-        "builds":  []
-    };
+    var pkg;
     var package_id;
     var builds_by_id = {};
     var build_ids;
@@ -186,8 +182,12 @@ add_route( function( conn, package_name ) {
                     return conn.error( "Package not found.", 404 );
 
                 //This package exists. Grab the official name & id.
-                results.name = rows[0].name;
-                packageid    = rows[0].id;
+                pkg = {
+                    "name":    rows[0].name,
+                    "authors": null,
+                    "builds":  null
+                }
+                packageid = rows[0].id;
 
                 grab_authors();
                 grab_builds();
@@ -206,10 +206,7 @@ add_route( function( conn, package_name ) {
                 if( err )
                     return conn.mysql_error( err );
 
-                rows.forEach( function( x ) {
-                    results.authors.push( x.author );
-                } );
-
+                pkg.authors = rows.map( function(x) { return x.author } );
                 finish();
             }
         );
@@ -226,6 +223,7 @@ add_route( function( conn, package_name ) {
                 if( err )
                     return conn.mysql_error( err );
 
+                pkg.builds = [];
                 rows.forEach( function( x ) {
                     var build = {
                         "version":      x.ver,
@@ -239,7 +237,7 @@ add_route( function( conn, package_name ) {
                         "conflicts":    [],
                         "hashes":       []
                     };
-                    results.builds.push( build );
+                    pkg.builds.push( build );
                     builds_by_id[ x.id ] = build;
                 } );
                 build_ids = Object.keys( builds_by_id );
@@ -358,8 +356,8 @@ add_route( function( conn, package_name ) {
         if( ++count != 6 )
             return;
 
-        //Finished; output results
-        conn.end( JSON.stringify( results ) );
+        //Finished; output package JSON
+        conn.end( JSON.stringify( pkg ) );
     }
 
     grab_name();
