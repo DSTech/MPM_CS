@@ -247,6 +247,7 @@ add_route( function( conn, package_name ) {
                 grab_interfaces();
                 grab_package_dependencies();
                 grab_interface_dependencies();
+                grab_conflicts();
                 grab_hashes();
             }
         );
@@ -321,6 +322,11 @@ add_route( function( conn, package_name ) {
         );
     }
 
+    function grab_conflicts() {
+        //STUB
+        finish();
+    }
+
     function grab_hashes() {
         conn.sql.query(
             "SELECT buildid, HEX( hash ) AS hash " +
@@ -347,8 +353,9 @@ add_route( function( conn, package_name ) {
         //grab_interfaces()
         //grab_package_dependencies()
         //grab_interface_dependencies()
+        //grab_conflicts()
         //grab_hashes()
-        if( ++count != 5 )
+        if( ++count != 6 )
             return;
 
         //Finished; output results
@@ -360,8 +367,148 @@ add_route( function( conn, package_name ) {
 
 //Describe a specific version of a package.
 //Examples: "/packages/forge/1.2.3" or "/packages/forge/1.2.3/"
-add_route( function( connection, package_name, version ) {
-    connection.end( "{ \"route\": \"package_version\", \"package\": \"" + package_name + "\", \"version\": \"" + version + "\" }" );
+add_route( function( conn, package_name, version ) {
+    var build;
+    var build_id;
+    var count = 0;
+
+    function grab_name() {
+        //Attempt to find the id and official name of a package with the given name.
+        //Note: Prepared statements will automatically .escape() provided parameters.
+        conn.sql.query(
+            "SELECT b.id, b.ver, b.given, b.flags " +
+                "FROM Build b "                     +
+                "INNER JOIN Package p "             +
+                    "ON b.packageid = p.id "        +
+                "WHERE p.name = ? AND b.ver = ? "   +
+                "LIMIT 1",
+            [ package_name, version ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+                if( rows.length == 0 )
+                    return conn.error( "Package or given version of package not found.", 404 );
+
+                //This package and the given version of this package exist. Grab the official version and id.
+                var row = rows[0];
+                build_id = row.id;
+                build = {
+                    "version":      row.ver,
+                    "givenVersion": row.given,
+                    "recommended":  Boolean( row.flags & FLAG_RECOMMENDED ),
+                    "interfaces":   null,
+                    "dependencies": {
+                        "packages":   null,
+                        "interfaces": null
+                    },
+                    "conflicts":    null,
+                    "hashes":       null
+                };
+
+                grab_interfaces();
+                grab_package_dependencies();
+                grab_interface_dependencies();
+                grab_conflicts();
+                grab_hashes();
+            }
+        );
+    }
+
+    function grab_interfaces() {
+        conn.sql.query(
+            "SELECT i.name, iv.ver AS version "             +
+                "FROM       BuildInterfaceVersion AS biv "  +
+                "INNER JOIN InterfaceVersion      AS iv "   +
+                    "ON biv.ifverid = iv.id "               +
+                "INNER JOIN Interface             AS i "    +
+                    "ON iv.interfaceid = i.id "             +
+                "WHERE biv.buildid = ?",
+            [ build_id ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                build.interfaces = rows;
+                finish();
+            }
+        );
+    }
+
+    function grab_package_dependencies() {
+        conn.sql.query(
+            "SELECT p.name, pd.version_range AS version " +
+            "FROM       PackageDependency AS pd "         +
+            "INNER JOIN Package           AS p "          +
+                "ON pd.packageid = p.id "                 +
+            "WHERE pd.buildid = ?",
+            [ build_id ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                build.dependencies.packages = rows;
+                finish();
+            }
+        );
+    }
+
+    function grab_interface_dependencies() {
+        conn.sql.query(
+            "SELECT i.name, idp.version_range AS version " +
+            "FROM       InterfaceDependency AS idp "       +
+            "INNER JOIN Interface           AS i "         +
+                "ON idp.interfaceid = i.id "               +
+            "WHERE idp.buildid = ?",
+            [ build_id ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                build.dependencies.interfaces = rows;
+                finish();
+            }
+        );
+    }
+
+    function grab_conflicts() {
+        //STUB
+        build.conflicts = [];
+        finish();
+    }
+
+    function grab_hashes() {
+        conn.sql.query(
+            "SELECT HEX( hash ) AS hash " +
+            "FROM BuildHash "             +
+            "WHERE buildid = ? "          +
+            "ORDER BY hashid ASC",
+            [ build_id ],
+            function( err, rows, fields ) {
+                if( err )
+                    return conn.mysql_error( err );
+
+                build.hashes = rows.map( function( x ) {
+                    return x.hash;
+                } );
+                finish();
+            }
+        );
+    }
+
+    function finish() {
+        //The following functions must complete before we can output the data:
+        //grab_interfaces()
+        //grab_package_dependencies()
+        //grab_interface_dependencies()
+        //grab_conflicts()
+        //grab_hashes()
+        if(  ++count != 5 )
+            return;
+
+        conn.end( JSON.stringify( build ) );
+    }
+
+    grab_name();
 }, /^\/packages\/([^/]+)\/(\d+\.\d+\.\d+)\/?$/ );
 
 
