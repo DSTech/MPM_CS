@@ -540,6 +540,7 @@ try {
 http.createServer( function( req, res ) {
     log_request( req );
     var conn = new Connection( req, res );
+    conn.startTimeout();
 
     //Ensure correct method being used
     if( req.method != "GET" )

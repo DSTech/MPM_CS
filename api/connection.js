@@ -1,5 +1,7 @@
 var log        = require( "./log" );
 
+//Note: 10,000 milliseconds = 10 sec
+var default_timeout     = 10000;
 var default_headers     = { "Content-Type": "application/json", "Cache-Control": "max-age=0" };
 var error_headers       = { "Content-Type": "text/plain",       "Cache-Control": "max-age=0" };
 
@@ -14,10 +16,36 @@ function Connection( req, res ) {
     this.res = res;
     this.url = null;
     this.sql = null;
-
+    this._timeout = null;
     this._ended = false;
 }
 module.exports = Connection;
+
+/**
+ * Call this function to start (or reset) a time-out timer on the connection.
+ * If .end() is not called on the connection before this time, the connection will .error() automatically with a 503.
+ * @param {Number} timeout - Optional. Amount of time in milliseconds to wait before terminating the connection. Defaults to 10000.
+ */
+Connection.prototype.startTimeout = function( timeout ) {
+    if( timeout == undefined ) { timeout = default_timeout; }
+
+    this.clearTimeout();
+
+    this._timeout = setTimeout( function() {
+        this.error( "The request was not handled quickly enough. The server could be overloaded, or an internal error may have occurred.", 503 );
+    }.bind( this ), timeout );
+}
+
+/**
+ * If the connection's time-out timer was started, cancels the timer.
+ * Otherwise, does nothing.
+ */
+Connection.prototype.clearTimeout = function() {
+    if( this._timeout != null ) {
+        clearTimeout( this._timeout );
+        this._timeout = null;
+    }
+}
 
 /**
  * Call this if an error occurs.
@@ -59,6 +87,11 @@ Connection.prototype.end = function( body, code, headers ) {
     if( code    == undefined ) { code    = 200;             }
     if( headers == undefined ) { headers = default_headers; }
 
+    //Cancel the connection timeout if one was started.
+    this.clearTimeout();
+
+    this._ended = true;
+
     //Ensure database connection is closed
     if( this.sql != null ) {
         this.sql.end();
@@ -68,6 +101,4 @@ Connection.prototype.end = function( body, code, headers ) {
     //Write headers and send the body of the message back to the client
     this.res.writeHeader( code, headers );
     this.res.end( body );
-
-    this._ended = true;
 }
