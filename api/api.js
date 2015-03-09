@@ -1,18 +1,9 @@
-//Get port and validate it
-var port = parseInt( process.argv[2] );
-if( isNaN( port ) ) {
-    console.error( "ERROR: No port (or invalid port) specified." );
-    process.exit( 1 );
-}
-
-
-
-
 /**************\
 |*  INCLUDES  *|
 \**************/
 //node.js
 var http     = require( "http" );
+var net      = require( "net" );
 var url      = require( "url" );
 var fs       = require( "fs" );
 
@@ -54,6 +45,49 @@ var mysql_params = {
 /**************\
 |* FUNCTIONS  *|
 \**************/
+
+/**
+ * Unlike parseInt, which only checks that the beginning of the string contains at least one digit,
+ * strictParseInt will verify that the str only consists of decimal digits.
+ * @returns {Number} The integer value of the string, or NaN if the provided string is not a number.
+ */
+function strictParseInt( str ) {
+    if( !/^\d+$/.test( str ) )
+        return NaN;
+    return parseInt( str );
+}
+
+/**
+*/
+function get_ips( req ) {
+    var ips = [];
+
+    //If the request is being served via a reverse proxy (e.g. NGINX),
+    //then the socket's remote address (if available) will be the IP of the proxy (e.g. 127.0.0.1 or ::1), rather than the user who originally made the request.
+    //To solve this problem, reverse proxies typically set the "X-Real-IP" and/or "X-Forwarded-For" headers to pass along the IP addresses involved in the request.
+    //However, just because a request contains these headers doesn't mean that we're behind a reverse proxy.
+    //Users can set these headers themselves, and proxies can be configured to modify / strip these headers, so the value shouldn't be relied upon.
+    //If the request travels through many proxies, these headers may be a comma-separated list of IPs.
+    //By convention, the original IP occurs at the beginning of the list, then proxies are appended as the request propogates through them.
+    var forwarded_ips = req.headers[ "x-forwarded-for" ] || req.headers[ "x-real-ip" ];
+    if( forwarded_ips ) {
+        forwarded_ips = forwarded_ips.split( "," );
+        if( forwarded_ips )
+            forwarded_ips.forEach( function( x ) { ips.push( trim_ip( x.trim() ) ); } );
+    }
+    //Try to determine what IP address is requesting the page.
+    //If the server is listening on a TCP/IP socket, the remote address of the request's socket will tell us the IP
+    //that we are directly communicating with.
+    //If the server is listening on a UNIX socket, there will be no remote address.
+    if( req.socket.remoteAddress )
+        ips.push( trim_ip( req.socket.remoteAddress ) );
+
+    //Return the list of IPs as a string separated by arrows pointing towards the original IP.
+    //It's possible to receive a request with no remote address (e.g. listening on UNIX socket, no X-Forwarded-For header, etc)
+    //In the case that we do, we simply return "?".
+    return ips.length > 0 ? ips.join( " <- " ) : "?";
+}
+
 /**
  * If "addr" is an IPv6 address specifying an IPv4 address,
  * the IPv4 portion of the address is returned. Otherwise, the given address is returned.
@@ -78,13 +112,13 @@ function log_request( req ) {
     //Log a detailed message including:
     var useragent = req.headers["user-agent"];
     log.out(
-        "[" + strftime( "%d-%b-%yT%H:%M:%S" ) + "] "  + //The date & time the request was made
-        trim_ip( req.socket.remoteAddress )           + //The user's IP
-        " "                                           +
-        ( useragent ? "(" + useragent + ") " :  "" )  + //The User-Agent string (if available)
-        req.method                                    + //Request method (GET, POST, etc)
-        " "                                           +
-        req.url                                         //Request URL
+        "[" + strftime( "%d-%b-%yT%H:%M:%S" ) + "] "         + //The date & time the request was made
+        get_ips( req )                                       + //IP addresses associated with the request (see get_ips for more info)
+        " "                                                  +
+        ( useragent ? "(" + useragent + ") " :  "" )         + //The User-Agent string (if available)
+        req.method                                           + //Request method (GET, POST, etc)
+        " "                                                  +
+        req.url                                                //Request URL
     );
 }
 
@@ -515,6 +549,23 @@ add_route( function( conn, package_name, version ) {
 /**************\
 |*   SERVER   *|
 \**************/
+//Make sure we were given a port / socket name
+if( process.argv[2] == undefined ) {
+    console.error( "ERROR: You must specify a port number (e.g. 8080) or the path for a UNIX socket." );
+    process.exit( 1 );
+}
+
+//Were we given a port #? If so, get the integer value.
+var port = strictParseInt( process.argv[2] );
+var unixSocket = false;
+
+//If not, assume this is a unix socket name
+//Sample UNIX socket name: "/tmp/mpm.socket"
+if( isNaN( port ) ) {
+    port = process.argv[2];
+    unixSocket = true;
+}
+
 //Open logfile
 try {
     log.init( logfile );
@@ -535,7 +586,7 @@ try {
 }
 
 //Create the server and listen on the given port
-http.createServer( function( req, res ) {
+var server = http.createServer( function( req, res ) {
     log_request( req );
     var conn = new Connection( req, res );
     conn.startTimeout();
@@ -553,7 +604,31 @@ http.createServer( function( req, res ) {
     //Try to find some route that can satisfy the request, or fail with a 404
     if( !try_routes( conn ) )
         return conn.error( "Route not found.", 404 );
-} ).listen( port );
+} );
 
-log.out( "Server started on port " + port + "." );
-console.log( "Press CTRL+C to exit." );
+server.listen( port );
+server.once( "error", function( err ) {
+    if( !unixSocket || err.code != "EADDRINUSE" )
+        throw e;
+
+    //Address in use? Is there already a server running?
+    var sock = net.connect( { "path": port } );
+    sock.on( "connect", function() {
+        sock.end();
+        console.error( "ERROR: Another server is active and is using the specified socket." );
+        process.exit( 1 );
+    } );
+
+    //If not, the server has probably crashed, and the UNIX socket it was using is now stale.
+    //We'll need to unlink it before we can try again...
+    sock.on( "error", function() {
+        fs.unlinkSync( port );
+
+        //Try listening again
+        server.listen( port );
+    } )
+} );
+server.on( "listening", function() {
+    log.out( "Server started on " + ( unixSocket ? "UNIX socket \"" + port + "\"" : "port " + port ) + "." );
+    console.log( "Press CTRL+C to exit." );
+} );
