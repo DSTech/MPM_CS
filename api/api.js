@@ -49,7 +49,8 @@ var mysql_params = {
 /**
  * Unlike parseInt, which only checks that the beginning of the string contains at least one digit,
  * strictParseInt will verify that the str only consists of decimal digits.
- * @returns {Number} The integer value of the string, or NaN if the provided string is not a number.
+ * @param {String} str - The string to parse.
+ * @returns {Number} The integer value of the string, or NaN if the provided string is not an integer.
  */
 function strictParseInt( str ) {
     if( !/^\d+$/.test( str ) )
@@ -58,7 +59,10 @@ function strictParseInt( str ) {
 }
 
 /**
-*/
+ * Returns a string describing a list of IPs involved in the given request.
+ * @param {http.IncomingMessage} req -  The request
+ * @returns {String} A string of IPs, e.g. "70.80.90.100 <- 192.168.1.1"
+ */
 function get_ips( req ) {
     var ips = [];
 
@@ -609,7 +613,7 @@ var server = http.createServer( function( req, res ) {
 server.listen( port );
 server.once( "error", function( err ) {
     if( !unixSocket || err.code != "EADDRINUSE" )
-        throw e;
+        throw err;
 
     //Address in use? Is there already a server running?
     var sock = net.connect( { "path": port } );
