@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
 	public static class IResolverExtensions {
@@ -18,7 +19,10 @@ namespace MPM.Core.Dependency {
 		/// <param name="target">
 		/// Configuration containing all packages selected for installation, and optionally any that are already installed
 		/// </param>
+		/// <param name="lookupPackage">
+		/// Looks up a package, returning a package definition containing only the single, specified build inside.
+		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
-		Configuration Resolve(Configuration target);
+		Configuration Resolve(Configuration target, Func<PackageSpec, Package> lookupPackage);
 	}
 }
