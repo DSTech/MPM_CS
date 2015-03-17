@@ -61,6 +61,9 @@ namespace MPM.Core.Dependency {
 		}
 	}
 	public class Configuration {
+		public static Configuration Empty { get; } = new Configuration {
+			Packages = new PackageSpec[0],
+		};
 		public PackageSpec[] Packages { get; set; }
 	}
 }

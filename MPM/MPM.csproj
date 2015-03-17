@@ -117,7 +117,9 @@
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
-    <Compile Include="Core\Dependency\Package.cs" />
+    <Compile Include="Core\Dependency\DependencyException.cs" />
+    <Compile Include="Core\Dependency\IResolver.cs" />
+    <Compile Include="Core\Dependency\PackageSpec.cs" />
     <Compile Include="Core\Dependency\Reconfiguration.cs" />
     <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
