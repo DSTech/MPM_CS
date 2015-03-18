@@ -6,6 +6,7 @@ using MPM.Core.Archival;
 using MPM.Core.Dependency;
 using System.Linq;
 using MPM.Net.DTO;
+using semver.tools;
 
 namespace MPMTest {
 	[TestClass]
@@ -26,7 +27,7 @@ namespace MPMTest {
 					InterfaceProvisions = new InterfaceProvision[0],
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
-					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
+					Version = SemanticVersion.Parse("0.0.1"),
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -36,12 +37,12 @@ namespace MPMTest {
 					InterfaceProvisions = new InterfaceProvision[0],
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
-					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+					Version = SemanticVersion.Parse("0.0.2"),
 				},
 			};
 			var testPackageSpec = new PackageSpec {
 				Name = "testPackage",
-				Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 				Manual = true,
 			};
 			var testConfig = new Configuration {
@@ -49,17 +50,15 @@ namespace MPMTest {
 					testPackageSpec,
 				},
 			};
-			var lookupBuild = new Func<PackageSpec, Package>(packageSpec => {
+			var lookupBuild = new Func<PackageSpec, NamedBuild[]>(packageSpec => {
 				if (packageSpec.Name != "testPackage") {
 					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
 				}
 				return new Package {
 					Authors = new[] { "testAuthor" },
 					Name = "testPackage",
-					Builds = new[] {
-						testPackageBuilds.First(b => b.Version == packageSpec.Version),
-					},
-				};
+					Builds = testPackageBuilds,
+				}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
 			});
 			var resultant = resolver.Resolve(testConfig, lookupBuild);
 			Assert.IsTrue(
@@ -118,12 +117,12 @@ namespace MPMTest {
 					},
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
-					Version = semver.tools.SemanticVersion.Parse("0.0.4"),
+					Version = SemanticVersion.Parse("0.0.4"),
 				},
 			};
 			var dependentPackageSpec = new PackageSpec {
 				Name = "testPackage",
-				Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 				Manual = true,
 			};
 			var dependentConfig = new Configuration {
@@ -131,23 +130,19 @@ namespace MPMTest {
 					dependentPackageSpec,
 				},
 			};
-			var lookupBuild = new Func<PackageSpec, Package>(packageSpec => {
+			var lookupBuild = new Func<PackageSpec, NamedBuild[]>(packageSpec => {
 				if (packageSpec.Name == "dependentPackage") {
 					return new Package {
 						Authors = new[] { "dependentAuthor" },
 						Name = packageSpec.Name,
-						Builds = new[] {
-						dependentPackageBuilds.First(b => b.Version == packageSpec.Version),
-					},
-					};
+						Builds = dependentPackageBuilds,
+					}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
 				} else if (packageSpec.Name == "anticedentPackage") {
 					return new Package {
 						Authors = new[] { "anticedentAuthor" },
 						Name = packageSpec.Name,
-						Builds = new[] {
-						anticedentPackageBuilds.First(b => b.Version == packageSpec.Version),
-					},
-					};
+						Builds = anticedentPackageBuilds,
+					}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
 				} else {
 					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
 				}

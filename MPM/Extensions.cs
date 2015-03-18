@@ -1,4 +1,7 @@
+using System;
+using System.Collections;
 using MPM.CLI;
+using NServiceKit.Text;
 
 namespace MPM {
 	public static class ActionProviderArgExtensions {

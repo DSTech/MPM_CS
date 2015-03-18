@@ -23,6 +23,6 @@ namespace MPM.Core.Dependency {
 		/// Looks up a package, returning a package definition containing only the single, specified build inside.
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
-		Configuration Resolve(Configuration target, Func<PackageSpec, Package> lookupPackage);
+		Configuration Resolve(Configuration target, Func<PackageSpec, NamedBuild[]> lookupPackage);
 	}
 }

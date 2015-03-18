@@ -87,6 +87,9 @@
       <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.4.0.38\lib\net40\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Interactive">
@@ -116,6 +119,7 @@
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
+    <Compile Include="Core\Dependency\NamedBuild.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
     <Compile Include="Core\Dependency\DependencyException.cs" />
     <Compile Include="Core\Dependency\IResolver.cs" />
