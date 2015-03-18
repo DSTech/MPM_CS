@@ -11,6 +11,7 @@ using QuickGraph.Algorithms;
 using QuickGraph.Algorithms.TopologicalSort;
 using QuickGraph.Data;
 using QuickGraph.Collections;
+using QuickGraph.Algorithms.Search;
 
 namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {
@@ -34,6 +35,17 @@ namespace MPM.Core.Dependency {
 						.Select(destination => new Edge<int>(buildIndex, destination))
 				);
 			}
+			var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
+			var onBackEdge = new EdgeAction<int, Edge<int>>(e => {
+				var edge = (Edge<int>)e;
+				adjGraph.RemoveEdge(edge);
+			});
+			try {
+				dfs.BackEdge += onBackEdge;
+				dfs.Compute();
+			} finally {
+				dfs.BackEdge -= onBackEdge;
+			}
 			return adjGraph
 				.TopologicalSort()
 				.Select(index => buildMap[index])
@@ -54,7 +66,7 @@ namespace MPM.Core.Dependency {
 			{
 				var unsortedOutput = output.ToArray();
 				output.Clear();
-				output.AddRange(TopoSortBuilds(unsortedOutput));
+				output.AddRange(SortBuilds(unsortedOutput));
 			}
 			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.Name).Count());
 			return new ResolvedConfiguration {

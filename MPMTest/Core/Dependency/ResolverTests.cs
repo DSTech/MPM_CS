@@ -7,6 +7,7 @@ using MPM.Core.Dependency;
 using System.Linq;
 using MPM.Net.DTO;
 using semver.tools;
+using System.Collections.Generic;
 
 namespace MPMTest {
 	[TestClass]
@@ -162,6 +163,103 @@ namespace MPMTest {
 					.Count() == 0,
 				"The resolver may not add manual packages to the resulting configuration"
 			);
+		}
+
+		[TestMethod]
+		public void SortBuilds() {
+			var r = new Resolver();
+			var builds = new NamedBuild[] {
+				new NamedBuild {
+					Name = "A",
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "B"
+						}
+					},
+				},
+				new NamedBuild {
+					Name = "B",
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "A"
+						}
+					},
+				},
+				new NamedBuild {
+					Name = "C",
+					Dependencies = new PackageDependency[0],
+				},
+			};
+			//Input must not contain self-dependency
+			Assert.IsFalse(builds.Any(build => build.Dependencies.Any(dependency => dependency.Name == build.Name)), "The input must not contain self-dependent packages");
+			//At least one input must be circularly-dependent
+			{
+				var wasCircular = false;
+				foreach (var build in builds) {
+					//A build must refer to something that refers back to this one
+					if (build.Dependencies.Any(
+						second => builds
+							.Where(other => other.Name == second.Name)
+							.Select(other => other.Dependencies)
+							.Any(otherDeps => otherDeps.Any(dep => dep.Name == build.Name))
+					)) {
+						wasCircular = true;
+						break;
+					}
+				}
+				Assert.IsTrue(
+					wasCircular,
+					"At least one input must be directly circularly-dependent to properly test the functionality"
+				);
+			}
+			//Input must fulfill all dependencies
+			{
+				var packageNames = new SortedSet<string>(builds.Select(b => b.Name));
+				foreach (var build in builds) {
+					foreach (var dep in build.Dependencies) {
+						CollectionAssert.Contains(packageNames, dep.Name, "The input build array should contain all dependencies to allow sorting");
+					}
+				}
+			}
+			//Input must not sorted so the test accomplishes something
+			{
+				var namesSeen = new SortedSet<string>();
+				bool sorted = true;
+				foreach (var build in builds) {
+					namesSeen.Add(build.Name);
+					foreach (var dep in build.Dependencies) {
+						if (!namesSeen.Contains(dep.Name)) {
+							sorted = false;
+							break;
+						}
+					}
+					if (sorted == false) {
+						break;
+					}
+				}
+				Assert.IsFalse(sorted, "The input build array should not be initially sorted");
+			}
+			var output = r.SortBuilds(builds);
+			//Output must be sorted
+			{
+				var namesSeen = new SortedSet<string>();
+				foreach (var build in output) {
+					namesSeen.Add(build.Name);
+					foreach (var dep in build.Dependencies) {
+						if (!namesSeen.Contains(dep.Name)) {
+							//Only fail here if the object is not codependent with the dependency and the dependency is not previously seen
+							Assert.IsTrue(
+								namesSeen.Contains(dep.Name) ||
+								output
+									.Where(other => other.Name == dep.Name)
+									.Select(other => other.Dependencies)
+									.Any(otherDeps => otherDeps.Any(dependency => dependency.Name == build.Name)),
+								"The output build array must be sorted"
+							);
+						}
+					}
+				}
+			}
 		}
 	}
 }
