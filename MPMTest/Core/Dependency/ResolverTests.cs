@@ -50,7 +50,7 @@ namespace MPMTest {
 					testPackageSpec,
 				},
 			};
-			var lookupBuild = new Func<PackageSpec, NamedBuild[]>(packageSpec => {
+			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
 				if (packageSpec.Name != "testPackage") {
 					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
 				}
@@ -60,7 +60,7 @@ namespace MPMTest {
 					Builds = testPackageBuilds,
 				}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
 			});
-			var resultant = resolver.Resolve(testConfig, lookupBuild);
+			var resultant = resolver.Resolve(testConfig, lookupPackageSpec);
 			Assert.IsTrue(
 				testConfig
 					.Packages
@@ -130,7 +130,7 @@ namespace MPMTest {
 					dependentPackageSpec,
 				},
 			};
-			var lookupBuild = new Func<PackageSpec, NamedBuild[]>(packageSpec => {
+			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
 				if (packageSpec.Name == "dependentPackage") {
 					return new Package {
 						Authors = new[] { "dependentAuthor" },
@@ -147,7 +147,7 @@ namespace MPMTest {
 					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
 				}
 			});
-			var resultant = resolver.Resolve(dependentConfig, lookupBuild);
+			var resultant = resolver.Resolve(dependentConfig, lookupPackageSpec);
 			Assert.IsTrue(
 				dependentConfig
 					.Packages

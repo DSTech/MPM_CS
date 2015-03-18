@@ -119,12 +119,14 @@
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
+    <Compile Include="Core\Dependency\DependencyConstraint.cs" />
     <Compile Include="Core\Dependency\NamedBuild.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
     <Compile Include="Core\Dependency\DependencyException.cs" />
     <Compile Include="Core\Dependency\IResolver.cs" />
     <Compile Include="Core\Dependency\PackageSpec.cs" />
     <Compile Include="Core\Dependency\Reconfiguration.cs" />
+    <Compile Include="Core\Dependency\ResolutionMode.cs" />
     <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\IServerManager.cs" />

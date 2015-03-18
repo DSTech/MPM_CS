@@ -12,7 +12,7 @@ using QuickGraph.Algorithms.TopologicalSort;
 
 namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {
-		public Configuration Resolve(Configuration target, Func<PackageSpec, NamedBuild[]> lookupPackageSpec) {
+		public Configuration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
 			var output = new List<PackageSpec>();
 			//Packages which exist in the resultant configuration- Only one version of each package may exist in the result
 			var includedPackages = new SortedSet<string>();
@@ -37,8 +37,29 @@ namespace MPM.Core.Dependency {
 		}
 
 		//I have no idea how to structure this part for conflict resolution to cooperate with later.
-		public void ResolveDependency(PackageSpec package, Func<PackageSpec, NamedBuild[]> lookupPackageSpec, PackageSpec Constraints) {
-			throw new NotImplementedException();
+		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
+			var namedBuilds = lookupPackageSpec(packageSpec);
+			switch (resolutionMode) {
+				case ResolutionMode.Highest:
+					return namedBuilds.FirstOrDefault(nb => constraintsArr.All(constraint => constraint.Allows(nb)));
+				case ResolutionMode.HighestStable:
+					NamedBuild highest = null;
+					foreach(var build in namedBuilds) {
+						if(!constraintsArr.All(constraint => constraint.Allows(build))) {
+							continue;
+						}
+						if (build.Stable) {
+							return build;
+						}
+						if (highest == null) {
+							highest = build;
+						}
+					}
+					return highest;
+				default:
+					throw new NotImplementedException($"{nameof(ResolutionMode)} \"{resolutionMode}\" is unsupported by {this.GetType().Name}");
+			}
 		}
 	}
 }
