@@ -1,7 +1,15 @@
 using System;
+using NServiceKit.Common;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
+	public static class PackageSpecExtensions {
+		public static PackageSpec ToSpec(this Net.DTO.PackageDependency dependency, bool manual = false) {
+			return new PackageSpec {
+				Manual = manual,
+			}.PopulateWith(dependency);
+		}
+	}
 	public class PackageSpec : IEquatable<PackageSpec> {
 		public String Name { get; set; }
 		public VersionSpec Version { get; set; }

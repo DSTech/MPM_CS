@@ -31,7 +31,7 @@ namespace MPM.Core.Dependency {
 		/// Looks up a package, returning named builds in descending order of version.
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
-		Configuration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec);
+		ResolvedConfiguration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec);
 		/// <summary>
 		/// Returns a build that qualifies with the specified dependency constraints.
 		/// </summary>

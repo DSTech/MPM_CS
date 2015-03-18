@@ -65,15 +65,14 @@ namespace MPMTest {
 				testConfig
 					.Packages
 					.Where(p => p.Manual)
-					.Except(resultant.Packages)
+					.Where(p => !resultant.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"All manual packages must be accounted for in the resulting configuration"
 			);
 			Assert.IsTrue(
 				resultant
 					.Packages
-					.Where(p => p.Manual)
-					.Except(testConfig.Packages)
+					.Where(p => !testConfig.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"The resolver may not add manual packages to the resulting configuration"
 			);
@@ -152,15 +151,14 @@ namespace MPMTest {
 				dependentConfig
 					.Packages
 					.Where(p => p.Manual)
-					.Except(resultant.Packages)
+					.Where(p => !resultant.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"All manual packages must be accounted for in the resulting configuration"
 			);
 			Assert.IsTrue(
 				resultant
 					.Packages
-					.Where(p => p.Manual)
-					.Except(dependentConfig.Packages)
+					.Where(p => !dependentConfig.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"The resolver may not add manual packages to the resulting configuration"
 			);

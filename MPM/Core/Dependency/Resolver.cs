@@ -9,30 +9,55 @@ using MPM.Net.DTO;
 using QuickGraph;
 using QuickGraph.Algorithms;
 using QuickGraph.Algorithms.TopologicalSort;
+using QuickGraph.Data;
+using QuickGraph.Collections;
 
 namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {
-		public Configuration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
-			var output = new List<PackageSpec>();
-			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
-			var includedPackages = new SortedSet<string>();
+		/// <summary>
+		/// Sorts builds topologically, from least-dependent to most-dependent.
+		/// </summary>
+		/// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
+		/// <returns>A sorted array of builds, with the least-dependent first</returns>
+		public NamedBuild[] SortBuilds(NamedBuild[] builds) {
+			var buildMap = builds.Distinct(b => b.Name).ToArray();
 
-			foreach (var package in target.Packages) {
-				if (package.Manual) {
-					includedPackages.Add(package.Name);
-					output.Add(package);
+			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false, builds.Length);
+			adjGraph.AddVertexRange(Enumerable.Range(0, buildMap.Length));
+			foreach (var buildIndex in Enumerable.Range(0, buildMap.Length)) {
+				adjGraph.AddEdgeRange(
+					buildMap
+						.ElementAt(buildIndex)
+						.Dependencies
+						.Select(dep => Array.FindIndex<NamedBuild>(buildMap, nb => nb.Name == dep.Name))
+						.Where(depIndex => depIndex != -1)
+						.Select(destination => new Edge<int>(buildIndex, destination))
+				);
+			}
+			return adjGraph
+				.TopologicalSort()
+				.Select(index => buildMap[index])
+				.ToArray();
+		}
+		public ResolvedConfiguration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
+			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
+			var output = new List<NamedBuild>();
+
+			foreach (var packageSpec in target.Packages) {
+				if (!packageSpec.Manual) {
 					continue;
 				}
 
-				var packageDetails = lookupPackageSpec(package).FirstOrDefault();
-				if (packageDetails == null) {
-					throw new DependencyException("Dependency could not be resolved because the package was not able to be looked up");
-				}
-
-				//foreach (var dependency in packageDetails.Dependencies) { }
+				var resolvedSet = ResolveRecursive(packageSpec, lookupPackageSpec);
+				output.AddRange(resolvedSet.Where(elem => !output.Contains(elem)));
+			}
+			{
+				var unsortedOutput = output.ToArray();
+				output.Clear();
+				output.AddRange(TopoSortBuilds(unsortedOutput));
 			}
 			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.Name).Count());
-			return new Configuration {
+			return new ResolvedConfiguration {
 				Packages = output.ToArray(),
 			};
 		}
