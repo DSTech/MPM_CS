@@ -61,5 +61,9 @@ namespace MPM.Core.Dependency {
 					throw new NotImplementedException($"{nameof(ResolutionMode)} \"{resolutionMode}\" is unsupported by {this.GetType().Name}");
 			}
 		}
+
+		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+			throw new NotImplementedException();
+		}
 	}
 }
