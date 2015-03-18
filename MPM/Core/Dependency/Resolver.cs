@@ -14,7 +14,7 @@ namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {
 		public Configuration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
 			var output = new List<PackageSpec>();
-			//Packages which exist in the resultant configuration- Only one version of each package may exist in the result
+			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
 			var includedPackages = new SortedSet<string>();
 
 			foreach (var package in target.Packages) {
@@ -31,12 +31,12 @@ namespace MPM.Core.Dependency {
 
 				//foreach (var dependency in packageDetails.Dependencies) { }
 			}
+			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.Name).Count());
 			return new Configuration {
 				Packages = output.ToArray(),
 			};
 		}
 
-		//I have no idea how to structure this part for conflict resolution to cooperate with later.
 		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
 			var namedBuilds = lookupPackageSpec(packageSpec);
@@ -45,8 +45,8 @@ namespace MPM.Core.Dependency {
 					return namedBuilds.FirstOrDefault(nb => constraintsArr.All(constraint => constraint.Allows(nb)));
 				case ResolutionMode.HighestStable:
 					NamedBuild highest = null;
-					foreach(var build in namedBuilds) {
-						if(!constraintsArr.All(constraint => constraint.Allows(build))) {
+					foreach (var build in namedBuilds) {
+						if (!constraintsArr.All(constraint => constraint.Allows(build))) {
 							continue;
 						}
 						if (build.Stable) {

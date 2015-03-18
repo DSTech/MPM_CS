@@ -11,7 +11,8 @@ namespace MPM.Core.Dependency {
 	/// Must return in descending order of version.
 	/// </summary>
 	/// <param name="packageSpec">Specification to look up</param>
-	/// <returns></returns>
+	/// <returns>Builds in descending order of version</returns>
+	/// <remarks>Should be converted to IQueryable to allow optimized behavior with constraint lookup</remarks>
 	public delegate IEnumerable<NamedBuild> PackageSpecLookup(PackageSpec packageSpec);
 	public static class IResolverExtensions {
 	}
@@ -31,6 +32,14 @@ namespace MPM.Core.Dependency {
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
 		Configuration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec);
+		/// <summary>
+		/// Returns a build that qualifies with the specified dependency constraints.
+		/// </summary>
+		/// <param name="packageSpec">Specification for the package for which to find a build</param>
+		/// <param name="lookupPackageSpec">Callback for which the system may look up a package from the index, optionally allowing caching to take place at higher layers</param>
+		/// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
+		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
+		/// <returns>A build satisfying the spec, qualifying with all constraints, resolved with the specified behavior</returns>
 		NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 	}
 }
