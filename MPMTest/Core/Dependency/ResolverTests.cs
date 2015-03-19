@@ -88,7 +88,7 @@ namespace MPMTest {
 					Dependencies = new [] {
 						new PackageDependency {
 							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
+							Version = new VersionSpec(SemanticVersion.Parse("0.0.3")),
 						},
 					},
 					Hashes = new string[0],

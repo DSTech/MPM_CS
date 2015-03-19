@@ -60,9 +60,12 @@ namespace MPM.Core.Dependency {
 					continue;
 				}
 
-				var resolvedSet = ResolveRecursive(packageSpec, lookupPackageSpec);
-				if(resolvedSet == null) {
-					throw new DependencyException("The specified dependencies could not be resolved");
+				NamedBuild[] resolvedSet;
+				try {
+					resolvedSet = ResolveRecursive(packageSpec, lookupPackageSpec);
+					Debug.Assert(resolvedSet != null);
+				} catch (DependencyException e) {
+					throw new DependencyException("The specified dependencies could not be resolved", e);
 				}
 				output.AddRange(resolvedSet.Where(elem => !output.Contains(elem)));
 			}
@@ -80,9 +83,11 @@ namespace MPM.Core.Dependency {
 		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
 			var namedBuilds = lookupPackageSpec(packageSpec);
+			NamedBuild result;
 			switch (resolutionMode) {
 				case ResolutionMode.Highest:
-					return namedBuilds.FirstOrDefault(nb => constraintsArr.All(constraint => constraint.Allows(nb)));
+					result = namedBuilds.FirstOrDefault(nb => constraintsArr.All(constraint => constraint.Allows(nb)));
+					break;
 				case ResolutionMode.HighestStable:
 					NamedBuild highest = null;
 					foreach (var build in namedBuilds) {
@@ -90,30 +95,37 @@ namespace MPM.Core.Dependency {
 							continue;
 						}
 						if (build.Stable) {
-							return build;
+							result = build;
+							break;
 						}
 						if (highest == null) {
 							highest = build;
 						}
 					}
-					return highest;
+					result = highest;
+					break;
 				default:
 					throw new NotImplementedException($"{nameof(ResolutionMode)} \"{resolutionMode}\" is unsupported by {this.GetType().Name}");
 			}
+			if (result == null) {
+				throw new DependencyException("Could not resolve package, no matching packages found.", packageSpec);
+			}
+			return result;
 		}
 
 		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var output = new List<NamedBuild>();
 			var resolvedBuild = ResolveDependency(packageSpec, lookupPackageSpec, constraints, resolutionMode);
-			if (resolvedBuild == null) {
-				return null;
-			}
+			Debug.Assert(resolvedBuild != null, "ResolveDependency is not allowed to return null");
 			output.Add(resolvedBuild);
 			foreach (var dependency in resolvedBuild.Dependencies) {
 				var depSpec = dependency.ToSpec();
-				var resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, constraints, resolutionMode);
-				if (resolvedDeps == null) {
-					return null;
+				NamedBuild[] resolvedDeps;
+				try {
+					resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, constraints, resolutionMode);
+					Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
+				} catch (DependencyException e) {
+					throw new DependencyException("Could not resolve package, no matching dependency tree found", e, depSpec, resolvedBuild);
 				}
 				output.AddRange(resolvedDeps);
 			}

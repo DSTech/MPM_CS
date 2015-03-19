@@ -39,6 +39,7 @@ namespace MPM.Core.Dependency {
 		/// <param name="lookupPackageSpec">Callback for which the system may look up a package from the index, optionally allowing caching to take place at higher layers</param>
 		/// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
+		/// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
 		/// <returns>A build satisfying the spec, qualifying with all constraints, resolved with the specified behavior</returns>
 		NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 		/// <summary>
@@ -52,6 +53,7 @@ namespace MPM.Core.Dependency {
 		/// <param name="lookupPackageSpec">Callback for which the system may look up a package from the index, optionally allowing caching to take place at higher layers</param>
 		/// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
+		/// <exception cref="DependencyException">Thrown if no qualifying dependency tree can be found</exception>
 		/// <returns>
 		/// A topologically-ordered array of dependencies on successful resolution back to root.
 		/// Null if resolution fails.
