@@ -77,7 +77,7 @@ namespace MPMTest {
 					.Count() == 0,
 				"The resolver may not add manual packages to the resulting configuration"
 			);
-			CollectionAssert.Contains(resultant.Packages, testPackageSpec);
+			Assert.IsTrue(resultant.Packages.Any(build => build.Name == testPackageSpec.Name));
 		}
 		[TestMethod]
 		public void ResolutionWithDependencies() {
@@ -85,7 +85,12 @@ namespace MPMTest {
 			var dependentPackageBuilds = new[] {
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "anticedentPackage",
+							Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
+						},
+					},
 					Hashes = new string[0],
 					GivenVersion = "0.0.1.218",
 					InterfaceProvisions = new InterfaceProvision[0],
@@ -95,12 +100,17 @@ namespace MPMTest {
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "anticedentPackage",
+							Version = new VersionSpec(SemanticVersion.Parse("0.0.9")),
+						},
+					},
 					Hashes = new string[0],
 					GivenVersion = "0.0.2.219",
 					InterfaceProvisions = new InterfaceProvision[0],
 					InterfaceRequirements = new [] {
-						new InterfaceDependency { Name = "anticedent" },
+						new InterfaceDependency { Name = "anticedentInterface" },
 					},
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
@@ -113,7 +123,7 @@ namespace MPMTest {
 					Hashes = new string[0],
 					GivenVersion = "1.0RC3",
 					InterfaceProvisions = new[] {
-						new InterfaceProvision { Name = "anticedent" },
+						new InterfaceProvision { Name = "anticedentInterface" },
 					},
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
@@ -121,8 +131,8 @@ namespace MPMTest {
 				},
 			};
 			var dependentPackageSpec = new PackageSpec {
-				Name = "testPackage",
-				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
+				Name = "dependentPackage",
+				Version = new VersionSpec(SemanticVersion.Parse("0.0.0"), false, SemanticVersion.Parse("0.0.2"), true),
 				Manual = true,
 			};
 			var dependentConfig = new Configuration {
@@ -155,13 +165,6 @@ namespace MPMTest {
 					.Where(p => !resultant.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"All manual packages must be accounted for in the resulting configuration"
-			);
-			Assert.IsTrue(
-				resultant
-					.Packages
-					.Where(p => !dependentConfig.Packages.Any(nb => nb.Name == p.Name))
-					.Count() == 0,
-				"The resolver may not add manual packages to the resulting configuration"
 			);
 		}
 

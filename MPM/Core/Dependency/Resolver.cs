@@ -20,10 +20,10 @@ namespace MPM.Core.Dependency {
 		/// </summary>
 		/// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
 		/// <returns>A sorted array of builds, with the least-dependent first</returns>
-		public NamedBuild[] SortBuilds(NamedBuild[] builds) {
+		public IEnumerable<NamedBuild> SortBuilds(IEnumerable<NamedBuild> builds) {
 			var buildMap = builds.Distinct(b => b.Name).ToArray();
 
-			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false, builds.Length);
+			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false);
 			adjGraph.AddVertexRange(Enumerable.Range(0, buildMap.Length));
 			foreach (var buildIndex in Enumerable.Range(0, buildMap.Length)) {
 				adjGraph.AddEdgeRange(
@@ -61,6 +61,9 @@ namespace MPM.Core.Dependency {
 				}
 
 				var resolvedSet = ResolveRecursive(packageSpec, lookupPackageSpec);
+				if(resolvedSet == null) {
+					throw new DependencyException("The specified dependencies could not be resolved");
+				}
 				output.AddRange(resolvedSet.Where(elem => !output.Contains(elem)));
 			}
 			{
@@ -100,7 +103,21 @@ namespace MPM.Core.Dependency {
 		}
 
 		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
-			throw new NotImplementedException();
+			var output = new List<NamedBuild>();
+			var resolvedBuild = ResolveDependency(packageSpec, lookupPackageSpec, constraints, resolutionMode);
+			if (resolvedBuild == null) {
+				return null;
+			}
+			output.Add(resolvedBuild);
+			foreach (var dependency in resolvedBuild.Dependencies) {
+				var depSpec = dependency.ToSpec();
+				var resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, constraints, resolutionMode);
+				if (resolvedDeps == null) {
+					return null;
+				}
+				output.AddRange(resolvedDeps);
+			}
+			return SortBuilds(output).ToArray();
 		}
 	}
 }
