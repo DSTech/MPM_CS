@@ -161,6 +161,9 @@ namespace MPMTest {
 				}
 			});
 			var resultant = resolver.Resolve(dependentConfig, lookupPackageSpec);
+			Assert.IsTrue(resultant.Packages.Length == 2);
+            Assert.IsTrue(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
+			Assert.IsTrue(resultant.Packages.Last().Name == "dependentPackage", "Dependent packages should occur after their dependencies");
 			Assert.IsTrue(
 				dependentConfig
 					.Packages
@@ -332,7 +335,10 @@ namespace MPMTest {
 					Dependencies = new [] {
 						new PackageDependency {
 							Name = "B"
-						}
+						},
+						new PackageDependency {
+							Name = "C"
+						},
 					},
 				},
 				new NamedBuild {
@@ -397,7 +403,15 @@ namespace MPMTest {
 				}
 				Assert.IsFalse(sorted, "The input build array should not be initially sorted");
 			}
-			var output = r.SortBuilds(builds);
+			var output = r.SortBuilds(builds).ToArray();
+			//Dependencies must appear in order of least dependence
+			{
+				Assert.IsTrue(output.Length == 3);
+				var orderErrMsg = "Dependencies must occur in order of least dependence";
+				Assert.IsTrue(output[0].Name == "C", orderErrMsg);
+				Assert.IsTrue(output[1].Name == "B", orderErrMsg);
+				Assert.IsTrue(output[2].Name == "A", orderErrMsg);
+			}
 			//Output must be sorted
 			{
 				var namesSeen = new SortedSet<string>();
