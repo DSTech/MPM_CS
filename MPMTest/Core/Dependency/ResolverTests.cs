@@ -88,7 +88,7 @@ namespace MPMTest {
 					Dependencies = new [] {
 						new PackageDependency {
 							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("0.0.3")),
+							Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
 						},
 					},
 					Hashes = new string[0],
@@ -97,6 +97,7 @@ namespace MPMTest {
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
+					Side = PackageSide.Universal,
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -114,6 +115,7 @@ namespace MPMTest {
 					},
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+					Side = PackageSide.Universal,
 				},
 			};
 			var anticedentPackageBuilds = new[] {
@@ -128,6 +130,7 @@ namespace MPMTest {
 					InterfaceRequirements = new InterfaceDependency[0],
 					Stable = true,
 					Version = SemanticVersion.Parse("0.0.4"),
+					Side = PackageSide.Universal,
 				},
 			};
 			var dependentPackageSpec = new PackageSpec {
@@ -167,7 +170,159 @@ namespace MPMTest {
 				"All manual packages must be accounted for in the resulting configuration"
 			);
 		}
-
+		[TestMethod]
+		public void ResolutionSideDependencies() {
+			var resolver = new Resolver();
+			var dependentPackageBuilds = new[] {
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "anticedentPackage",
+							Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.3"), true),
+						},
+					},
+					Hashes = new string[0],
+					GivenVersion = "0.0.1.218",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
+					Side = PackageSide.Universal,
+				},
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "anticedentPackage",
+							Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.4"), true),
+						},
+					},
+					Hashes = new string[0],
+					GivenVersion = "0.0.2.219",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+					Side = PackageSide.Universal,
+				},
+			};
+			var anticedentPackageBuilds = new[] {
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new PackageDependency[0],
+					Hashes = new string[0],
+					GivenVersion = "1.0RC2_Universal",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = SemanticVersion.Parse("1.0.2"),
+					Side = PackageSide.Universal,
+				},
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new PackageDependency[0],
+					Hashes = new string[0],
+					GivenVersion = "1.0RC3_Client",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = SemanticVersion.Parse("1.0.3"),
+					Side = PackageSide.Client,
+				},
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new PackageDependency[0],
+					Hashes = new string[0],
+					GivenVersion = "1.0RC3_Universal",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = SemanticVersion.Parse("1.0.3"),
+					Side = PackageSide.Universal,
+				},
+				new Build {
+					Conflicts = new PackageConflict[0],
+					Dependencies = new PackageDependency[0],
+					Hashes = new string[0],
+					GivenVersion = "1.0RC4_Universal",
+					InterfaceProvisions = new InterfaceProvision[0],
+					InterfaceRequirements = new InterfaceDependency[0],
+					Stable = true,
+					Version = SemanticVersion.Parse("1.0.4"),
+					Side = PackageSide.Universal,
+				},
+			};
+			var lookupSatisfies = new Func<PackageSpec, NamedBuild, bool>((spec, build) => {
+				return
+					spec.Version.Satisfies(build.Version) &&
+					(
+						build.Side == spec.Side ||
+						build.Side == PackageSide.Universal
+                    );
+			});
+			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
+				if (packageSpec.Name == "dependentPackage") {
+					return new Package {
+						Authors = new[] { "dependentAuthor" },
+						Name = packageSpec.Name,
+						Builds = dependentPackageBuilds,
+					}.ToNamedBuilds()
+						.Where(b => lookupSatisfies(packageSpec, b))
+						.OrderByDescending(b => b.Version)
+						.ThenByDescending(b => b.Side == packageSpec.Side)
+						.ToArray();
+				} else if (packageSpec.Name == "anticedentPackage") {
+					return new Package {
+						Authors = new[] { "anticedentAuthor" },
+						Name = packageSpec.Name,
+						Builds = anticedentPackageBuilds,
+					}.ToNamedBuilds()
+						.Where(b => lookupSatisfies(packageSpec, b))
+						.OrderByDescending(b => b.Version)
+						.ThenByDescending(b => b.Side == packageSpec.Side)
+						.ToArray();
+				} else {
+					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
+				}
+			});
+			var dependentConfigSameVersionSidePref = new Configuration {
+				Packages = new PackageSpec[] {
+					new PackageSpec {
+						Name = "dependentPackage",
+						Version = new VersionSpec(SemanticVersion.Parse("0.0.1")),
+						Manual = true,
+					},
+				},
+				Side = PackageSide.Client,
+			};
+			var resultantConfigSameVersionSidePref = resolver.Resolve(dependentConfigSameVersionSidePref, lookupPackageSpec);
+			Assert.IsTrue(
+				resultantConfigSameVersionSidePref
+					.Packages
+					.Where(p => p.Name == "anticedentPackage")
+					.All(p => p.GivenVersion == "1.0RC3_Client"),
+				"Packages should prefer those of the same side when versions are equal"
+			);
+			var dependentConfigDifferentVersionVersionPref = new Configuration {
+				Packages = new PackageSpec[] {
+					new PackageSpec {
+						Name = "dependentPackage",
+						Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
+						Manual = true,
+					},
+				},
+				Side = PackageSide.Client,
+			};
+			var resultantConfigDifferentVersionVersionPref = resolver.Resolve(dependentConfigDifferentVersionVersionPref, lookupPackageSpec);
+			Assert.IsTrue(
+				resultantConfigDifferentVersionVersionPref
+					.Packages
+					.Where(p => p.Name == "anticedentPackage")
+					.All(p => p.GivenVersion == "1.0RC4_Universal"),
+				"Packages should prefer those of the higher version, even when the preferred side are available for a lower version"
+			);
+		}
 		[TestMethod]
 		public void SortBuilds() {
 			var r = new Resolver();

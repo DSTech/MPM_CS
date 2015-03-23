@@ -6,6 +6,7 @@ namespace MPM.Net.DTO {
 	public class Build {
 		public SemanticVersion Version { get; set; }
 		public String GivenVersion { get; set; }
+		public PackageSide Side { get; set; } = PackageSide.Universal;
 		public InterfaceProvision[] InterfaceProvisions { get; set; }
 		public InterfaceDependency[] InterfaceRequirements { get; set; }
 		public PackageDependency[] Dependencies { get; set; }

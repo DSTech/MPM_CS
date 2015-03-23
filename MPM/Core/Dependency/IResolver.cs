@@ -41,7 +41,7 @@ namespace MPM.Core.Dependency {
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
 		/// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
 		/// <returns>A build satisfying the spec, qualifying with all constraints, resolved with the specified behavior</returns>
-		NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide side = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 		/// <summary>
 		/// A variant of ResolveDependency which should implement additional constraints on each cycle until a dependency tree can be resolved as non-null.
 		/// Should attempt to resolve each subsequent build in the package spec,
@@ -51,6 +51,7 @@ namespace MPM.Core.Dependency {
 		/// </summary>
 		/// <param name="packageSpec">Specification for the package for which to find a build</param>
 		/// <param name="lookupPackageSpec">Callback for which the system may look up a package from the index, optionally allowing caching to take place at higher layers</param>
+		/// <param name="packageSide">Specifies which side is performing resolution, determining whether or not package dependencies are to be counted</param>
 		/// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
 		/// <exception cref="DependencyException">Thrown if no qualifying dependency tree can be found</exception>
@@ -58,6 +59,6 @@ namespace MPM.Core.Dependency {
 		/// A topologically-ordered array of dependencies on successful resolution back to root.
 		/// Null if resolution fails.
 		/// </returns>
-		NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
     }
 }

@@ -80,7 +80,7 @@ namespace MPM.Core.Dependency {
 			};
 		}
 
-		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
 			var namedBuilds = lookupPackageSpec(packageSpec);
 			NamedBuild result;
@@ -113,16 +113,19 @@ namespace MPM.Core.Dependency {
 			return result;
 		}
 
-		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var output = new List<NamedBuild>();
-			var resolvedBuild = ResolveDependency(packageSpec, lookupPackageSpec, constraints, resolutionMode);
+			var resolvedBuild = ResolveDependency(packageSpec, lookupPackageSpec, packageSide, constraints, resolutionMode);
 			Debug.Assert(resolvedBuild != null, "ResolveDependency is not allowed to return null");
 			output.Add(resolvedBuild);
 			foreach (var dependency in resolvedBuild.Dependencies) {
 				var depSpec = dependency.ToSpec();
+				if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
+					continue;
+				}
 				NamedBuild[] resolvedDeps;
 				try {
-					resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, constraints, resolutionMode);
+					resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, packageSide, constraints, resolutionMode);
 					Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
 				} catch (DependencyException e) {
 					throw new DependencyException("Could not resolve package, no matching dependency tree found", e, depSpec, resolvedBuild);

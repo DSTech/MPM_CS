@@ -1,4 +1,5 @@
 using System;
+using MPM.Net.DTO;
 using NServiceKit.Common;
 using semver.tools;
 
@@ -7,13 +8,14 @@ namespace MPM.Core.Dependency {
 		public static PackageSpec ToSpec(this Net.DTO.PackageDependency dependency, bool manual = false) {
 			return new PackageSpec {
 				Manual = manual,
-			}.PopulateWith(dependency);
+			}.PopulateWithNonDefaultValues(dependency);
 		}
 	}
 	public class PackageSpec : IEquatable<PackageSpec> {
 		public String Name { get; set; }
 		public VersionSpec Version { get; set; }
-		public bool Manual { get; set; }
+		public PackageSide Side { get; set; } = PackageSide.Universal;
+		public bool Manual { get; set; } = false;
 
 		public override bool Equals(object obj) {
 			var packageSpec = obj as PackageSpec;

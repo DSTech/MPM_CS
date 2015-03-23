@@ -1,14 +1,14 @@
 using System;
 using MPM.Core;
-using ServiceStack;
 
 namespace MPM.Core.Dependency {
 	using System.Linq;
 	using Net.DTO;
+	using NServiceKit.Common;
 
 	public static class NamedBuildExtensions {
 		public static NamedBuild ToNamedBuild(this Package package, Build build) {
-			var namedBuild = build.ConvertTo<NamedBuild>();
+			var namedBuild = new NamedBuild().PopulateWithNonDefaultValues(build);
 			namedBuild.PopulateWithNonDefaultValues(package);
 			return namedBuild;
 		}

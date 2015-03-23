@@ -65,5 +65,6 @@ namespace MPM.Core.Dependency {
 			Packages = new PackageSpec[0],
 		};
 		public PackageSpec[] Packages { get; set; }
-	}
+		public PackageSide Side { get; set; } = PackageSide.Universal;
+    }
 }
