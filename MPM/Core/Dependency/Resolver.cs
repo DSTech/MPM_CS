@@ -46,10 +46,13 @@ namespace MPM.Core.Dependency {
 			} finally {
 				dfs.BackEdge -= onBackEdge;
 			}
-			return adjGraph
+
+			var results = adjGraph
 				.TopologicalSort()
+				.Reverse()
 				.Select(index => buildMap[index])
 				.ToArray();
+			return results;
 		}
 		public ResolvedConfiguration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result

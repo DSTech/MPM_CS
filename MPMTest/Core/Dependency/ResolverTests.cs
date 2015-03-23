@@ -162,7 +162,7 @@ namespace MPMTest {
 			});
 			var resultant = resolver.Resolve(dependentConfig, lookupPackageSpec);
 			Assert.IsTrue(resultant.Packages.Length == 2);
-            Assert.IsTrue(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
+			Assert.IsTrue(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
 			Assert.IsTrue(resultant.Packages.Last().Name == "dependentPackage", "Dependent packages should occur after their dependencies");
 			Assert.IsTrue(
 				dependentConfig
@@ -262,7 +262,7 @@ namespace MPMTest {
 					(
 						build.Side == spec.Side ||
 						build.Side == PackageSide.Universal
-                    );
+					);
 			});
 			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
 				if (packageSpec.Name == "dependentPackage") {
@@ -346,11 +346,22 @@ namespace MPMTest {
 					Dependencies = new [] {
 						new PackageDependency {
 							Name = "A"
-						}
+						},
+						new PackageDependency {
+							Name = "D"
+						},
 					},
 				},
 				new NamedBuild {
 					Name = "C",
+					Dependencies = new [] {
+						new PackageDependency {
+							Name = "D"
+						},
+                    },
+				},
+				new NamedBuild {
+					Name = "D",
 					Dependencies = new PackageDependency[0],
 				},
 			};
@@ -406,11 +417,12 @@ namespace MPMTest {
 			var output = r.SortBuilds(builds).ToArray();
 			//Dependencies must appear in order of least dependence
 			{
-				Assert.IsTrue(output.Length == 3);
+				Assert.IsTrue(output.Length == 4);
 				var orderErrMsg = "Dependencies must occur in order of least dependence";
-				Assert.IsTrue(output[0].Name == "C", orderErrMsg);
+				Assert.IsTrue(output[0].Name == "D", orderErrMsg);
 				Assert.IsTrue(output[1].Name == "B", orderErrMsg);
-				Assert.IsTrue(output[2].Name == "A", orderErrMsg);
+				Assert.IsTrue(output[2].Name == "C", orderErrMsg);
+				Assert.IsTrue(output[3].Name == "A", orderErrMsg);
 			}
 			//Output must be sorted
 			{
