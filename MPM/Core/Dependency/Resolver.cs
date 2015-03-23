@@ -105,7 +105,7 @@ namespace MPM.Core.Dependency {
 					result = highest;
 					break;
 				default:
-					throw new NotImplementedException($"{nameof(ResolutionMode)} \"{resolutionMode}\" is unsupported by {this.GetType().Name}");
+					throw new NotImplementedException(String.Format("{0} \"{1}\" is unsupported by {2}", nameof(ResolutionMode), resolutionMode, this.GetType().Name));
 			}
 			if (result == null) {
 				throw new DependencyException("Could not resolve package, no matching packages found.", packageSpec);

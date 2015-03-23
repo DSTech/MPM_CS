@@ -12,15 +12,15 @@ namespace MPM.Core.Dependency {
 		}
 		public DependencyException(string message, PackageSpec packageSpec = null, NamedBuild dependent = null)
 			: base(message) {
-			PackageSpec = packageSpec;
-			Dependent = dependent;
+			this.PackageSpec = packageSpec;
+			this.Dependent = dependent;
 		}
 		public DependencyException(string message, Exception innerException, PackageSpec packageSpec = null, NamedBuild dependent = null) : base(message, innerException) {
-			PackageSpec = packageSpec;
-			Dependent = dependent;
+			this.PackageSpec = packageSpec;
+			this.Dependent = dependent;
 		}
 		public override string ToString() {
-			return $"({Dependent?.Name ?? "<dependent>"})=>{PackageSpec}:\n{base.ToString()}";
+			return String.Format("({0})=>{1}:\n{2}", this.Dependent?.Name ?? "<dependent>", this.PackageSpec, base.ToString());
         }
 	}
 }

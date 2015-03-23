@@ -1,0 +1,5 @@
+language: csharp
+mono: latest
+solution: MPM.sln
+script:
+  - xbuild /p:Configuration=Release MPM/MPM.csproj
