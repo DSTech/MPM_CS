@@ -52,9 +52,10 @@ namespace MPM.Core.Archival {
 	}
 	public class EncryptedChunk : IEnumerable<byte> {
 		public EncryptedChunk(IEnumerable<byte> contents) {
-			var contentsArr = contents.ToArray();
-			IV = contentsArr.Skip(2).Take(BitConverter.ToInt16(contentsArr.Take(2).ToArray(), 0)).ToArray();
-			this.contents = contentsArr.Skip(2 + IV.Length).ToArray();
+			var contentsEnumr = contents.GetEnumerator();
+			var IVlength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
+            IV = contentsEnumr.Take(IVlength).ToArray();
+			this.contents = contentsEnumr.AsEnumerable().ToArray();
 		}
 		private byte[] IV;
 		private byte[] contents;

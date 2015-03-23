@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core;
 
 namespace MPM.Core.Archival {
 	public class Archive : IList<EncryptedChunk> {
@@ -24,9 +25,10 @@ namespace MPM.Core.Archival {
 			return Enumerable.Concat(header, contents).ToArray();
 		}
 		public static byte[] VerifyLeadingHash(byte[] contents) {
-			var leadingHashLength = BitConverter.ToInt16(contents.Take(2).ToArray(), 0);
-			var leadingHash = contents.Skip(2).Take(leadingHashLength).ToArray();
-			var body = contents.Skip(2 + leadingHashLength).ToArray();
+			var contentsEnumr = contents.AsEnumerable().GetEnumerator();
+			var leadingHashLength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
+			var leadingHash = contentsEnumr.Take(leadingHashLength).ToArray();
+			var body = contentsEnumr.AsEnumerable().ToArray();
 			using (var sha256 = new SHA256Managed()) {
 				if (!sha256.ComputeHash(body).SequenceEqual(leadingHash)) {
 					return null;
