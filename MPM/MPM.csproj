@@ -157,6 +157,7 @@
     <Compile Include="Net\DTO\ForcedDependency.cs" />
     <Compile Include="Net\DTO\InstallationResolution.cs" />
     <Compile Include="Net\DTO\PackageSide.cs" />
+    <Compile Include="Net\IServiceClientExtensions.cs" />
     <Compile Include="Net\PackageConflictExtensions.cs" />
     <Compile Include="Net\DTO\InterfaceProvision.cs" />
     <Compile Include="Net\DTO\Build.cs" />
@@ -166,6 +167,14 @@
     <Compile Include="Net\DTO\Package.cs" />
     <Compile Include="Net\DTO\PackagesRequest.cs" />
     <Compile Include="Net\DTO\PackageRequest.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\LibraryExtractSpec.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\LibraryNativesSpec.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\LibraryRuleOSSpec.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\LibraryRuleSpec.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\LibrarySpec.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\MinecraftVersionCollection.cs" />
+    <Compile Include="Net\Protocols\Minecraft\MinecraftDownloadClient.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTO\MinecraftVersion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
