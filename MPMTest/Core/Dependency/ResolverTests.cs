@@ -1,46 +1,21 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MPM;
-using MPM.Core.Archival;
 using MPM.Core.Dependency;
-using System.Linq;
 using MPM.Net.DTO;
 using semver.tools;
-using System.Collections.Generic;
 
-namespace MPMTest {
+namespace MPMTest.Core.Dependency {
 	[TestClass]
 	public class ResolverTests {
 		[TestMethod]
-		public void Empty() {
-			Assert.IsTrue(new Resolver().Resolve(Configuration.Empty, (spec) => null).Packages.Length == 0);
+		public async Task Empty() {
+			Assert.IsTrue((await new Resolver().Resolve(Configuration.Empty, new TestPackageRepository(new Package[0]), "testArch", "testPlatform")).Packages.Length == 0);
 		}
 		[TestMethod]
-		public void ResolutionNoDependencies() {
+		public async Task ResolutionNoDependencies() {
 			var resolver = new Resolver();
-			var testPackageBuilds = new[] {
-				new Build {
-					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
-					Hashes = new string[0],
-					GivenVersion = "0.0.1.218",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
-					Stable = true,
-					Version = SemanticVersion.Parse("0.0.1"),
-				},
-				new Build {
-					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
-					Hashes = new string[0],
-					GivenVersion = "0.0.2.219",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
-					Stable = true,
-					Version = SemanticVersion.Parse("0.0.2"),
-				},
-			};
 			var testPackageSpec = new PackageSpec {
 				Name = "testPackage",
 				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
@@ -51,17 +26,39 @@ namespace MPMTest {
 					testPackageSpec,
 				},
 			};
-			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
-				if (packageSpec.Name != "testPackage") {
-					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
-				}
-				return new Package {
+			var testRepository = new TestPackageRepository(new[] {
+				new Package {
 					Authors = new[] { "testAuthor" },
 					Name = "testPackage",
-					Builds = testPackageBuilds,
-				}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
+					Builds = new[] {
+						new Build {
+							Conflicts = new PackageConflict[0],
+							Dependencies = new PackageDependency[0],
+							Hashes = new string[0],
+							GivenVersion = "0.0.1.218",
+							InterfaceProvisions = new InterfaceProvision[0],
+							InterfaceRequirements = new InterfaceDependency[0],
+							Stable = true,
+							Version = SemanticVersion.Parse("0.0.1"),
+							Arch = "testArch",
+							Platform = "testPlatform",
+						},
+						new Build {
+							Conflicts = new PackageConflict[0],
+							Dependencies = new PackageDependency[0],
+							Hashes = new string[0],
+							GivenVersion = "0.0.2.219",
+							InterfaceProvisions = new InterfaceProvision[0],
+							InterfaceRequirements = new InterfaceDependency[0],
+							Stable = true,
+							Version = SemanticVersion.Parse("0.0.2"),
+							Arch = "testArch",
+							Platform = "testPlatform",
+						},
+					},
+				},
 			});
-			var resultant = resolver.Resolve(testConfig, lookupPackageSpec);
+			var resultant = await resolver.Resolve(testConfig, testRepository, "testArch", "testPlatform");
 			Assert.IsTrue(
 				testConfig
 					.Packages
@@ -80,59 +77,8 @@ namespace MPMTest {
 			Assert.IsTrue(resultant.Packages.Any(build => build.Name == testPackageSpec.Name));
 		}
 		[TestMethod]
-		public void ResolutionWithDependencies() {
+		public async Task ResolutionWithDependencies() {
 			var resolver = new Resolver();
-			var dependentPackageBuilds = new[] {
-				new Build {
-					Conflicts = new PackageConflict[0],
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
-						},
-					},
-					Hashes = new string[0],
-					GivenVersion = "0.0.1.218",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
-					Stable = true,
-					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
-					Side = PackageSide.Universal,
-				},
-				new Build {
-					Conflicts = new PackageConflict[0],
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("0.0.9")),
-						},
-					},
-					Hashes = new string[0],
-					GivenVersion = "0.0.2.219",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new [] {
-						new InterfaceDependency { Name = "anticedentInterface" },
-					},
-					Stable = true,
-					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
-					Side = PackageSide.Universal,
-				},
-			};
-			var anticedentPackageBuilds = new[] {
-				new Build {
-					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
-					Hashes = new string[0],
-					GivenVersion = "1.0RC3",
-					InterfaceProvisions = new[] {
-						new InterfaceProvision { Name = "anticedentInterface" },
-					},
-					InterfaceRequirements = new InterfaceDependency[0],
-					Stable = true,
-					Version = SemanticVersion.Parse("0.0.4"),
-					Side = PackageSide.Universal,
-				},
-			};
 			var dependentPackageSpec = new PackageSpec {
 				Name = "dependentPackage",
 				Version = new VersionSpec(SemanticVersion.Parse("0.0.0"), false, SemanticVersion.Parse("0.0.2"), true),
@@ -143,24 +89,74 @@ namespace MPMTest {
 					dependentPackageSpec,
 				},
 			};
-			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
-				if (packageSpec.Name == "dependentPackage") {
-					return new Package {
-						Authors = new[] { "dependentAuthor" },
-						Name = packageSpec.Name,
-						Builds = dependentPackageBuilds,
-					}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
-				} else if (packageSpec.Name == "anticedentPackage") {
-					return new Package {
-						Authors = new[] { "anticedentAuthor" },
-						Name = packageSpec.Name,
-						Builds = anticedentPackageBuilds,
-					}.ToNamedBuilds().Where(b => packageSpec.Version.Satisfies(b.Version)).ToArray();
-				} else {
-					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
+			var lookupPackageSpec = new TestPackageRepository(new[] {
+				new Package {
+					Name = "dependentPackage",
+					Authors = new[] { "dependentAuthor" },
+					Builds = new[] {
+						new Build {
+							Conflicts = new PackageConflict[0],
+							Dependencies = new [] {
+								new PackageDependency {
+									Name = "anticedentPackage",
+									Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
+								},
+							},
+							Hashes = new string[0],
+							GivenVersion = "0.0.1.218",
+							InterfaceProvisions = new InterfaceProvision[0],
+							InterfaceRequirements = new InterfaceDependency[0],
+							Stable = true,
+							Version = semver.tools.SemanticVersion.Parse("0.0.1"),
+							Side = PackageSide.Universal,
+							Arch = "testArch",
+							Platform = "testPlatform",
+						},
+						new Build {
+							Conflicts = new PackageConflict[0],
+							Dependencies = new [] {
+								new PackageDependency {
+									Name = "anticedentPackage",
+									Version = new VersionSpec(SemanticVersion.Parse("0.0.9")),
+								},
+							},
+							Hashes = new string[0],
+							GivenVersion = "0.0.2.219",
+							InterfaceProvisions = new InterfaceProvision[0],
+							InterfaceRequirements = new [] {
+								new InterfaceDependency { Name = "anticedentInterface" },
+							},
+							Stable = true,
+							Version = semver.tools.SemanticVersion.Parse("0.0.2"),
+							Side = PackageSide.Universal,
+							Arch = "testArch",
+							Platform = "testPlatform",
+						},
+					},
+				},
+				new Package {
+					Name = "anticedentPackage",
+					Authors = new[] { "anticedentAuthor" },
+					Builds = new[] {
+						new Build {
+							Conflicts = new PackageConflict[0],
+							Dependencies = new PackageDependency[0],
+							Hashes = new string[0],
+							GivenVersion = "1.0RC3",
+							InterfaceProvisions = new[] {
+								new InterfaceProvision { Name = "anticedentInterface" },
+							},
+							InterfaceRequirements = new InterfaceDependency[0],
+							Stable = true,
+							Version = SemanticVersion.Parse("0.0.4"),
+							Side = PackageSide.Universal,
+							Arch = "testArch",
+							Platform = "testPlatform",
+						},
+					},
 				}
 			});
-			var resultant = resolver.Resolve(dependentConfig, lookupPackageSpec);
+			var resultant = await resolver.Resolve(dependentConfig, lookupPackageSpec, "testArch", "testPlatform");
 			Assert.IsTrue(resultant.Packages.Length == 2);
 			Assert.IsTrue(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
 			Assert.IsTrue(resultant.Packages.Last().Name == "dependentPackage", "Dependent packages should occur after their dependencies");
@@ -174,7 +170,7 @@ namespace MPMTest {
 			);
 		}
 		[TestMethod]
-		public void ResolutionSideDependencies() {
+		public async Task ResolutionSideDependencies() {
 			var resolver = new Resolver();
 			var dependentPackageBuilds = new[] {
 				new Build {
@@ -192,6 +188,8 @@ namespace MPMTest {
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
 					Side = PackageSide.Universal,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -208,6 +206,8 @@ namespace MPMTest {
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
 					Side = PackageSide.Universal,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 			};
 			var anticedentPackageBuilds = new[] {
@@ -221,6 +221,8 @@ namespace MPMTest {
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.2"),
 					Side = PackageSide.Universal,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -232,6 +234,8 @@ namespace MPMTest {
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.3"),
 					Side = PackageSide.Client,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -243,6 +247,8 @@ namespace MPMTest {
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.3"),
 					Side = PackageSide.Universal,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
@@ -254,39 +260,20 @@ namespace MPMTest {
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.4"),
 					Side = PackageSide.Universal,
+					Arch = "testArch",
+					Platform = "testPlatform",
 				},
 			};
-			var lookupSatisfies = new Func<PackageSpec, NamedBuild, bool>((spec, build) => {
-				return
-					spec.Version.Satisfies(build.Version) &&
-					(
-						build.Side == spec.Side ||
-						build.Side == PackageSide.Universal
-					);
-			});
-			var lookupPackageSpec = new PackageSpecLookup(packageSpec => {
-				if (packageSpec.Name == "dependentPackage") {
-					return new Package {
-						Authors = new[] { "dependentAuthor" },
-						Name = packageSpec.Name,
-						Builds = dependentPackageBuilds,
-					}.ToNamedBuilds()
-						.Where(b => lookupSatisfies(packageSpec, b))
-						.OrderByDescending(b => b.Version)
-						.ThenByDescending(b => b.Side == packageSpec.Side)
-						.ToArray();
-				} else if (packageSpec.Name == "anticedentPackage") {
-					return new Package {
-						Authors = new[] { "anticedentAuthor" },
-						Name = packageSpec.Name,
-						Builds = anticedentPackageBuilds,
-					}.ToNamedBuilds()
-						.Where(b => lookupSatisfies(packageSpec, b))
-						.OrderByDescending(b => b.Version)
-						.ThenByDescending(b => b.Side == packageSpec.Side)
-						.ToArray();
-				} else {
-					throw new ArgumentOutOfRangeException(nameof(packageSpec), "Packages that are not in- or dependencies of- the request input should not be looked up by the resolver");
+			var testRepository = new TestPackageRepository(new[] {
+				new Package {
+					Name = "dependentPackage",
+					Authors = new[] { "dependentAuthor" },
+					Builds = dependentPackageBuilds,
+				},
+				new Package {
+					Name = "anticedentPackage",
+					Authors = new[] { "anticedentAuthor" },
+					Builds = anticedentPackageBuilds,
 				}
 			});
 			var dependentConfigSameVersionSidePref = new Configuration {
@@ -299,7 +286,7 @@ namespace MPMTest {
 				},
 				Side = PackageSide.Client,
 			};
-			var resultantConfigSameVersionSidePref = resolver.Resolve(dependentConfigSameVersionSidePref, lookupPackageSpec);
+			var resultantConfigSameVersionSidePref = await resolver.Resolve(dependentConfigSameVersionSidePref, testRepository, "testArch", "testPlatform");
 			Assert.IsTrue(
 				resultantConfigSameVersionSidePref
 					.Packages
@@ -317,7 +304,7 @@ namespace MPMTest {
 				},
 				Side = PackageSide.Client,
 			};
-			var resultantConfigDifferentVersionVersionPref = resolver.Resolve(dependentConfigDifferentVersionVersionPref, lookupPackageSpec);
+			var resultantConfigDifferentVersionVersionPref = await resolver.Resolve(dependentConfigDifferentVersionVersionPref, testRepository, "testArch", "testRepository");
 			Assert.IsTrue(
 				resultantConfigDifferentVersionVersionPref
 					.Packages
@@ -358,7 +345,7 @@ namespace MPMTest {
 						new PackageDependency {
 							Name = "D"
 						},
-                    },
+					},
 				},
 				new NamedBuild {
 					Name = "D",

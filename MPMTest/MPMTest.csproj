@@ -54,6 +54,7 @@
     <Compile Include="ArchiveTests.cs" />
     <Compile Include="Core\Dependency\ResolverTests.cs" />
     <Compile Include="Core\Dependency\PackageSpecTests.cs" />
+    <Compile Include="Core\Dependency\TestPackageRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

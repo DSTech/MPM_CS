@@ -11,8 +11,7 @@ namespace MPM.Data {
 	public interface IPackageRepository {
 		/// <summary>
 		/// Fetches a list of all packages, but is not required to return any particular data (eg. authors) for each package.
-		/// Should be used to find packages for which further information may be looked up via
-		/// <see cref="FetchPackage(string)"/> or <see cref="FetchBuild(string, SemanticVersion)"/>.
+		/// Should be used to find packages for which further information may be looked up via <see cref="FetchPackage(string)"/> or <see cref="FetchBuild(string, SemanticVersion)"/>.
 		/// </summary>
 		/// <returns>Multiple <see cref="Package"/> instances containing, at minimum, the name of the package.</returns>
 		IObservable<Package> FetchPackageList();
@@ -29,14 +28,20 @@ namespace MPM.Data {
 		/// </summary>
 		/// <param name="packageName"></param>
 		/// <param name="version"></param>
-		/// <returns>A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package of the specified name was found.</returns>
+		/// <returns>
+		/// A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package of the specified name was found.
+		/// Builds must be returned in descending order of version.
+		/// </returns>
 		Task<Build> FetchBuild(String packageName, SemanticVersion version);
 		/// <summary>
 		/// Looks up a package for any versions matching a specifier.
 		/// </summary>
 		/// <param name="packageName">Name of the package to look up</param>
 		/// <param name="versionSpec">The version specification to check against before returning a build</param>
-		/// <returns>A <see cref="Package"/> instance containing only builds which comply with the <paramref name="versionSpec"/> given. Null when no package of the specified name was found.</returns>
+		/// <returns>
+		/// A <see cref="Package"/> instance containing only builds which comply with the <paramref name="versionSpec"/> given. Null when no package of the specified name was found.
+		/// Builds must be returned in descending order of version.
+		/// </returns>
 		Task<Package> FetchBuilds(String packageName, VersionSpec versionSpec);
 	}
 }

@@ -4,16 +4,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Data;
 using MPM.Net;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
 	public static class ResolvedConfigurationExtensions {
-		//Returns conflicts caused by particular builds
-		//LookupBuild should return a package with exactly one build
-		public static IEnumerable<Tuple<NamedBuild, PackageConflict>> FindConflicts(this ResolvedConfiguration configuration, PackageSpecLookup lookupBuild) {
+		/// <summary>
+		/// Checks for conflicts in the specified configuration.
+		/// </summary>
+		/// <param name="configuration"><see cref="ResolvedConfiguration"/> within which to check for conflicts</param>
+		/// <returns>An enumerable of tuples containing a specific <see cref="NamedBuild"/> and <see cref="PackageConflict"/> specified by the returned build.</returns>
+		public static IEnumerable<Tuple<NamedBuild, PackageConflict>> FindConflicts(this ResolvedConfiguration configuration) {
 			foreach (var build in configuration.Packages) {
-
 				var conflicts = build.FindConflicts(
 					configuration
 						.Packages
@@ -26,10 +29,16 @@ namespace MPM.Core.Dependency {
 			}
 		}
 
-		//Returns any conflicts triggered by a particular set of packages interacting with the given package
-		//LookupBuild should return a package with exactly one build
-		//These interactions are one-way: other packages must check their conflicts with the source as well
-		public static IEnumerable<PackageConflict> FindConflicts(this NamedBuild build, NamedBuild[] otherBuilds) {
+		/// <summary>
+		/// Checks a specific <see cref="NamedBuild"/> for conflicts it may have with others in its configuration.
+		/// </summary>
+		/// <remarks>
+		/// These interactions are one-way: other packages must check their conflicts with the source as well.
+		/// </remarks>
+		/// <param name="namedBuild">The build for which to check conflict conditions</param>
+		/// <param name="otherBuilds">The other builds in the <see cref="ResolvedConfiguration"/> to check conditions against</param>
+		/// <returns>Any <see cref="PackageConflict"/> triggered by a particular set of packages interacting with the given <see cref="NamedBuild"/></returns>
+		public static IEnumerable<PackageConflict> FindConflicts(this NamedBuild namedBuild, NamedBuild[] otherBuilds) {
 			var packageNames = otherBuilds
 				.Select(b => b.Name)
 				.ToArray();
@@ -37,7 +46,7 @@ namespace MPM.Core.Dependency {
 				.SelectMany(b => b.InterfaceProvisions)
 				.Select(b => b.Name)
 				.ToArray();
-			foreach (var conflict in build.Conflicts) {
+			foreach (var conflict in namedBuild.Conflicts) {
 				if (conflict.CheckPackageConflict(packageNames, interfaceNames)) {
 					yield return conflict;
 				}
@@ -45,10 +54,7 @@ namespace MPM.Core.Dependency {
 		}
 	}
 	public class ResolvedConfiguration {
-		public static ResolvedConfiguration Empty { get; }
-		= new ResolvedConfiguration {
-			Packages = new NamedBuild[0],
-		};
+		public static ResolvedConfiguration Empty { get; } = new ResolvedConfiguration { Packages = new NamedBuild[0] };
 		public NamedBuild[] Packages { get; set; }
 	}
 }

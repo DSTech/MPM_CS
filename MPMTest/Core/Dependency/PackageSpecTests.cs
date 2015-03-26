@@ -1,13 +1,9 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MPM;
-using MPM.Core.Archival;
-using MPM.Core.Dependency;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MPM.Core.Dependency;
 using semver.tools;
 
-namespace MPMTest {
+namespace MPMTest.Core.Dependency {
 	[TestClass]
 	public class PackageSpecTests {
 		[TestMethod]

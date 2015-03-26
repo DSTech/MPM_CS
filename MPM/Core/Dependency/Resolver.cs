@@ -12,6 +12,7 @@ using QuickGraph.Algorithms.TopologicalSort;
 using QuickGraph.Data;
 using QuickGraph.Collections;
 using QuickGraph.Algorithms.Search;
+using MPM.Data;
 
 namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {
@@ -54,7 +55,7 @@ namespace MPM.Core.Dependency {
 				.ToArray();
 			return results;
 		}
-		public ResolvedConfiguration Resolve(Configuration target, PackageSpecLookup lookupPackageSpec) {
+		public async Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository repository, String arch, String platform) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
 			var output = new List<NamedBuild>();
 
@@ -65,7 +66,7 @@ namespace MPM.Core.Dependency {
 
 				NamedBuild[] resolvedSet;
 				try {
-					resolvedSet = ResolveRecursive(packageSpec, lookupPackageSpec);
+					resolvedSet = await ResolveRecursive(packageSpec, repository, arch, platform);
 					Debug.Assert(resolvedSet != null);
 				} catch (DependencyException e) {
 					throw new DependencyException("The specified dependencies could not be resolved", e);
@@ -83,9 +84,9 @@ namespace MPM.Core.Dependency {
 			};
 		}
 
-		public NamedBuild ResolveDependency(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public async Task<NamedBuild> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, String Arch, String Platform, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
-			var namedBuilds = lookupPackageSpec(packageSpec);
+			var namedBuilds = await repository.LookupSpec(packageSpec);
 			NamedBuild result;
 			switch (resolutionMode) {
 				case ResolutionMode.Highest:
@@ -116,19 +117,19 @@ namespace MPM.Core.Dependency {
 			return result;
 		}
 
-		public NamedBuild[] ResolveRecursive(PackageSpec packageSpec, PackageSpecLookup lookupPackageSpec, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public async Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, String arch, String platform, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var output = new List<NamedBuild>();
-			var resolvedBuild = ResolveDependency(packageSpec, lookupPackageSpec, packageSide, constraints, resolutionMode);
+			var resolvedBuild = await ResolveDependency(packageSpec, repository, arch, platform, packageSide, constraints, resolutionMode);
 			Debug.Assert(resolvedBuild != null, "ResolveDependency is not allowed to return null");
 			output.Add(resolvedBuild);
 			foreach (var dependency in resolvedBuild.Dependencies) {
-				var depSpec = dependency.ToSpec();
+				var depSpec = dependency.ToSpec(arch, platform);
 				if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
 					continue;
 				}
 				NamedBuild[] resolvedDeps;
 				try {
-					resolvedDeps = ResolveRecursive(depSpec, lookupPackageSpec, packageSide, constraints, resolutionMode);
+					resolvedDeps = await ResolveRecursive(depSpec, repository, arch, platform, packageSide, constraints, resolutionMode);
 					Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
 				} catch (DependencyException e) {
 					throw new DependencyException("Could not resolve package, no matching dependency tree found", e, depSpec, resolvedBuild);
