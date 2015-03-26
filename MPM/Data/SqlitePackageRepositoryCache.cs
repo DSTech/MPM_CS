@@ -43,27 +43,27 @@ namespace MPM.Data {
 			throw new NotImplementedException();
 		}
 
-		public Build FetchBuild(string packageName, SemanticVersion version) {
+		public Task<Build> FetchBuild(string packageName, SemanticVersion version) {
 			throw new NotImplementedException();
 		}
 
-		public Package FetchBuilds(string packageName, VersionSpec versionSpec) {
+		public Task<Package> FetchBuilds(string packageName, VersionSpec versionSpec) {
 			throw new NotImplementedException();
 		}
 
-		public Package FetchPackage(string packageName) {
+		public Task<Package> FetchPackage(string packageName) {
 			throw new NotImplementedException();
 		}
 
-		public IEnumerable<Package> FetchPackageList() {
+		public IObservable<Package> FetchPackageList() {
 			throw new NotImplementedException();
 		}
 
-		public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
+		public IObservable<Package> FetchPackageList(DateTime updatedAfter) {
 			throw new NotImplementedException();
 		}
 
-		public void Sync() {
+		public Task Sync() {
 			throw new NotImplementedException();
 		}
 
