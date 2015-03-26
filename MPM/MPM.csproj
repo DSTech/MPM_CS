@@ -146,6 +146,8 @@
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\IServerManager.cs" />
+    <Compile Include="Data\IPackageRepository.cs" />
+    <Compile Include="Data\IPackageRepositoryCache.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Core\Archival\ArchiveChunk.cs" />
@@ -182,7 +184,9 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Core\Instances\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\sqlite3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
