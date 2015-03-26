@@ -148,6 +148,7 @@
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Data\IPackageRepository.cs" />
     <Compile Include="Data\IPackageRepositoryCache.cs" />
+    <Compile Include="Data\SqlitePackageRepositoryCache.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Core\Archival\ArchiveChunk.cs" />
