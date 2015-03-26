@@ -55,11 +55,11 @@ namespace MPM.Data {
 			throw new NotImplementedException();
 		}
 
-		public IObservable<Package> FetchPackageList() {
+		public Task<IEnumerable<Package>> FetchPackageList() {
 			throw new NotImplementedException();
 		}
 
-		public IObservable<Package> FetchPackageList(DateTime updatedAfter) {
+		public Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter) {
 			throw new NotImplementedException();
 		}
 

@@ -14,14 +14,14 @@ namespace MPM.Data {
 		/// Should be used to find packages for which further information may be looked up via <see cref="FetchPackage(string)"/> or <see cref="FetchBuild(string, SemanticVersion)"/>.
 		/// </summary>
 		/// <returns>Multiple <see cref="Package"/> instances containing, at minimum, the name of the package.</returns>
-		IObservable<Package> FetchPackageList();
+		Task<IEnumerable<Package>> FetchPackageList();
 		/// <summary>
 		/// Similar to <see cref="FetchPackageList"/>, fetches only packages which have changed since the specified <paramref name="updatedAfter"/> time.
 		/// May contain more packages than strictly those updated after the specified time, depending on the repository's server-side implementation.
 		/// </summary>
 		/// <param name="updatedAfter"></param>
 		/// <returns>Multiple <see cref="Package"/> instances containing, at minimum, the name of the package.</returns>
-		IObservable<Package> FetchPackageList(DateTime updatedAfter);
+		Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter);
 		Task<Package> FetchPackage(String packageName);
 		/// <summary>
 		/// Looks up a particular build of a package.
