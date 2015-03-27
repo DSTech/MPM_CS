@@ -3,4 +3,3 @@ mono: latest
 solution: MPM.sln
 script:
   - xbuild /p:Configuration=Release /tv:4.0 MPM.sln
-  - mono ./packages/xunit.runner.console.2.0.0/tools/xunit.console.exe ./MPMTest/bin/Release/MPMTest.dll
