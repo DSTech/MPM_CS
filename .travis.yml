@@ -5,5 +5,5 @@ install:
   - nuget restore MPM.sln
   - nuget install xunit.runner.console -Version 2.0.0 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Release MPM.sln
+  - xbuild /p:Configuration=Release /tv:4.0 MPM.sln
   - mono ./testrunner/xunit.runners.2.0.0/tools/xunit.console.exe ./MPMTest/bin/Release/MPMTest.dll
