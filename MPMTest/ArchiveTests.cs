@@ -1,26 +1,24 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MPM.Core.Archival;
+using Xunit;
 
 namespace MPMTest {
-	[TestClass]
 	public class LeadingHashTests {
-		[TestMethod]
+		[Fact]
 		public void LeadingHashVerification() {
 			string testString = DateTime.Today.ToString();
 			var testInputValue = System.Text.Encoding.UTF8.GetBytes(testString);
 			var hashed = Archive.ApplyLeadingHash(testInputValue);
-			Assert.IsNotNull(hashed);
+			Assert.NotNull(hashed);
 
 			var verifiedResult = Archive.VerifyLeadingHash(hashed);
-			Assert.IsNotNull(verifiedResult);
-			Assert.AreEqual(testString, System.Text.Encoding.UTF8.GetString(verifiedResult));
+			Assert.NotNull(verifiedResult);
+			Assert.Equal(testString, System.Text.Encoding.UTF8.GetString(verifiedResult));
 		}
 	}
-	[TestClass]
 	public class ArchiveTests {
-		[TestMethod]
+		[Fact]
 		public async Task ArchiveVerificationSplit() {
 			const string packageName = "testingArchive";
 			string testString = DateTime.Today.ToString();
@@ -28,25 +26,25 @@ namespace MPMTest {
 			var testInputValue = System.Text.Encoding.UTF8.GetBytes(testString);
 
 			var archive = await Archive.CreateArchive(packageName, testInputValue, 16);
-			Assert.IsNotNull(archive);
+			Assert.NotNull(archive);
 
 			var unpacked = await archive.Unpack(packageName);
-			Assert.IsNotNull(unpacked);
-			Assert.AreEqual(testString, System.Text.Encoding.UTF8.GetString(unpacked));
+			Assert.NotNull(unpacked);
+			Assert.Equal(testString, System.Text.Encoding.UTF8.GetString(unpacked));
 		}
 
-		[TestMethod]
+		[Fact]
 		public async Task ArchiveVerification() {
 			const string packageName = "testingArchive";
 			string testString = DateTime.Today.ToString();
 			var testInputValue = System.Text.Encoding.UTF8.GetBytes(testString);
 
 			var archive = await Archive.CreateArchive(packageName, testInputValue);
-			Assert.IsNotNull(archive);
+			Assert.NotNull(archive);
 
 			var unpacked = await archive.Unpack(packageName);
-			Assert.IsNotNull(unpacked);
-			Assert.AreEqual(testString, System.Text.Encoding.UTF8.GetString(unpacked));
+			Assert.NotNull(unpacked);
+			Assert.Equal(testString, System.Text.Encoding.UTF8.GetString(unpacked));
 		}
 	}
 }

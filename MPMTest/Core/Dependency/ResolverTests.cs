@@ -1,25 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MPM.Core.Dependency;
 using MPM.Net.DTO;
 using semver.tools;
+using Xunit;
 
 namespace MPMTest.Core.Dependency {
-	[TestClass]
 	public class ResolverTests {
-		[TestMethod]
+		[Fact]
 		public async Task Empty() {
-			Assert.IsTrue((await new Resolver().Resolve(Configuration.Empty, new TestPackageRepository(new Package[0]), "testArch", "testPlatform")).Packages.Length == 0);
+			Assert.True((await new Resolver().Resolve(Configuration.Empty, new TestPackageRepository(new Package[0]))).Packages.Length == 0);
 		}
-		[TestMethod]
+		[Fact]
 		public async Task ResolutionNoDependencies() {
 			var resolver = new Resolver();
 			var testPackageSpec = new PackageSpec {
 				Name = "testPackage",
 				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 				Manual = true,
+				Arch = "testArch",
+				Platform = "testPlatform",
 			};
 			var testConfig = new Configuration {
 				Packages = new PackageSpec[] {
@@ -58,8 +59,8 @@ namespace MPMTest.Core.Dependency {
 					},
 				},
 			});
-			var resultant = await resolver.Resolve(testConfig, testRepository, "testArch", "testPlatform");
-			Assert.IsTrue(
+			var resultant = await resolver.Resolve(testConfig, testRepository);
+			Assert.True(
 				testConfig
 					.Packages
 					.Where(p => p.Manual)
@@ -67,22 +68,24 @@ namespace MPMTest.Core.Dependency {
 					.Count() == 0,
 				"All manual packages must be accounted for in the resulting configuration"
 			);
-			Assert.IsTrue(
+			Assert.True(
 				resultant
 					.Packages
 					.Where(p => !testConfig.Packages.Any(nb => nb.Name == p.Name))
 					.Count() == 0,
 				"The resolver may not add manual packages to the resulting configuration"
 			);
-			Assert.IsTrue(resultant.Packages.Any(build => build.Name == testPackageSpec.Name));
+			Assert.True(resultant.Packages.Any(build => build.Name == testPackageSpec.Name));
 		}
-		[TestMethod]
+		[Fact]
 		public async Task ResolutionWithDependencies() {
 			var resolver = new Resolver();
 			var dependentPackageSpec = new PackageSpec {
 				Name = "dependentPackage",
 				Version = new VersionSpec(SemanticVersion.Parse("0.0.0"), false, SemanticVersion.Parse("0.0.2"), true),
 				Manual = true,
+				Arch = "testArch",
+				Platform = "testPlatform",
 			};
 			var dependentConfig = new Configuration {
 				Packages = new PackageSpec[] {
@@ -156,11 +159,11 @@ namespace MPMTest.Core.Dependency {
 					},
 				}
 			});
-			var resultant = await resolver.Resolve(dependentConfig, lookupPackageSpec, "testArch", "testPlatform");
-			Assert.IsTrue(resultant.Packages.Length == 2);
-			Assert.IsTrue(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
-			Assert.IsTrue(resultant.Packages.Last().Name == "dependentPackage", "Dependent packages should occur after their dependencies");
-			Assert.IsTrue(
+			var resultant = await resolver.Resolve(dependentConfig, lookupPackageSpec);
+			Assert.True(resultant.Packages.Length == 2);
+			Assert.True(resultant.Packages.First().Name == "anticedentPackage", "Dependencies should appear before their dependent children");
+			Assert.True(resultant.Packages.Last().Name == "dependentPackage", "Dependent packages should occur after their dependencies");
+			Assert.True(
 				dependentConfig
 					.Packages
 					.Where(p => p.Manual)
@@ -169,7 +172,7 @@ namespace MPMTest.Core.Dependency {
 				"All manual packages must be accounted for in the resulting configuration"
 			);
 		}
-		[TestMethod]
+		[Fact]
 		public async Task ResolutionSideDependencies() {
 			var resolver = new Resolver();
 			var dependentPackageBuilds = new[] {
@@ -282,12 +285,14 @@ namespace MPMTest.Core.Dependency {
 						Name = "dependentPackage",
 						Version = new VersionSpec(SemanticVersion.Parse("0.0.1")),
 						Manual = true,
+						Arch = "testArch",
+						Platform = "testPlatform",
 					},
 				},
 				Side = PackageSide.Client,
 			};
-			var resultantConfigSameVersionSidePref = await resolver.Resolve(dependentConfigSameVersionSidePref, testRepository, "testArch", "testPlatform");
-			Assert.IsTrue(
+			var resultantConfigSameVersionSidePref = await resolver.Resolve(dependentConfigSameVersionSidePref, testRepository);
+			Assert.True(
 				resultantConfigSameVersionSidePref
 					.Packages
 					.Where(p => p.Name == "anticedentPackage")
@@ -300,12 +305,14 @@ namespace MPMTest.Core.Dependency {
 						Name = "dependentPackage",
 						Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 						Manual = true,
+						Arch = "testArch",
+						Platform = "testPlatform",
 					},
 				},
 				Side = PackageSide.Client,
 			};
-			var resultantConfigDifferentVersionVersionPref = await resolver.Resolve(dependentConfigDifferentVersionVersionPref, testRepository, "testArch", "testRepository");
-			Assert.IsTrue(
+			var resultantConfigDifferentVersionVersionPref = await resolver.Resolve(dependentConfigDifferentVersionVersionPref, testRepository);
+			Assert.True(
 				resultantConfigDifferentVersionVersionPref
 					.Packages
 					.Where(p => p.Name == "anticedentPackage")
@@ -313,7 +320,7 @@ namespace MPMTest.Core.Dependency {
 				"Packages should prefer those of the higher version, even when the preferred side are available for a lower version"
 			);
 		}
-		[TestMethod]
+		[Fact]
 		public void SortBuilds() {
 			var r = new Resolver();
 			var builds = new NamedBuild[] {
@@ -353,7 +360,7 @@ namespace MPMTest.Core.Dependency {
 				},
 			};
 			//Input must not contain self-dependency
-			Assert.IsFalse(builds.Any(build => build.Dependencies.Any(dependency => dependency.Name == build.Name)), "The input must not contain self-dependent packages");
+			Assert.False(builds.Any(build => build.Dependencies.Any(dependency => dependency.Name == build.Name)), "The input must not contain self-dependent packages");
 			//At least one input must be circularly-dependent
 			{
 				var wasCircular = false;
@@ -369,7 +376,7 @@ namespace MPMTest.Core.Dependency {
 						break;
 					}
 				}
-				Assert.IsTrue(
+				Assert.True(
 					wasCircular,
 					"At least one input must be directly circularly-dependent to properly test the functionality"
 				);
@@ -379,7 +386,7 @@ namespace MPMTest.Core.Dependency {
 				var packageNames = new SortedSet<string>(builds.Select(b => b.Name));
 				foreach (var build in builds) {
 					foreach (var dep in build.Dependencies) {
-						CollectionAssert.Contains(packageNames, dep.Name, "The input build array should contain all dependencies to allow sorting");
+						Assert.True(packageNames.Contains(dep.Name), "The input build array should contain all dependencies to allow sorting");
 					}
 				}
 			}
@@ -399,17 +406,17 @@ namespace MPMTest.Core.Dependency {
 						break;
 					}
 				}
-				Assert.IsFalse(sorted, "The input build array should not be initially sorted");
+				Assert.False(sorted, "The input build array should not be initially sorted");
 			}
 			var output = r.SortBuilds(builds).ToArray();
 			//Dependencies must appear in order of least dependence
 			{
-				Assert.IsTrue(output.Length == 4);
+				Assert.True(output.Length == 4);
 				var orderErrMsg = "Dependencies must occur in order of least dependence";
-				Assert.IsTrue(output[0].Name == "D", orderErrMsg);
-				Assert.IsTrue(output[1].Name == "B", orderErrMsg);
-				Assert.IsTrue(output[2].Name == "C", orderErrMsg);
-				Assert.IsTrue(output[3].Name == "A", orderErrMsg);
+				Assert.True(output[0].Name == "D", orderErrMsg);
+				Assert.True(output[1].Name == "B", orderErrMsg);
+				Assert.True(output[2].Name == "C", orderErrMsg);
+				Assert.True(output[3].Name == "A", orderErrMsg);
 			}
 			//Output must be sorted
 			{
@@ -419,7 +426,7 @@ namespace MPMTest.Core.Dependency {
 					foreach (var dep in build.Dependencies) {
 						if (!namesSeen.Contains(dep.Name)) {
 							//Only fail here if the object is not codependent with the dependency and the dependency is not previously seen
-							Assert.IsTrue(
+							Assert.True(
 								namesSeen.Contains(dep.Name) ||
 								output
 									.Where(other => other.Name == dep.Name)

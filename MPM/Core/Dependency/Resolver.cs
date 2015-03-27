@@ -55,7 +55,7 @@ namespace MPM.Core.Dependency {
 				.ToArray();
 			return results;
 		}
-		public async Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository repository, String arch, String platform) {
+		public async Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository repository) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
 			var output = new List<NamedBuild>();
 
@@ -66,7 +66,7 @@ namespace MPM.Core.Dependency {
 
 				NamedBuild[] resolvedSet;
 				try {
-					resolvedSet = await ResolveRecursive(packageSpec, repository, arch, platform);
+					resolvedSet = await ResolveRecursive(packageSpec, repository);
 					Debug.Assert(resolvedSet != null);
 				} catch (DependencyException e) {
 					throw new DependencyException("The specified dependencies could not be resolved", e);
@@ -84,59 +84,60 @@ namespace MPM.Core.Dependency {
 			};
 		}
 
-		public async Task<NamedBuild> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, String Arch, String Platform, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public async Task<NamedBuild[]> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
 			var namedBuilds = await repository.LookupSpec(packageSpec);
-			NamedBuild result;
+			NamedBuild[] result;
 			switch (resolutionMode) {
 				case ResolutionMode.Highest:
-					result = namedBuilds.FirstOrDefault(nb => constraintsArr.All(constraint => constraint.Allows(nb)));
+					result = namedBuilds
+						.Where(nb => (nb.Side == packageSide || nb.Side == PackageSide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
+						.OrderByDescending(nb => nb.Version)
+						.ThenByDescending(nb => nb.Side == packageSide)
+						.ToArray();
 					break;
 				case ResolutionMode.HighestStable:
-					NamedBuild highest = null;
-					foreach (var build in namedBuilds) {
-						if (!constraintsArr.All(constraint => constraint.Allows(build))) {
-							continue;
-						}
-						if (build.Stable) {
-							result = build;
-							break;
-						}
-						if (highest == null) {
-							highest = build;
-						}
-					}
-					result = highest;
+					result = namedBuilds
+						.Where(nb => (nb.Side == packageSide || nb.Side == PackageSide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
+						.OrderByDescending(nb => nb.Stable)
+						.ThenByDescending(nb => nb.Version)
+						.ThenByDescending(nb => nb.Side == packageSide)
+						.ToArray();
 					break;
 				default:
 					throw new NotImplementedException(String.Format("{0} \"{1}\" is unsupported by {2}", nameof(ResolutionMode), resolutionMode, this.GetType().Name));
 			}
-			if (result == null) {
+			if (result.Length == 0) {
 				throw new DependencyException("Could not resolve package, no matching packages found.", packageSpec);
 			}
 			return result;
 		}
 
-		public async Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, String arch, String platform, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
-			var output = new List<NamedBuild>();
-			var resolvedBuild = await ResolveDependency(packageSpec, repository, arch, platform, packageSide, constraints, resolutionMode);
-			Debug.Assert(resolvedBuild != null, "ResolveDependency is not allowed to return null");
-			output.Add(resolvedBuild);
-			foreach (var dependency in resolvedBuild.Dependencies) {
-				var depSpec = dependency.ToSpec(arch, platform);
-				if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
-					continue;
+		public async Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+			var possibleBuilds = await ResolveDependency(packageSpec, repository, packageSide, constraints, resolutionMode);
+			Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");
+			foreach (var possibleBuild in possibleBuilds) {
+				var output = new List<NamedBuild>();
+				Debug.Assert(possibleBuild != null, "ResolveDependency must not return null elements");
+				output.Add(possibleBuild);
+				foreach (var dependency in possibleBuild.Dependencies) {
+					var depSpec = dependency.ToSpec(packageSpec.Arch, packageSpec.Platform);
+					if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
+						continue;
+					}
+					NamedBuild[] resolvedDeps;
+					try {
+						resolvedDeps = await ResolveRecursive(depSpec, repository, packageSide, constraints, resolutionMode);
+						Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
+					} catch (DependencyException) {
+						goto nextBuild;
+					}
+					output.AddRange(resolvedDeps);
 				}
-				NamedBuild[] resolvedDeps;
-				try {
-					resolvedDeps = await ResolveRecursive(depSpec, repository, arch, platform, packageSide, constraints, resolutionMode);
-					Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
-				} catch (DependencyException e) {
-					throw new DependencyException("Could not resolve package, no matching dependency tree found", e, depSpec, resolvedBuild);
-				}
-				output.AddRange(resolvedDeps);
-			}
-			return SortBuilds(output).ToArray();
+				return SortBuilds(output).ToArray();
+				nextBuild: continue;
+            }
+			throw new DependencyException("Could not resolve package, no viable dependency tree found", packageSpec);
 		}
 	}
 }

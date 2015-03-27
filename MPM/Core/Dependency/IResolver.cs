@@ -24,7 +24,7 @@ namespace MPM.Core.Dependency {
 		/// Repository (Preferably cached, due to resolution behavior requiring many requests) which will source the information for resolution.
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
-		Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository packageRepository, String arch, String platform);
+		Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository packageRepository);
 		/// <summary>
 		/// Returns a build that qualifies with the specified dependency constraints.
 		/// </summary>
@@ -35,8 +35,8 @@ namespace MPM.Core.Dependency {
 		/// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
 		/// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
-		/// <returns>A build satisfying the spec, qualifying with all constraints, resolved with the specified behavior</returns>
-		Task<NamedBuild> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, String arch, String platform, PackageSide side = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		/// <returns>A set of builds satisfying the spec, qualifying with all constraints, resolved with the specified behavior, ordered from most to least prefered</returns>
+		Task<NamedBuild[]> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide side = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 		/// <summary>
 		/// A variant of ResolveDependency which should implement additional constraints on each cycle until a dependency tree can be resolved as non-null.
 		/// Should attempt to resolve each subsequent build in the package spec,
@@ -56,6 +56,6 @@ namespace MPM.Core.Dependency {
 		/// A topologically-ordered array of dependencies on successful resolution back to root.
 		/// Null if resolution fails.
 		/// </returns>
-		Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, String arch, String platform, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
     }
 }

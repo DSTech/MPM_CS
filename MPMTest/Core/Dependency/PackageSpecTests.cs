@@ -1,12 +1,11 @@
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MPM.Core.Dependency;
 using semver.tools;
+using Xunit;
 
 namespace MPMTest.Core.Dependency {
-	[TestClass]
 	public class PackageSpecTests {
-		[TestMethod]
+		[Fact]
 		public void Equality() {
 			var first = new PackageSpec {
 				Name = "testPackage",
@@ -23,9 +22,9 @@ namespace MPMTest.Core.Dependency {
 				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 				Manual = false,
 			};
-			Assert.AreEqual(first, second);
-			Assert.IsTrue(new[] { first }.Except(new[] { second }).Count() == 0);
-			Assert.AreNotEqual(second, third);
+			Assert.Equal(first, second);
+			Assert.True(new[] { first }.Except(new[] { second }).Count() == 0);
+			Assert.NotEqual(second, third);
 		}
 	}
 }

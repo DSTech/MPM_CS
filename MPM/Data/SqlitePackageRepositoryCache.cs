@@ -43,7 +43,7 @@ namespace MPM.Data {
 			throw new NotImplementedException();
 		}
 
-		public Task<Build> FetchBuild(string packageName, SemanticVersion version) {
+		public Task<Build> FetchBuild(string packageName, SemanticVersion version, PackageSide side, string arch, string platform) {
 			throw new NotImplementedException();
 		}
 

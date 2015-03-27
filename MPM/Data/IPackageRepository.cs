@@ -29,10 +29,10 @@ namespace MPM.Data {
 		/// <param name="packageName"></param>
 		/// <param name="version"></param>
 		/// <returns>
-		/// A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package of the specified name was found.
-		/// Builds must be returned in descending order of version.
+		/// A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package within the specified constraints was found.
+		/// Builds must be returned in descending order of version, with side-specific returned before universal packages.
 		/// </returns>
-		Task<Build> FetchBuild(String packageName, SemanticVersion version);
+		Task<Build> FetchBuild(String packageName, SemanticVersion version, PackageSide side, String arch, String platform);
 		/// <summary>
 		/// Looks up a package for any versions matching a specifier.
 		/// </summary>
@@ -40,7 +40,7 @@ namespace MPM.Data {
 		/// <param name="versionSpec">The version specification to check against before returning a build</param>
 		/// <returns>
 		/// A <see cref="Package"/> instance containing only builds which comply with the <paramref name="versionSpec"/> given. Null when no package of the specified name was found.
-		/// Builds must be returned in descending order of version.
+		/// Builds must be returned in descending order of version, with side-specific returned before universal packages.
 		/// </returns>
 		Task<Package> FetchBuilds(String packageName, VersionSpec versionSpec);
 	}
