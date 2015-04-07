@@ -23,7 +23,7 @@ namespace MPM.Data {
 			this.repository = repository;
 			this.ownsRepositoryInstance = ownsRepositoryInstance;
 			var strBldr = new SQLiteConnectionStringBuilder();
-			if(!File.Exists(sqliteDbLocation.AbsolutePath)) {
+			if (!File.Exists(sqliteDbLocation.AbsolutePath)) {
 				SQLiteConnection.CreateFile(sqliteDbLocation.AbsolutePath);
 			}
 			strBldr.DataSource = sqliteDbLocation.AbsolutePath;
