@@ -173,7 +173,9 @@
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
+    <Compile Include="Core\Instances\ILauncher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
+    <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Data\DBreezePackageRepositoryCache.cs" />
     <Compile Include="Data\IPackageRepository.cs" />

@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MPM.Core.Instances;
 
 namespace MPM {
-	public class MinecraftLauncher : IDisposable {
+	public class MinecraftLauncher : ILauncher, IDisposable {
 		public string UserName { get; set; }
-		public void Launch() {
+		public void Launch(Instance instance) {
 			throw new NotImplementedException();
 		}
 
