@@ -41,7 +41,7 @@ namespace MPM.CLI {
 		[ArgShortcut("l"), ArgShortcut("-l"), ArgShortcut("--launch")]
 		public void LaunchMinecraft(LaunchMinecraftArgs args) {
 			using (var minecraftLauncher = args.ToConfiguredLauncher()) {
-				minecraftLauncher.Launch();
+				throw new NotImplementedException();//minecraftLauncher.Launch();
 			}
 		}
 	}
