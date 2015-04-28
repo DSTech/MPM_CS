@@ -55,7 +55,7 @@ namespace MPM.Core.Dependency {
 				.ToArray();
 			return results;
 		}
-		public async Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository repository) {
+		public async Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository repository) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
 			var output = new List<NamedBuild>();
 
@@ -79,7 +79,7 @@ namespace MPM.Core.Dependency {
 				output.AddRange(SortBuilds(unsortedOutput));
 			}
 			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.Name).Count());
-			return new ResolvedConfiguration {
+			return new InstanceConfiguration {
 				Packages = output.ToArray(),
 			};
 		}

@@ -24,7 +24,7 @@ namespace MPM.Core.Dependency {
 		/// Repository (Preferably cached, due to resolution behavior requiring many requests) which will source the information for resolution.
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
-		Task<ResolvedConfiguration> Resolve(Configuration target, IPackageRepository packageRepository);
+		Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository packageRepository);
 		/// <summary>
 		/// Returns a build that qualifies with the specified dependency constraints.
 		/// </summary>

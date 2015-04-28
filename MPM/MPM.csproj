@@ -166,7 +166,7 @@
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
-    <Compile Include="Core\Dependency\ResolvedConfiguration.cs" />
+    <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
     <Compile Include="Core\Dependency\NamedBuild.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
@@ -178,12 +178,17 @@
     <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
+    <Compile Include="Core\Instances\FileSystem.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
+    <Compile Include="Core\Instances\IFileSystem.cs" />
+    <Compile Include="Core\Instances\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Data\CouchbasePackageRepositoryCache.cs" />
+    <Compile Include="Data\IHashRepository.cs" />
+    <Compile Include="Data\IHashRetriever.cs" />
     <Compile Include="Data\IPackageRepository.cs" />
     <Compile Include="Data\IPackageRepositoryCache.cs" />
     <Compile Include="Data\SqlitePackageRepositoryCache.cs" />
