@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
+using MPM.Core.FileSystem;
 using MPM.Data;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Instances {
 	public class Installer {
 		private readonly Instance instance;
+		private readonly IFileIndex fileIndex;
 		private readonly IFileSystem fileSystem;
 		private readonly IPackageRepository packageRepository;
 		private readonly IHashRepository hashRepository;
@@ -18,6 +20,7 @@ namespace MPM.Core.Instances {
 			this.instance = instance;
 			this.packageRepository = packageRepository;
 			this.hashRepository = hashRepository;
+			fileIndex = instance.GetFileIndex();
 			fileSystem = instance.GetFileSystem();
 		}
 		/// <summary>
@@ -32,6 +35,19 @@ namespace MPM.Core.Instances {
 		public async Task<InstanceConfiguration> Install(NamedBuild build) {
 			//TODO: Error if any builds of the same package are already installed
 			var archiveContents = await RetrieveArchive(hashRepository, build.Name, build.Hashes);
+			//Open archiveContents as a VFS
+			//Read and parse archiveContentsVfs.InstallerScript to operations
+			//var backup = fileIndex.Save();
+			//For each IInstallerOperation "operation", with dependencies of package specified:
+			//	fileIndex.Update(operation, dependencyNames)//Includes interface names, will try to force this operation to occur before or "simultaneously with" other operations
+			//If an update fails:
+			//	fileIndex.Restore(backup)
+			//	throw new InstallationException();
+			//var delta = fileIndex.CalculateDelta(fileSystem);
+			//TODO: Clear non-config changes to filesystem
+			//if !fileSystem.Consider(delta)://TODO: Implement a simulation of operations to internally determine consistancy with state
+			//	throw new InstallationException();
+			//fileSystem.Apply(delta);
 			throw new NotImplementedException();
 		}
 		/// <summary>

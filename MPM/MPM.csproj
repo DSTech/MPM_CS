@@ -178,9 +178,12 @@
     <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
-    <Compile Include="Core\Instances\FileSystem.cs" />
+    <Compile Include="Core\FileSystem\FileSystem.cs" />
+    <Compile Include="Core\FileSystem\IFileDelta.cs" />
+    <Compile Include="Core\FileSystem\IFileTreeDelta.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
-    <Compile Include="Core\Instances\IFileSystem.cs" />
+    <Compile Include="Core\FileSystem\IFileIndex.cs" />
+    <Compile Include="Core\FileSystem\IFileSystem.cs" />
     <Compile Include="Core\Instances\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
