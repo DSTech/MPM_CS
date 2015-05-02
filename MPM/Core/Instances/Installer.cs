@@ -66,13 +66,13 @@ namespace MPM.Core.Instances {
 				}
 			} catch (Exception) {
 				fileIndex.Restore(backup);
+				throw new InstallationException();
 			}
-			//	throw new InstallationException();
-			//var delta = fileIndex.CalculateDelta(fileSystem);
+			var delta = fileIndex.CalculateDelta(fileSystem);
 			//TODO: Clear non-config changes to filesystem
 			//if !fileSystem.Consider(delta)://TODO: Implement a simulation of operations to internally determine consistancy with state
 			//	throw new InstallationException();
-			//fileSystem.Apply(delta);
+			fileSystem.Apply(delta);
 			throw new NotImplementedException();
 		}
 	}
