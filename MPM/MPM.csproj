@@ -109,6 +109,10 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.1.1.0.102\lib\net40\Platform.VirtualFileSystem.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Platform.VirtualFileSystem.Providers.Zip, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.102\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Platform.Xml.Serialization, Version=1.1.0.177, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.177\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
