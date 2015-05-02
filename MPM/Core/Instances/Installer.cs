@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,15 +34,39 @@ namespace MPM.Core.Instances {
 		/// <exception cref="InvalidOperationException">Thrown when a version of the specified package is already installed.</exception>
 		/// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
 		public async Task<InstanceConfiguration> Install(NamedBuild build) {
+			//TODO: Persist the package-data for the NamedBuild being installed
 			//TODO: Error if any builds of the same package are already installed
-			var archiveContents = await RetrieveArchive(hashRepository, build.Name, build.Hashes);
-			//Open archiveContents as a VFS
-			//Read and parse archiveContentsVfs.InstallerScript to operations
-			//var backup = fileIndex.Save();
-			//For each IInstallerOperation "operation", with dependencies of package specified:
-			//	fileIndex.Update(operation, dependencyNames)//Includes interface names, will try to force this operation to occur before or "simultaneously with" other operations
-			//If an update fails:
-			//	fileIndex.Restore(backup)
+			var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);
+			var archiveVFS = VirtualFileSystem.FromData(archiveContents);
+			string packageJson;
+			try {
+				using (var packageJsonReader = new StreamReader(archiveVFS.Read("package.json"))) {
+					packageJson = packageJsonReader.ReadToEnd();
+				}
+			} catch {
+				throw new InstallationException("Failed to read package.json from package");
+			}
+			var installationScriptUnparsed = new PackageJsonParser(packageJson).InstallationScript;
+			if (installationScriptUnparsed == null) {
+				//TODO: Determine whether or not the spec allows or should allow a "blank" installation,
+				//	defaulting to merely placing the contents into the /mods directory?
+				throw new InstallationException("Installation script did not exist in package");
+			}
+			IEnumerable<IInstallationOperation> installationScript;
+			try {
+				installationScript = InstallationScriptParser.Parse(installationScriptUnparsed);
+			} catch (FormatException e) {
+				throw new InstallationException("Installation script was of incorrect format", e);
+			}
+			var backup = fileIndex.Save();
+			try {
+				foreach (var installationOperation in installationScript) {
+					//TODO: Index should store origin of the file (Essentially the file declaration) and the name of the package the installation instruction came from
+					fileIndex.Update(build.Name, installationOperation);
+				}
+			} catch (Exception) {
+				fileIndex.Restore(backup);
+			}
 			//	throw new InstallationException();
 			//var delta = fileIndex.CalculateDelta(fileSystem);
 			//TODO: Clear non-config changes to filesystem
@@ -49,42 +74,6 @@ namespace MPM.Core.Instances {
 			//	throw new InstallationException();
 			//fileSystem.Apply(delta);
 			throw new NotImplementedException();
-		}
-		/// <summary>
-		/// Collects and assembles an archive's hashes from the given hash repository.
-		/// </summary>
-		/// <param name="hashRepository">The repository within which to search for hashes.</param>
-		/// <param name="hashes">The hashes which must be assembled, in order, to produce the package archive</param>
-		/// <returns>A byte array of the unpacked archive.</returns>
-		/// <exception cref="KeyNotFoundException">Thrown when a package could not be resolved to an archive or retrieved.</exception>
-		/// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
-		private async Task<byte[]> RetrieveArchive(IHashRepository hashRepository, string packageName, string[] hashes) {
-			var hashRetrievers = await hashRepository.Resolve(hashes);
-			var retrievers = hashes.Zip(hashRetrievers, (hash, retriever) => Tuple.Create(hash, retriever));
-			{
-				var failedResolutions = retrievers.Where(retr => retr.Item2 == null).ToArray();
-				if (failedResolutions.Length > 0) {
-					throw new KeyNotFoundException(
-						String.Format(
-							"Could not resolve method of retreival for hashes:\n[\n{0}\n]",
-							String.Join(
-								",\n",
-								failedResolutions.Select(
-									item => String.Format("\t\"{0}\"", item.Item1)
-								)
-							)
-						),
-						new AggregateException(
-							failedResolutions.Select(failedResolution => new KeyNotFoundException(failedResolution.Item1))//An exception is created with each hash that could not be located.
-						)
-					);//Outputs a json-esque array to allow easy export by a user alongside an aggregate containing a more easily computer-understandable output
-				}
-			}
-			//TODO: Switch to TPL Dataflow as described in https://msdn.microsoft.com/en-us/library/hh228603.aspx for parallelism control to prevent flooding
-			//WhenAll preserves order of provided tasks, so each value will be associated with its parent hash
-			var retrievedHashes = (await Task.WhenAll(retrievers.Select(async retriever => await retriever.Item2.Retrieve())));
-			var archive = new Archival.Archive(retrievedHashes.Select(retrievedHash => new Archival.EncryptedChunk(retrievedHash)));
-			return await archive.Unpack(packageName);
 		}
 	}
 }

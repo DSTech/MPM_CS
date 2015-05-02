@@ -1,4 +1,4 @@
-﻿namespace MPM.Core.FileSystem {
+namespace MPM.Core.FileSystem {
 	public interface IFileDelta {
 	}
 }
