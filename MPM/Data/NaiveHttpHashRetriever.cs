@@ -14,7 +14,7 @@ namespace MPM.Data {
 			: this(Convert.FromBase64String(hash), uri) { }
 		public NaiveHttpHashRetriever(byte[] hash, Uri uri) {
 			Hash = hash;
-			@Uri = uri;
+			this.@Uri = uri;
 		}
 		public async Task<byte[]> Retrieve() {
 			using (var stream = await RetrieveStream()) {
@@ -22,7 +22,7 @@ namespace MPM.Data {
 			}
 		}
 		public async Task<Stream> RetrieveStream() {
-			var req = WebRequest.CreateHttp(@Uri);
+			var req = WebRequest.CreateHttp(this.@Uri);
 			return await req.GetRequestStreamAsync();
 		}
 	}
