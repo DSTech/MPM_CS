@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace MPM.Data {
 	public class NaiveHttpHashRetriever : IHashRetriever {
 		public byte[] Hash { get; }
-		public Uri Uri { get; }
+		public Uri @Uri { get; }
 		public NaiveHttpHashRetriever(string hash, Uri uri)
 			: this(Convert.FromBase64String(hash), uri) { }
 		public NaiveHttpHashRetriever(byte[] hash, Uri uri) {
 			Hash = hash;
-			Uri = uri;
+			@Uri = uri;
 		}
 		public async Task<byte[]> Retrieve() {
 			using (var stream = await RetrieveStream()) {
@@ -22,7 +22,7 @@ namespace MPM.Data {
 			}
 		}
 		public async Task<Stream> RetrieveStream() {
-			var req = WebRequest.CreateHttp(Uri);
+			var req = WebRequest.CreateHttp(@Uri);
 			return await req.GetRequestStreamAsync();
 		}
 	}
