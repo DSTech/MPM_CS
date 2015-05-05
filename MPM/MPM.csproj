@@ -207,12 +207,13 @@
     <Compile Include="Core\FileSystem\IFileSystem.cs" />
     <Compile Include="Core\Instances\IInstallationOperation.cs" />
     <Compile Include="Core\Instances\InstallationException.cs" />
-    <Compile Include="Core\Instances\InstallationScriptParser.cs" />
+    <Compile Include="Core\Info\InstallationScriptParser.cs" />
     <Compile Include="Core\Instances\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\FileSystem\VirtualFileSystem.cs" />
-    <Compile Include="Core\Instances\PackageJsonParser.cs" />
+    <Compile Include="Core\Info\PackageInfoParser.cs" />
+    <Compile Include="Core\Info\PackageJsonParser.cs" />
     <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Data\CouchbasePackageRepositoryCache.cs" />

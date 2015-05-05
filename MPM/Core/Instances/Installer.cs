@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
 using MPM.Core.FileSystem;
+using MPM.Core.Info;
 using MPM.Data;
 using MPM.Net.DTO;
 
@@ -38,23 +39,25 @@ namespace MPM.Core.Instances {
 			//TODO: Error if any builds of the same package are already installed
 			var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);
 			var archiveVFS = VirtualFileSystem.FromData(archiveContents);
-			string packageJson;
-			try {
-				using (var packageJsonReader = new StreamReader(archiveVFS.Read("package.json"))) {
-					packageJson = packageJsonReader.ReadToEnd();
+			PackageInfoParser packageInfo;
+			{
+				string packageJson;
+				try {
+					using (var packageJsonReader = new StreamReader(archiveVFS.Read("package.json"))) {
+						packageJson = packageJsonReader.ReadToEnd();
+					}
+				} catch {
+					throw new InstallationException("Failed to read package.json from package");
 				}
-			} catch {
-				throw new InstallationException("Failed to read package.json from package");
-			}
-			var installationScriptUnparsed = new PackageJsonParser(packageJson).InstallationScript;
-			if (installationScriptUnparsed == null) {
-				//TODO: Determine whether or not the spec allows or should allow a "blank" installation,
-				//	defaulting to merely placing the contents into the /mods directory?
-				throw new InstallationException("Installation script did not exist in package");
+				try {
+					packageInfo = new PackageInfoParser(packageJson);
+				} catch (FormatException e) {
+					throw new InstallationException("Package info was of incorrect format", e);
+				} 
 			}
 			IEnumerable<IInstallationOperation> installationScript;
 			try {
-				installationScript = InstallationScriptParser.Parse(installationScriptUnparsed);
+				installationScript = packageInfo.InstallationScript;
 			} catch (FormatException e) {
 				throw new InstallationException("Installation script was of incorrect format", e);
 			}
