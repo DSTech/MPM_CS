@@ -10,10 +10,10 @@ using MPM.Core.Info;
 using MPM.Data;
 using MPM.Net.DTO;
 
-namespace MPM.Core.Instances {
+namespace MPM.Core.Instances.Installation {
 	public class Installer {
 		private readonly Instance instance;
-		private readonly IFileIndex fileIndex;
+		private readonly IFileMap fileMap;
 		private readonly IFileSystem fileSystem;
 		private readonly IPackageRepository packageRepository;
 		private readonly IHashRepository hashRepository;
@@ -53,7 +53,7 @@ namespace MPM.Core.Instances {
 					packageInfo = new PackageInfoParser(packageJson);
 				} catch (FormatException e) {
 					throw new InstallationException("Package info was of incorrect format", e);
-				} 
+				}
 			}
 			IEnumerable<IInstallationOperation> installationScript;
 			try {

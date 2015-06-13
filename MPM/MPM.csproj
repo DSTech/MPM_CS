@@ -205,10 +205,13 @@
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\FileSystem\IFileIndex.cs" />
     <Compile Include="Core\FileSystem\IFileSystem.cs" />
-    <Compile Include="Core\Instances\IInstallationOperation.cs" />
-    <Compile Include="Core\Instances\InstallationException.cs" />
+    <Compile Include="Core\Instances\Installation\FileMap.cs" />
+    <Compile Include="Core\Instances\Installation\IFileMap.cs" />
+    <Compile Include="Core\Instances\Installation\IFileOperation.cs" />
+    <Compile Include="Core\Instances\Installation\IInstallationOperation.cs" />
+    <Compile Include="Core\Instances\Installation\InstallationException.cs" />
     <Compile Include="Core\Info\InstallationScriptParser.cs" />
-    <Compile Include="Core\Instances\Installer.cs" />
+    <Compile Include="Core\Instances\Installation\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\FileSystem\VirtualFileSystem.cs" />

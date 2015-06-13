@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace MPM.Core.Instances {
+namespace MPM.Core.Instances.Installation {
 	[Serializable]
-	internal class InstallationException : Exception {
+	public class InstallationException : Exception {
 		public InstallationException() {
 		}
 
