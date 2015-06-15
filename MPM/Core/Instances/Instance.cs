@@ -14,7 +14,7 @@ namespace MPM.Core.Instances {
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
 
 		public IFileMap GetFileMap() {
-			throw new NotImplementedException();
+			return this.Configuration.GenerateFileMap();
 		}
 
 		public IFileSystem GetFileSystem() {
@@ -29,7 +29,7 @@ namespace MPM.Core.Instances {
 
 		public ILauncher CreateLauncher() {
 			var ctor = LauncherType.GetConstructor(new Type[0]);
-			return ctor.Invoke(new object[0]) as ILauncher;
+			return (ILauncher)ctor.Invoke(new object[0]);
 		}
 	}
 }

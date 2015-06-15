@@ -22,22 +22,36 @@ namespace MPM.Core.Instances.Installation {
 			var created = destinationUris.Except(currentUris).ToArray();//Entries to be created
 
 			var deletionOperations = new List<Tuple<Uri, IFileOperation[]>>(deleted.Length);
-			//TODO: Fill with deletions
-			throw new NotImplementedException();
+			//Create deletions for removed paths.
+			foreach (var deletionUri in deleted) {
+				deletionOperations.Add(new Tuple<Uri, IFileOperation[]>(deletionUri, new[] {
+					new DeleteFileOperation(),
+				}));
+			}
 
 			var modificationOperations = new List<Tuple<Uri, IFileOperation[]>>(modified.Length);
-			//TODO: Delta & Fill
-			throw new NotImplementedException();
+			//Create deletions in front of modified paths.
+			foreach (var modificationUri in modified) {
+				modificationOperations.Add(new Tuple<Uri, IFileOperation[]>(
+					modificationUri,
+					Enumerable.Concat(
+						new[] {
+							new DeleteFileOperation(),
+						},
+						destination[modificationUri]
+					).ToArray()
+				));
+			}
 
 			var creationOperations = new List<Tuple<Uri, IFileOperation[]>>(created.Length);
-			//Fill with destination uri's operation contents
+			//Fill with operation contents from destination entry 
 			foreach (var creationUri in created) {
 				Debug.Assert(destination.ContainsKey(creationUri));
 				var creationSteps = destination[creationUri];
 				creationOperations.Add(Tuple.Create(creationUri, creationSteps.ToArray()));
 			}
 
-			return EnumerableEx.Concat(deletionOperations, modificationOperations, creationOperations);
+			return EnumerableEx.Concat(deletionOperations, modificationOperations, creationOperations).ToArray();
 		}
 	}
 }

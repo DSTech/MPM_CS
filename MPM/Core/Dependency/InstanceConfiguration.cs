@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Instances.Installation;
 using MPM.Data;
 using MPM.Net;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
-	public static class ResolvedConfigurationExtensions {
+	public static class InstanceConfigurationExtensions {
 		/// <summary>
 		/// Checks for conflicts in the specified configuration.
 		/// </summary>
@@ -51,6 +52,9 @@ namespace MPM.Core.Dependency {
 					yield return conflict;
 				}
 			}
+		}
+		public static IFileMap GenerateFileMap(this InstanceConfiguration instanceConfiguration) {
+			throw new NotImplementedException();
 		}
 	}
 	public class InstanceConfiguration {
