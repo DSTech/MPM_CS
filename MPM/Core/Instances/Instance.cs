@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Dependency;
 using MPM.Core.FileSystem;
+using MPM.Core.Instances.Installation;
 
 namespace MPM.Core.Instances {
 	public class Instance {
@@ -11,12 +13,18 @@ namespace MPM.Core.Instances {
         public Uri Location { get; set; }
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
 
-		public IFileIndex GetFileIndex() {
+		public IFileMap GetFileMap() {
 			throw new NotImplementedException();
 		}
 
 		public IFileSystem GetFileSystem() {
-			throw new NotImplementedException();
+			return new LocalFileSystem(Location);
+		}
+
+		public InstanceConfiguration @Configuration {
+			get {
+				throw new NotImplementedException();
+			}
 		}
 
 		public ILauncher CreateLauncher() {

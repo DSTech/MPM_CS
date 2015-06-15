@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances;
+using MPM.Core.Instances.Installation;
 
 namespace MPM.Core.Info {
 	/// <summary>

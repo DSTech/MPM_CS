@@ -22,7 +22,7 @@ namespace MPM.Core.Instances.Installation {
 			this.instance = instance;
 			this.packageRepository = packageRepository;
 			this.hashRepository = hashRepository;
-			fileIndex = instance.GetFileIndex();
+			fileMap = instance.GetFileMap();
 			fileSystem = instance.GetFileSystem();
 		}
 		/// <summary>

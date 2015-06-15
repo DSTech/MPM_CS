@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MPM.Core.Instances;
+using MPM.Core.Instances.Installation;
 using Newtonsoft.Json.Linq;
 
 namespace MPM.Core.Info {
