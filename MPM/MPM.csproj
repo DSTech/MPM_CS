@@ -205,6 +205,7 @@
     <Compile Include="Core\FileSystem\IFileSystemExtensions.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\FileSystem\IFileSystem.cs" />
+    <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\FileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMapExtensions.cs" />
