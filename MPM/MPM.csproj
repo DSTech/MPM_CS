@@ -101,8 +101,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceKit.Text.1.0.10\lib\net35\NServiceKit.Text.dll</HintPath>
     </Reference>
-    <Reference Include="Platform, Version=1.1.0.177, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.1.0.177\lib\net40\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.1.0.198, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.198\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
@@ -198,13 +198,7 @@
     <Compile Include="Core\Dependency\Resolver.cs" />
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
-    <Compile Include="Core\FileSystem\LocalFileNode.cs" />
-    <Compile Include="Core\FileSystem\LocalFileSystem.cs" />
-    <Compile Include="Core\FileSystem\IFileNode.cs" />
-    <Compile Include="Core\FileSystem\IFileNodeExtensions.cs" />
-    <Compile Include="Core\FileSystem\IFileSystemExtensions.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
-    <Compile Include="Core\FileSystem\IFileSystem.cs" />
     <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\FileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMap.cs" />
@@ -264,7 +258,9 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Core\FileSystem\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\sqlite3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

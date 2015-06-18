@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\xunit.runner.visualstudio.2.1.0-beta1-build1051\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.1.0-beta1-build1051\build\net20\xunit.runner.visualstudio.props')" />
-  <Import Project="..\packages\xunit.core.2.1.0-beta1-build2945\build\portable-net45+aspnetcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props" Condition="Exists('..\packages\xunit.core.2.1.0-beta1-build2945\build\portable-net45+aspnetcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props')" />
+  <Import Project="..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props')" />
+  <Import Project="..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props" Condition="Exists('..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props')" />
   <Import Project="..\packages\xunit.core.2.0.0\build\Xamarin.iOS\xunit.core.props" Condition="Exists('..\packages\xunit.core.2.0.0\build\Xamarin.iOS\xunit.core.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,7 +19,8 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <NuGetPackageImportStamp>52e3a374</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,9 +61,29 @@
     <Reference Include="Couchbase.Lite">
       <HintPath>..\packages\Couchbase.Lite.1.0.4.1\lib\net45\Couchbase.Lite.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1-beta2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1-beta3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform, Version=1.1.0.198, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.198\lib\net40\Platform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.VirtualFileSystem.1.1.0.102\lib\net40\Platform.VirtualFileSystem.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.VirtualFileSystem.Providers.Zip, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.102\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.197, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.197\lib\net40\Platform.Xml.Serialization.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
@@ -99,16 +120,17 @@
       <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.assert, Version=2.1.0.2945, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\xunit.assert.2.1.0-beta1-build2945\lib\portable-net45+aspnetcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.assert.dll</HintPath>
+    <Reference Include="xunit.assert, Version=2.1.0.2981, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.assert.2.1.0-beta2-build2981\lib\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.assert.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.core, Version=2.1.0.2945, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\xunit.extensibility.core.2.1.0-beta1-build2945\lib\portable-net45+aspnetcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.dll</HintPath>
+    <Reference Include="xunit.core, Version=2.1.0.2981, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.core.2.1.0-beta2-build2981\lib\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.1.0.2945, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.execution.2.1.0-beta1-build2945\lib\net45\xunit.execution.desktop.dll</HintPath>
+    <Reference Include="xunit.execution.desktop, Version=2.1.0.2981, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.execution.2.1.0-beta2-build2981\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -121,6 +143,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ArchiveTests.cs" />
+    <Compile Include="Core\FileSystemTests.cs" />
     <Compile Include="Core\Dependency\ResolverTests.cs" />
     <Compile Include="Core\Dependency\PackageSpecTests.cs" />
     <Compile Include="Core\Dependency\TestPackageRepository.cs" />
@@ -158,6 +181,13 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SQLitePCL.raw_basic.0.8.0\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\packages\SQLitePCL.raw_basic.0.8.0\build\net45\SQLitePCL.raw_basic.targets')" />
   <Import Project="..\packages\SQLitePCL.raw.0.8.0\build\net45\SQLitePCL.raw.targets" Condition="Exists('..\packages\SQLitePCL.raw.0.8.0\build\net45\SQLitePCL.raw.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props'))" />
+    <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -5,15 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
-using MPM.Core.FileSystem;
 using MPM.Core.Info;
 using MPM.Data;
 using MPM.Net.DTO;
+using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
 	public class Installer {
 		private readonly Instance instance;
-		private readonly IFileMap fileMap;
 		private readonly IFileSystem fileSystem;
 		private readonly IPackageRepository packageRepository;
 		private readonly IHashRepository hashRepository;
@@ -22,7 +21,6 @@ namespace MPM.Core.Instances.Installation {
 			this.instance = instance;
 			this.packageRepository = packageRepository;
 			this.hashRepository = hashRepository;
-			fileMap = instance.GetFileMap();
 			fileSystem = instance.GetFileSystem();
 		}
 		/// <summary>
@@ -37,13 +35,13 @@ namespace MPM.Core.Instances.Installation {
 		public async Task<InstanceConfiguration> Install(NamedBuild build) {
 			//TODO: Persist the package-data for the NamedBuild being installed
 			//TODO: Error if any builds of the same package are already installed
-			var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);
-			var archiveVFS = VirtualFileSystem.FromData(archiveContents);
+			/*var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);
+			var archiveVFS = ArchiveFileSystem.FromData(archiveContents);
 			PackageInfoParser packageInfo;
 			{
 				string packageJson;
 				try {
-					using (var packageJsonReader = new StreamReader(archiveVFS.Read("package.json"))) {
+					using (var packageJsonReader = new StreamReader(archiveVFS.Resolve(new Uri("package.json")).OpenRead())) {
 						packageJson = packageJsonReader.ReadToEnd();
 					}
 				} catch {
@@ -75,7 +73,7 @@ namespace MPM.Core.Instances.Installation {
 			//TODO: Clear non-config changes to filesystem
 			//if !fileSystem.Consider(delta)://TODO: Implement a simulation of operations to internally determine consistancy with state
 			//	throw new InstallationException();
-			fileSystem.Apply(delta);
+			fileSystem.Apply(delta);*/
 			throw new NotImplementedException();
 		}
 	}

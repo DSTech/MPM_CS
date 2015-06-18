@@ -4,25 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
-using MPM.Core.FileSystem;
 using MPM.Core.Instances.Installation;
+using Platform.VirtualFileSystem;
+using Platform.VirtualFileSystem.Providers.Local;
 
 namespace MPM.Core.Instances {
 	public class Instance {
 		public String Name { get; set; }
-        public Uri Location { get; set; }
+        public String Location { get; set; }
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
-
-		public IFileMap GetFileMap() {
-			return this.Configuration.GenerateFileMap();
-		}
-
+		
 		public IFileSystem GetFileSystem() {
-			return new LocalFileSystem(Location);
+			return new LocalFileSystem(LocalNodeAddress.Parse(Location), FileSystemOptions.Default);
 		}
 
 		public InstanceConfiguration @Configuration {
 			get {
+				throw new NotImplementedException();
+			}
+			set {
 				throw new NotImplementedException();
 			}
 		}

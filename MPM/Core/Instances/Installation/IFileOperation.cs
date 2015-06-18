@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using MPM.Core.FileSystem;
+using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
 	public static class IFileOperationExtensions {
@@ -81,8 +81,8 @@ namespace MPM.Core.Instances.Installation {
 		/// Reversible entries must have <see cref="UsesPreviousContents"/> as true.
 		/// </remarks>
 		/// <param name="fileSystem">The filesystem upon which the operations should be performed.</param>
-		/// <param name="uri">The path of the content which should be altered.</param>
-		void Perform(IFileSystem fileSystem, Uri uri);
+		/// <param name="path">The path of the content which should be altered.</param>
+		void Perform(IFileSystem fileSystem, String path);
 		/// <summary>
 		/// Reverts the actions of the operation on the specified path within the given filesystem.
 		/// </summary>
@@ -90,10 +90,10 @@ namespace MPM.Core.Instances.Installation {
 		/// Reversing of operations may not request resources from the network, only from the cache.
 		/// </remarks>
 		/// <param name="fileSystem">The filesystem upon which the operations should be reversed.</param>
-		/// <param name="uri">The path of the content which should be altered.</param>
+		/// <param name="path">The path of the content which should be altered.</param>
 		/// <exception cref="NotSupportedException">
 		/// Must be thrown when called upon a non-reversible instance.
 		/// </exception>
-		void Reverse(IFileSystem fileSystem, Uri uri);
+		void Reverse(IFileSystem fileSystem, String path);
 	}
 }

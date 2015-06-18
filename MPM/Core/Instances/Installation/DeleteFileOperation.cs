@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MPM.Core.FileSystem;
+using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
 	public class DeleteFileOperation : IFileOperation {
@@ -20,11 +20,11 @@ namespace MPM.Core.Instances.Installation {
 			}
 		}
 
-		public void Perform(IFileSystem fileSystem, Uri uri) {
-			fileSystem.Delete(uri);
+		public void Perform(IFileSystem fileSystem, String path) {
+			fileSystem.ResolveFile(path).Delete();
 		}
 
-		public void Reverse(IFileSystem fileSystem, Uri uri) {
+		public void Reverse(IFileSystem fileSystem, String path) {
 			Debug.Assert(false);
 			throw new NotSupportedException();
 		}
