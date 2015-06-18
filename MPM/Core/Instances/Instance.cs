@@ -15,7 +15,7 @@ namespace MPM.Core.Instances {
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
 		
 		public IFileSystem GetFileSystem() {
-			return new LocalFileSystem(LocalNodeAddress.Parse(Location), FileSystemOptions.Default);
+            return FileSystemManager.Default.ResolveDirectory(Location).CreateView();
 		}
 
 		public InstanceConfiguration @Configuration {
