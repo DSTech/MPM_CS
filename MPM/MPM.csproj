@@ -186,6 +186,7 @@
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
+    <Compile Include="Core\Dependency\InstanceConfigurationExtensions.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
     <Compile Include="Core\Dependency\NamedBuild.cs" />
@@ -199,21 +200,29 @@
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheEntryExtensions.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheEntry.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheManager.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheWriter.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheReader.cs" />
+    <Compile Include="Core\Instances\Installation\ExtractFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\FileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMapExtensions.cs" />
+    <Compile Include="Core\Instances\Installation\IFileOperationExtensions.cs" />
     <Compile Include="Core\Instances\Installation\IFileOperation.cs" />
-    <Compile Include="Core\Instances\Installation\IInstallationOperation.cs" />
     <Compile Include="Core\Instances\Installation\InstallationException.cs" />
     <Compile Include="Core\Info\InstallationScriptParser.cs" />
     <Compile Include="Core\Instances\Installation\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
+    <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Info\PackageInfoParser.cs" />
     <Compile Include="Core\Info\PackageJsonParser.cs" />
     <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
+    <Compile Include="Core\Protocols\IProtocolResolver.cs" />
     <Compile Include="Data\CouchbasePackageRepositoryCache.cs" />
     <Compile Include="Data\IHashRepository.cs" />
     <Compile Include="Data\IHashRetriever.cs" />
@@ -258,9 +267,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\FileSystem\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Resources\sqlite3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

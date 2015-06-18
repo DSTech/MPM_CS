@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances;
 using MPM.Core.Instances.Installation;
+using MPM.Core.Instances.Installation.Scripts;
 
 namespace MPM.Core.Info {
 	/// <summary>
@@ -16,7 +17,7 @@ namespace MPM.Core.Info {
 		public PackageInfoParser(string packageJson) {
 			this.packageJsonParser = new PackageJsonParser(packageJson);
 		}
-		public IEnumerable<IInstallationOperation> InstallationScript {
+		public IEnumerable<IFileDeclaration> InstallationScript {
 			get {
 				return InstallationScriptParser.Parse(packageJsonParser.InstallationScript);
 			}

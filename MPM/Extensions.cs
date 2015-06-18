@@ -8,6 +8,39 @@ using MPM.CLI;
 using NServiceKit.Text;
 
 namespace MPM {
+	class SolidifyingReadOnlyCollection<T> : IReadOnlyCollection<T> {
+		private IEnumerable<T> source;
+		private IReadOnlyCollection<T> solidified;
+		public int Count => Cache().Count;
+		public SolidifyingReadOnlyCollection(IEnumerable<T> source) {
+			if (source == null) {
+				throw new ArgumentNullException(nameof(source));
+			}
+			this.source = source;
+			this.solidified = null;
+			//Precache sources that do not need copied with ToArray
+			var readOnlySource = source as IReadOnlyCollection<T>;
+			if (readOnlySource != null) {
+				solidified = readOnlySource;
+			}
+			var listSource = source as List<T>;
+			if (listSource != null) {
+				solidified = listSource;
+			}
+		}
+		private IReadOnlyCollection<T> Cache() {
+			if (solidified == null) {
+				solidified = source.ToArray();
+			}
+			return solidified;
+		}
+		public IEnumerator<T> GetEnumerator() {
+			return Cache().GetEnumerator();
+		}
+		IEnumerator IEnumerable.GetEnumerator() {
+			return Cache().GetEnumerator();
+		}
+	}
 	public static class IEnumerableExtensions {
 		public static IEnumerable<T> SubEnumerable<T>(this IEnumerable<T> enumerable, int startIndex) {
 			if (enumerable == null) {
@@ -38,6 +71,9 @@ namespace MPM {
 				return enumerable.Take(count);
 			}
 			return enumerable.Skip(startIndex).Take(count);
+		}
+		public static IReadOnlyCollection<T> Solidify<T>(this IEnumerable<T> enumerable) {
+			return new SolidifyingReadOnlyCollection<T>(enumerable);
 		}
 	}
 	public static class ActionProviderArgExtensions {
