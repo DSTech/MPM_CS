@@ -16,37 +16,17 @@ namespace MPM.Core.Instances.Installation {
 		public static IEnumerable<IFileOperation> Cull(this IEnumerable<IFileOperation> opChain) {
 			var store = new Queue<IFileOperation>();
 			foreach (var op in opChain) {
-				if (!op.UsesPreviousContents) {
-					store.Clear();
+				if (op is DeleteFileOperation || op is ExtractFileOperation) {//Operations which replace the content of the file
+					store.Clear();//Remove previous operations, they will be replaced by their subsequent operations.
 				}
 				store.Enqueue(op);
 			}
-			//TODO: Clear the last operation if it is a deletion. Empty chains are a no-op.
-			return store.ToArray();
-		}
-		public static bool IsReversible(this IEnumerable<IFileOperation> opChain) {
-			return opChain.All(entry => entry.Reversible && entry.UsesPreviousContents);
-		}
-		/// <summary>
-		/// Creates an <see cref="IEnumerable{IFileOperation}"/> which will revert an <paramref name="opChain"/>
-		/// such that the <paramref name="lastOp"/> will be the last operation that occurred on the target.
-		/// Will create a hard-reverse sequence if necessary steps were not reversible.
-		/// </summary>
-		/// <param name="opChain">The chain of operations that brought the file to its current state.</param>
-		/// <param name="lastOp">The last operation that should appear to have been performed on the file.</param>
-		/// <returns>A <see cref="IEnumerable{IFileOperation}"/> that, when performed in order, results in a file of the requested state.</returns>
-		public static IEnumerable<IFileOperation> CreateReversionTo(this IEnumerable<IFileOperation> opChain, IFileOperation lastOp) {
-			var _opChain = opChain.ToList();
-			var lastIndex = _opChain.LastIndexOf(lastOp);
-			if (lastIndex < 0) {
-				throw new ArgumentOutOfRangeException(nameof(lastOp), $"was not in {nameof(opChain)}");
+			var arr = store.ToArray();
+			//If the last operation is a deletion, nothing should be performed.
+			if (arr.Last() is DeleteFileOperation) {
+				return new IFileOperation[0];
 			}
-			var stepsAfter = _opChain.SubEnumerable(lastIndex + 1);
-			if (stepsAfter.IsReversible()) {
-				Debug.Assert(stepsAfter.All(s => s.UsesPreviousContents));
-				return stepsAfter.Reverse().ToArray();
-			}
-			return _opChain.Take(lastIndex + 1).ToArray();
+			return arr;
 		}
 	}
 }

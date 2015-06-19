@@ -14,6 +14,7 @@ namespace MPM.Core.Instances.Installation {
 		/// <param name="destination"></param>
 		/// <returns></returns>
 		public static IEnumerable<Tuple<Uri, IFileOperation[]>> Difference(this IFileMap currentMap, IFileMap destination) {
+			//TODO: Update to fit the new IFileOperation
 			var currentUris = currentMap.Keys.ToArray();
 			var destinationUris = destination.Keys.ToArray();
 

@@ -205,6 +205,7 @@
     <Compile Include="Core\Instances\Cache\ICacheManager.cs" />
     <Compile Include="Core\Instances\Cache\ICacheWriter.cs" />
     <Compile Include="Core\Instances\Cache\ICacheReader.cs" />
+    <Compile Include="Core\Instances\Installation\ClaimFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\ExtractFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\FileMap.cs" />

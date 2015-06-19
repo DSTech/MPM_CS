@@ -9,12 +9,19 @@ using Platform.VirtualFileSystem;
 using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
+using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
 	/// <summary>
 	/// An operation to extract a file from a cached archive to a specified target.
 	/// </summary>
 	public class ExtractFileOperation : IFileOperation {
+		public bool UsesPreviousContents => false;
+
+		public string PackageName { get; set; }
+
+		public SemanticVersion PackageVersion { get; set; }
+
 		public string ArchiveCacheEntry { get; set; }
 
 		public string SourcePath { get; set; }
@@ -22,14 +29,12 @@ namespace MPM.Core.Instances.Installation {
 		public ExtractFileOperation() {
 		}
 
-		public ExtractFileOperation(string archiveCacheEntry, string sourcePath) {
+		public ExtractFileOperation(string packageName, SemanticVersion packageVersion, string archiveCacheEntry, string sourcePath) {
+			this.PackageName = PackageName;
+			this.PackageVersion = packageVersion;
 			this.ArchiveCacheEntry = archiveCacheEntry;
 			this.SourcePath = sourcePath;
 		}
-
-		public bool Reversible => false;
-
-		public bool UsesPreviousContents => false;
 
 		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
 			var targetFile = fileSystem.ResolveFile(path);
@@ -54,11 +59,6 @@ namespace MPM.Core.Instances.Installation {
 					break;
 				}
 			}
-		}
-
-		public void Reverse(IFileSystem fileSystem, String path, ICacheReader cache) {
-			Debug.Assert(false);
-			throw new NotSupportedException();
 		}
 	}
 }
