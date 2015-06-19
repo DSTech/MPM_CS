@@ -7,7 +7,7 @@ using MPM.Core.Dependency;
 using MPM.Core.Instances.Installation.Scripts;
 
 namespace MPM.Core.Instances.Info {
-	public class ParsedPackageInfo : NamedBuild {
+	public class ParsedBuildInfo : NamedBuild {
 		public IReadOnlyList<IFileDeclaration> Installation { get; set; }
 	}
 }

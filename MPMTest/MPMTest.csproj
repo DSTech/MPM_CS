@@ -58,6 +58,14 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Couchbase.Lite">
       <HintPath>..\packages\Couchbase.Lite.1.0.4.1\lib\net45\Couchbase.Lite.dll</HintPath>
     </Reference>
@@ -188,6 +196,7 @@
     <Error Condition="!Exists('..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.1.0-beta2-build2981\build\portable-net45+dnxcore50+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.core.props'))" />
     <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.1.0-beta2-build1055\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
+  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

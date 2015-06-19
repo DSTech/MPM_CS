@@ -1,11 +1,8 @@
-using System;
-using MPM.Core;
+using System.Linq;
+using MPM.Net.DTO;
+using NServiceKit.Common;
 
-namespace MPM.Core.Dependency {
-	using System.Linq;
-	using Net.DTO;
-	using NServiceKit.Common;
-
+namespace MPM.Core.Instances.Info {
 	public static class NamedBuildExtensions {
 		public static NamedBuild ToNamedBuild(this Package package, Build build) {
 			var namedBuild = new NamedBuild().PopulateWithNonDefaultValues(build);
@@ -15,8 +12,5 @@ namespace MPM.Core.Dependency {
 		public static NamedBuild[] ToNamedBuilds(this Package package) {
 			return package.Builds.Select(b => package.ToNamedBuild(b)).ToArray();
 		}
-	}
-	public class NamedBuild : Build {
-		public String Name { get; set; }
 	}
 }

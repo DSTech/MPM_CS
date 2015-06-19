@@ -58,6 +58,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Couchbase.Lite">
       <HintPath>..\packages\Couchbase.Lite.1.0.4.1\lib\net45\Couchbase.Lite.dll</HintPath>
     </Reference>
@@ -189,7 +197,7 @@
     <Compile Include="Core\Dependency\InstanceConfigurationExtensions.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
-    <Compile Include="Core\Dependency\NamedBuild.cs" />
+    <Compile Include="Core\Instances\Info\NamedBuild.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
     <Compile Include="Core\Dependency\DependencyException.cs" />
     <Compile Include="Core\Dependency\IResolver.cs" />
@@ -200,9 +208,10 @@
     <Compile Include="Core\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
+    <Compile Include="Core\Instances\Info\NamedBuildExtensions.cs" />
     <Compile Include="Core\Instances\Info\ScriptFileDeclaration.cs" />
-    <Compile Include="Core\Instances\Info\ParsedPackageInfo.cs" />
-    <Compile Include="Core\Instances\Info\PackageInfo.cs" />
+    <Compile Include="Core\Instances\Info\ParsedBuildInfo.cs" />
+    <Compile Include="Core\Instances\Info\RawBuildInfo.cs" />
     <Compile Include="Core\Instances\Cache\ICacheEntryExtensions.cs" />
     <Compile Include="Core\Instances\Cache\ICacheEntry.cs" />
     <Compile Include="Core\Instances\Cache\ICacheManager.cs" />
@@ -292,6 +301,7 @@
   </Target>
   <Import Project="..\packages\SQLitePCL.raw_basic.0.8.0\build\net45\SQLitePCL.raw_basic.targets" Condition="Exists('..\packages\SQLitePCL.raw_basic.0.8.0\build\net45\SQLitePCL.raw_basic.targets')" />
   <Import Project="..\packages\SQLitePCL.raw.0.8.0\build\net45\SQLitePCL.raw.targets" Condition="Exists('..\packages\SQLitePCL.raw.0.8.0\build\net45\SQLitePCL.raw.targets')" />
+  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
