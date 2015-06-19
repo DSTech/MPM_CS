@@ -7,16 +7,24 @@ using MPM.Core.Dependency;
 
 namespace MPM.Core.Instances.Installation {
 	public class FileMapEntrySorter {
-		public FileMap Sort(IReadOnlyCollection<Tuple<NamedBuild, IFileMap>> packageMaps) {
+		public FileMap Sort(IReadOnlyCollection<Tuple<NamedBuild, IFileMap>> packageMapping) {
+			return Sort(packageMapping.ToDictionary(mapping => mapping.Item1, mapping => mapping.Item2));
+		}
+        public FileMap Sort(IReadOnlyDictionary<NamedBuild, IFileMap> packageMapping) {
 			IReadOnlyCollection<NamedBuild> sortedConfiguration = new Resolver()
 				.SortBuilds(
-					packageMaps.Select(
-						mapping => mapping.Item1
+					packageMapping.Select(
+						mapping => mapping.Key
 					)
 					.Solidify()
 				)
 				.ToArray();
-			var packageMapping = packageMaps.ToDictionary(nb => nb.Item1, nb => nb.Item2);
+			return Sort(sortedConfiguration, packageMapping);
+		}
+		public FileMap Sort(IReadOnlyCollection<NamedBuild> sortedConfiguration, IReadOnlyCollection<Tuple<NamedBuild, IFileMap>> packageMapping) {
+			return Sort(packageMapping.ToDictionary(mapping => mapping.Item1, mapping => mapping.Item2));
+		}
+		public FileMap Sort(IReadOnlyCollection<NamedBuild> sortedConfiguration, IReadOnlyDictionary<NamedBuild, IFileMap> packageMapping) {
 			var result = new FileMap();
 			//Register all operations from each package in order of package dependency
 			foreach (var build in sortedConfiguration) {
