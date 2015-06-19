@@ -22,7 +22,7 @@ namespace MPM.Core.Instances.Installation {
 			return Sort(sortedConfiguration, packageMapping);
 		}
 		public FileMap Sort(IReadOnlyCollection<NamedBuild> sortedConfiguration, IReadOnlyCollection<Tuple<NamedBuild, IFileMap>> packageMapping) {
-			return Sort(packageMapping.ToDictionary(mapping => mapping.Item1, mapping => mapping.Item2));
+			return Sort(sortedConfiguration, packageMapping.ToDictionary(mapping => mapping.Item1, mapping => mapping.Item2));
 		}
 		public FileMap Sort(IReadOnlyCollection<NamedBuild> sortedConfiguration, IReadOnlyDictionary<NamedBuild, IFileMap> packageMapping) {
 			var result = new FileMap();
