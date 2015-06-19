@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MPM.Core.Instances.Info;
 using MPM.Core.Instances.Installation;
 using MPM.Net;
 using MPM.Net.DTO;

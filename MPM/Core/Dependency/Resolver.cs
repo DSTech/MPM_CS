@@ -13,6 +13,7 @@ using QuickGraph.Data;
 using QuickGraph.Collections;
 using QuickGraph.Algorithms.Search;
 using MPM.Data;
+using MPM.Core.Instances.Info;
 
 namespace MPM.Core.Dependency {
 	public class Resolver : IResolver {

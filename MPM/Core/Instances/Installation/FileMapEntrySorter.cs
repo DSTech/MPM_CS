@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
+using MPM.Core.Instances.Info;
 
 namespace MPM.Core.Instances.Installation {
 	public class FileMapEntrySorter {

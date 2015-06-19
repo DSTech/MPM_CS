@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Instances.Info;
 
 namespace MPM.Core.Dependency {
 	public class DependencyException : Exception {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
+using MPM.Core.Instances.Info;
 using MPM.Net.DTO;
 using semver.tools;
 using Xunit;
