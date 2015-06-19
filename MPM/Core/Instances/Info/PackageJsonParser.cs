@@ -2,7 +2,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MPM.Core.Info {
+namespace MPM.Core.Instances.Info {
 	/// <summary>
 	/// Exposes the primative JSON objects from the package info file in preparation for translation to internal classes.
 	/// Also returns null for missing keys.

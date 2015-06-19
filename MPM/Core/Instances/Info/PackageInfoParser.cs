@@ -7,7 +7,7 @@ using MPM.Core.Instances;
 using MPM.Core.Instances.Installation;
 using MPM.Core.Instances.Installation.Scripts;
 
-namespace MPM.Core.Info {
+namespace MPM.Core.Instances.Info {
 	/// <summary>
 	/// Exposes the internal-structure translations of the package info through use of translators.
 	/// Returns defaults for missing keys.

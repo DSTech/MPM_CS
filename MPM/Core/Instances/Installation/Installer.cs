@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Dependency;
-using MPM.Core.Info;
+using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Net.DTO;
 using Platform.VirtualFileSystem;

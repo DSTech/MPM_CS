@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
+using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
 	public interface IFileDeclaration {
+		/// <summary>
+		/// The name of the package that sourced this declaration.
+		/// </summary>
+		String PackageName { get; }
+		/// <summary>
+		/// The version of the package which sourced this declaration.
+		/// </summary>
+		SemanticVersion PackageVersion { get; }
 		/// <summary>
 		/// The path of the file to be installed relative to the root of the package archive root.
 		/// The first portion may be a "protocol", eg https://. Protocols require a <see cref="Hash"/> to be specified.
