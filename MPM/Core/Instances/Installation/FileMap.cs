@@ -1,24 +1,25 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
 	struct FileMapEntry {
-		public string PackageId { get; set; }
-		public string OperationId { get; set; }
+		public string PackageName { get; set; }
+		public SemanticVersion PackageVersion { get; set; }
 		public IFileOperation Operation { get; set; }
 	}
 	public class FileMap : IFileMap {
-		private Dictionary<Uri, Stack<FileMapEntry>> operations = new Dictionary<Uri, Stack<FileMapEntry>>();
-		public IEnumerable<IFileOperation> this[Uri key] {
+		private Dictionary<String, Stack<FileMapEntry>> operations = new Dictionary<String, Stack<FileMapEntry>>();
+		public IReadOnlyCollection<IFileOperation> this[String key] {
 			get {
 				if (!operations.ContainsKey(key)) {
-					return Enumerable.Empty<IFileOperation>();
+					return new IFileOperation[0];
 				}
-				return operations[key].Reverse().Select(v => v.Operation);
+				return operations[key].Reverse().Select(v => v.Operation).ToArray();
 			}
 		}
 		public int Count {
@@ -26,31 +27,31 @@ namespace MPM.Core.Instances.Installation {
 				return operations.Count;
 			}
 		}
-		public IEnumerable<Uri> Keys {
+		public IEnumerable<String> Keys {
 			get {
 				return operations.Keys;
 			}
 		}
-		public IEnumerable<IEnumerable<IFileOperation>> Values {
+		public IEnumerable<IReadOnlyCollection<IFileOperation>> Values {
 			get {
-				return operations.Values.Select(opSet => opSet.Reverse().Select(entry => entry.Operation));
+				return operations.Values.Select(opSet => opSet.Reverse().Select(entry => entry.Operation).ToArray());
 			}
 		}
-		public bool ContainsKey(Uri key) {
+		public bool ContainsKey(String key) {
 			return operations.ContainsKey(key);
 		}
-		public IEnumerator<KeyValuePair<Uri, IEnumerable<IFileOperation>>> GetEnumerator() {
+		public IEnumerator<KeyValuePair<String, IReadOnlyCollection<IFileOperation>>> GetEnumerator() {
 			using (var enumer = operations.GetEnumerator()) {
 				while (enumer.MoveNext()) {
-					yield return new KeyValuePair<Uri, IEnumerable<IFileOperation>>(enumer.Current.Key, enumer.Current.Value.Reverse().Select(v => v.Operation));
+					yield return new KeyValuePair<String, IReadOnlyCollection<IFileOperation>>(enumer.Current.Key, enumer.Current.Value.Reverse().Select(v => v.Operation).ToArray());
 				}
 			}
 		}
-		public bool TryGetValue(Uri key, out IEnumerable<IFileOperation> value) {
+		public bool TryGetValue(String key, out IReadOnlyCollection<IFileOperation> value) {
 			Stack<FileMapEntry> operationStack;
 			var success = operations.TryGetValue(key, out operationStack);
 			if (success) {
-				value = operationStack.Reverse().Select(v => v.Operation);
+				value = operationStack.Reverse().Select(v => v.Operation).ToArray();
 			} else {
 				value = new IFileOperation[0];
 			}
@@ -59,30 +60,55 @@ namespace MPM.Core.Instances.Installation {
 		IEnumerator IEnumerable.GetEnumerator() {
 			return this.GetEnumerator();
 		}
-		public void Register(Uri uri, string packageId, string operationId, IFileOperation operation) {
+		public void Register(String path, IFileOperation operation) {
 			Stack<FileMapEntry> target;
-			if (operations.ContainsKey(uri)) {
-				target = operations[uri];
+			if (operations.ContainsKey(path)) {
+				target = operations[path];
 			} else {
 				target = new Stack<FileMapEntry>();
-				operations.Add(uri, target);
+				operations.Add(path, target);
 			}
 			target.Push(new FileMapEntry {
-				PackageId = packageId,
-				OperationId = operationId,
+				PackageName = operation.PackageName,
+				PackageVersion = operation.PackageVersion,
 				Operation = operation,
 			});
 		}
-		public bool Unregister(Uri uri, string packageId, string operationId) {
-			if (!operations.ContainsKey(uri)) {
+		public bool Unregister(String path, string packageName, SemanticVersion packageVersion) {
+			if (!operations.ContainsKey(path)) {
 				return false;
 			}
-			var target = operations[uri];
-			var found = target.RemoveFirst(op => op.PackageId == packageId && op.OperationId == operationId);
+			var target = operations[path];
+			var found = target.RemoveAll(op => op.PackageName == packageName && op.PackageVersion == packageVersion);
 			if (target.Count == 0) {
-				operations.Remove(uri);
+				operations.Remove(path);
 			}
-			return found;
+			return found > 0;
+		}
+		public bool UnregisterPackage(String path, string packageName) {
+			if (!operations.ContainsKey(path)) {
+				return false;
+			}
+			var target = operations[path];
+			var found = target.RemoveAll(op => op.PackageName == packageName);
+			if (target.Count == 0) {
+				operations.Remove(path);
+			}
+			return found > 0;
+		}
+		public bool UnregisterPackage(string packageName) {
+			int pathsChanged = 0;
+			foreach (var operation in operations.ToArray()) {
+				var target = operation.Value;
+				var numFound = target.RemoveAll(op => op.PackageName == packageName);
+				if (numFound > 0) {
+					++pathsChanged;
+				}
+				if (target.Count == 0) {
+					operations.Remove(operation.Key);
+				}
+			}
+			return pathsChanged > 0;
 		}
 	}
 }

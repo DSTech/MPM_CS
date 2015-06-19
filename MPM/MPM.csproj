@@ -209,6 +209,7 @@
     <Compile Include="Core\Instances\Installation\ExtractFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\FileMap.cs" />
+    <Compile Include="Core\Instances\Installation\FileMapEntrySorter.cs" />
     <Compile Include="Core\Instances\Installation\IFileMap.cs" />
     <Compile Include="Core\Instances\Installation\IFileMapExtensions.cs" />
     <Compile Include="Core\Instances\Installation\IFileOperationExtensions.cs" />

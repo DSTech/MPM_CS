@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
 	/// <summary>
-	/// A mapping of file <see cref="Uri"/>s to <see cref="IEnumerable{IFileOperation}"/>s.
-	/// Able to register and unregister operations to URIs
+	/// A mapping of file path <see cref="String"/>s to <see cref="IReadOnlyCollection{IFileOperation}"/>s.
+	/// Able to register and unregister operations to paths
 	/// </summary>
-	public interface IFileMap : IReadOnlyDictionary<Uri, IEnumerable<IFileOperation>> {
-		void Register(Uri uri, string packageId, string operationId, IFileOperation operation);
-		bool Unregister(Uri uri, string packageId, string operationId);
+	public interface IFileMap : IReadOnlyDictionary<String, IReadOnlyCollection<IFileOperation>> {
+		void Register(String path, IFileOperation operation);
+		bool Unregister(String path, string packageName, SemanticVersion packageVersion);
+		bool UnregisterPackage(string packageName);
+		bool UnregisterPackage(String path, string packageName);
 	}
 }

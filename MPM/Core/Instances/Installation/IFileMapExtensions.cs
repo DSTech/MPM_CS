@@ -13,7 +13,7 @@ namespace MPM.Core.Instances.Installation {
 		/// <param name="currentMap"></param>
 		/// <param name="destination"></param>
 		/// <returns></returns>
-		public static IEnumerable<Tuple<Uri, IFileOperation[]>> Difference(this IFileMap currentMap, IFileMap destination) {
+		public static IEnumerable<Tuple<String, IFileOperation[]>> Difference(this IFileMap currentMap, IFileMap destination) {
 			//TODO: Update to fit the new IFileOperation
 			var currentUris = currentMap.Keys.ToArray();
 			var destinationUris = destination.Keys.ToArray();
@@ -22,34 +22,34 @@ namespace MPM.Core.Instances.Installation {
 			var modified = currentUris.Intersect(destinationUris).ToArray();//Entries to be modified
 			var created = destinationUris.Except(currentUris).ToArray();//Entries to be created
 
-			var deletionOperations = new List<Tuple<Uri, IFileOperation[]>>(deleted.Length);
+			var deletionOperations = new List<Tuple<String, IFileOperation[]>>(deleted.Length);
 			//Create deletions for removed paths.
-			foreach (var deletionUri in deleted) {
-				deletionOperations.Add(new Tuple<Uri, IFileOperation[]>(deletionUri, new[] {
+			foreach (var deletionPath in deleted) {
+				deletionOperations.Add(new Tuple<String, IFileOperation[]>(deletionPath, new[] {
 					new DeleteFileOperation(),
 				}));
 			}
 
-			var modificationOperations = new List<Tuple<Uri, IFileOperation[]>>(modified.Length);
+			var modificationOperations = new List<Tuple<String, IFileOperation[]>>(modified.Length);
 			//Create deletions in front of modified paths.
-			foreach (var modificationUri in modified) {
-				modificationOperations.Add(new Tuple<Uri, IFileOperation[]>(
-					modificationUri,
+			foreach (var modificationPath in modified) {
+				modificationOperations.Add(new Tuple<String, IFileOperation[]>(
+					modificationPath,
 					Enumerable.Concat(
 						new[] {
 							new DeleteFileOperation(),
 						},
-						destination[modificationUri]
+						destination[modificationPath]
 					).ToArray()
 				));
 			}
 
-			var creationOperations = new List<Tuple<Uri, IFileOperation[]>>(created.Length);
+			var creationOperations = new List<Tuple<String, IFileOperation[]>>(created.Length);
 			//Fill with operation contents from destination entry 
-			foreach (var creationUri in created) {
-				Debug.Assert(destination.ContainsKey(creationUri));
-				var creationSteps = destination[creationUri];
-				creationOperations.Add(Tuple.Create(creationUri, creationSteps.ToArray()));
+			foreach (var creationPath in created) {
+				Debug.Assert(destination.ContainsKey(creationPath));
+				var creationSteps = destination[creationPath];
+				creationOperations.Add(Tuple.Create(creationPath, creationSteps.ToArray()));
 			}
 
 			return EnumerableEx.Concat(deletionOperations, modificationOperations, creationOperations).ToArray();
