@@ -41,10 +41,10 @@ namespace MPM.Data {
 		/// <param name="repository">The repository that will be cached</param>
 		/// <param name="dbLocation">The location wherein the cache will be (or is already) stored</param>
 		/// <param name="ownsRepositoryInstance">Whether or not this instance is responsible for disposal of the <paramref name="repository"/> instance</param>
-		public CouchbaseLitePackageRepositoryCache(IPackageRepository repository, Uri dbLocation, bool ownsRepositoryInstance = false) {
+		public CouchbaseLitePackageRepositoryCache(IPackageRepository repository, String dbLocation, bool ownsRepositoryInstance = false) {
 			this.repository = repository;
 			this.ownsRepositoryInstance = ownsRepositoryInstance;
-			this.db = new Manager(Directory.CreateDirectory(dbLocation.AbsolutePath), new ManagerOptions());
+			this.db = new Manager(Directory.CreateDirectory(dbLocation), new ManagerOptions());
 			PrepDatabase(db);
 		}
 
