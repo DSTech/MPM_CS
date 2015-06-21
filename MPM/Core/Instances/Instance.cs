@@ -9,53 +9,60 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
 using Platform.VirtualFileSystem.Providers.Local;
+using Couchbase.Lite;
+using System.IO;
+using MPM.Data;
 
 namespace MPM.Core.Instances {
 	public class Instance {
+		const string MpmDirectory = ".mpm";
+		const string DbDirectory = "db";
+		const string ConfigurationName = "configuration";
+		const string MetaName = "meta";
+		const string PackageName = "packages";
+		const string PackageCacheName = "packagecache";
+
+		private Manager DbManager { get; set; }
 		public String Name { get; set; }
-		public String Location { get; set; }
+		private String _location = null;
+		public String Location {
+			get {
+				return _location;
+			}
+			set {
+				_location = value;
+				if (_location != null) {
+					DbManager = new Manager(Directory.CreateDirectory(Path.Combine(_location, MpmDirectory, DbDirectory)), ManagerOptions.Default);
+				}
+			}
+		}
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
+
+		public Instance() {
+		}
+
+		private Database GetDb(string databaseName) {
+			return DbManager.GetDatabase(databaseName);
+		}
+
+		public IMetaDataManager GetDbMeta() {
+			return new CouchbaseMetaDataManager(GetDb(MetaName));
+		}
 
 		public IFileSystem GetFileSystem() {
 			return FileSystemManager.Default.ResolveDirectory(Location).CreateView();
 		}
 
-		const string MpmDirectory = ".mpm";
-		const string ConfigurationName = "configuration.json";
-		readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings {
-			TypeNameHandling = TypeNameHandling.Auto,
-			Formatting = Formatting.Indented,
-			ObjectCreationHandling = ObjectCreationHandling.Replace,
-		};
 		public InstanceConfiguration @Configuration {
 			get {
-				using (var fileSystem = GetFileSystem()) {
-					var mpmDir = fileSystem.ResolveDirectory(MpmDirectory);
-					if (!mpmDir.Exists) {
-						return InstanceConfiguration.Empty;
-					}
-					var configFile = mpmDir.ResolveFile(ConfigurationName);
-					if (!configFile.Exists) {
-						return InstanceConfiguration.Empty;
-					}
-                    var configReader = configFile.GetContent().GetReader();
-					using (var jsonReader = new JsonTextReader(configReader)) {
-						return JsonSerializer.Create(JsonSettings).Deserialize<InstanceConfiguration>(jsonReader);
-					}
+				using (var meta = GetDbMeta()) {
+					var conf = meta.Get<InstanceConfiguration>(ConfigurationName);
+					return conf ?? InstanceConfiguration.Empty;
 				}
 			}
 			set {
-				using (var fileSystem = GetFileSystem()) {
-					var mpmDir = fileSystem.ResolveDirectory(MpmDirectory);
-					if (!mpmDir.Exists) {
-						mpmDir.Create(true);
-					}
-					var configFile = fileSystem.ResolveFile(ConfigurationName);
-					configFile.ResolveDirectory(".").Create();
-					var configWriter = configFile.GetContent().GetWriter();
-					using (var jsonWriter = new JsonTextWriter(configWriter)) {
-						JsonSerializer.Create(JsonSettings).Serialize(jsonWriter, value, typeof(InstanceConfiguration));
-					}
+				using (var meta = GetDbMeta()) {
+					meta.Set<InstanceConfiguration>(ConfigurationName, value);
 				}
 			}
 		}
