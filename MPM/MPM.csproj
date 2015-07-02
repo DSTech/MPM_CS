@@ -67,10 +67,6 @@
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Couchbase.Lite, Version=1.1.0.17194, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Couchbase.Lite.1.1.0.1\lib\net45\Couchbase.Lite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
@@ -88,7 +84,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1-beta3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceKit, Version=1.0.35.0, Culture=neutral, processorArchitecture=MSIL">
@@ -111,8 +107,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceKit.Text.1.0.10\lib\net35\NServiceKit.Text.dll</HintPath>
     </Reference>
-    <Reference Include="Platform, Version=1.1.0.198, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.1.0.198\lib\net40\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.1.0.202, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.202\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
@@ -123,8 +119,8 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.102\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.197, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.197\lib\net40\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.202, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.202\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerArgs, Version=2.6.0.1, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
@@ -245,18 +241,18 @@
     <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Core\Protocols\IProtocolResolver.cs" />
-    <Compile Include="Data\CouchbaseExtensions.cs" />
-    <Compile Include="Data\CouchbaseMetaDataManager.cs" />
-    <Compile Include="Data\CouchbasePackageRepositoryCache.cs" />
+    <Compile Include="Data\BaseKeyValueStore.cs" />
+    <Compile Include="Data\DbUntypedKeyValueStore.cs" />
+    <Compile Include="Data\DbMetaDataManager.cs" />
+    <Compile Include="Data\DbPackageRepositoryCache.cs" />
     <Compile Include="Data\IHashRepository.cs" />
     <Compile Include="Data\IHashRetriever.cs" />
-    <Compile Include="Data\IMetaDataManagerExtensions.cs" />
+    <Compile Include="Data\IUntypedKeyValueStore.cs" />
     <Compile Include="Data\IPackageRepository.cs" />
     <Compile Include="Data\IPackageRepositoryCache.cs" />
     <Compile Include="Data\IMetaDataManager.cs" />
     <Compile Include="Data\NaiveHttpHashRepository.cs" />
     <Compile Include="Data\NaiveHttpHashRetriever.cs" />
-    <Compile Include="Data\SqlitePackageRepositoryCache.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Core\Archival\ArchiveChunk.cs" />

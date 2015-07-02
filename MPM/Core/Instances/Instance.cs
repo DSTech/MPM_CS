@@ -9,44 +9,44 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
 using Platform.VirtualFileSystem.Providers.Local;
-using Couchbase.Lite;
 using System.IO;
 using MPM.Data;
+using System.Data;
+using System.Data.SQLite;
 
 namespace MPM.Core.Instances {
 	public class Instance {
 		const string MpmDirectory = ".mpm";
 		const string DbDirectory = "db";
+		const string DbName = "mpm.sqlite";
 		const string ConfigurationName = "configuration";
 		const string MetaName = "meta";
 		const string PackageName = "packages";
 		const string PackageCacheName = "packagecache";
 
-		private Manager DbManager { get; set; }
-		public String Name { get; set; }
-		private String _location = null;
-		public String Location {
-			get {
-				return _location;
-			}
-			set {
-				_location = value;
-				if (_location != null) {
-					DbManager = new Manager(Directory.CreateDirectory(Path.Combine(_location, MpmDirectory, DbDirectory)), ManagerOptions.Default);
+		private IDbConnection CreateDbConnection() {
+			SQLiteConnection connection;
+			{
+				var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(Location, MpmDirectory, DbDirectory)).FullName, DbName);
+				if (!File.Exists(dbPath)) {
+					SQLiteConnection.CreateFile(dbPath);
 				}
+				var connStrBld = new SQLiteConnectionStringBuilder() {
+					DataSource = dbPath,
+				};
+				connection = new SQLiteConnection(connStrBld.ConnectionString);
 			}
+			return connection;
 		}
+		public String Name { get; set; }
+		public String Location { get; set; }
 		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
 
 		public Instance() {
 		}
 
-		private Database GetDb(string databaseName) {
-			return DbManager.GetDatabase(databaseName);
-		}
-
 		public IMetaDataManager GetDbMeta() {
-			return new CouchbaseMetaDataManager(GetDb(MetaName));
+			return new DbMetaDataManager(CreateDbConnection(), MetaName);
 		}
 
 		public IFileSystem GetFileSystem() {
