@@ -8,6 +8,7 @@ namespace MPM.Data {
 	public interface IUntypedKeyValueStore<KEYTYPE> : IDisposable {
 		IEnumerable<KEYTYPE> Keys { get; }
 		IEnumerable<KeyValuePair<KEYTYPE, object>> Pairs { get; }
+		IEnumerable<object> Values { get; }
 		void Set(KEYTYPE key, object value, Type type);
 		void Set<VALUETYPE>(KEYTYPE key, VALUETYPE value);
 		object Get(KEYTYPE key, Type type);

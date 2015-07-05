@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Data {
-	public abstract class BaseKeyValueStore<KEYTYPE> : IUntypedKeyValueStore<KEYTYPE> {
+	public abstract class BaseUntypedKeyValueStore<KEYTYPE> : IUntypedKeyValueStore<KEYTYPE> {
 		public abstract IEnumerable<KEYTYPE> Keys { get; }
 		public abstract IEnumerable<KeyValuePair<KEYTYPE, object>> Pairs { get; }
+		public abstract IEnumerable<object> Values { get; }
 		public abstract object Get(KEYTYPE key, Type type);
 		public abstract void Set(KEYTYPE key, object value, Type type);
 		public abstract void Clear(KEYTYPE key);

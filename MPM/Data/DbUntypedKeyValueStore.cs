@@ -11,7 +11,7 @@ using Dapper;
 using Newtonsoft.Json;
 
 namespace MPM.Data {
-	public class DbKeyValueStore<KEYTYPE> : BaseKeyValueStore<KEYTYPE>, IDisposable {
+	public class DbKeyValueStore<KEYTYPE> : BaseUntypedKeyValueStore<KEYTYPE>, IDisposable {
 		private readonly IDbConnection db;
 		private readonly string tableName;
 
@@ -67,6 +67,18 @@ namespace MPM.Data {
 								JsonConvert.DeserializeObject(entry.v)
 							)
 						)
+						.ToArray();
+				} finally {
+					db.Close();
+				}
+			}
+		}
+		public override IEnumerable<object> Values {
+			get {
+				try {
+					db.Open();
+					return db.Query<string>($"SELECT `v` FROM `{tableName}`")
+						.Select(JsonConvert.DeserializeObject)
 						.ToArray();
 				} finally {
 					db.Close();

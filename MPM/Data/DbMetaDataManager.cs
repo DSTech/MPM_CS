@@ -22,6 +22,11 @@ namespace MPM.Data {
 				return db.Pairs;
 			}
 		}
+		public IEnumerable<object> Values {
+			get {
+				return db.Values;
+			}
+		}
 
 		public DbMetaDataManager(IDbConnection db, string tableName) {
 			if (tableName == null) {
