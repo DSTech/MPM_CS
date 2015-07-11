@@ -240,6 +240,7 @@
     <Compile Include="Core\Instances\Info\PackageJsonParser.cs" />
     <Compile Include="Core\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
+    <Compile Include="Core\GlobalStorage.cs" />
     <Compile Include="Core\Protocols\IProtocolResolver.cs" />
     <Compile Include="Data\BaseUntypedKeyValueStore.cs" />
     <Compile Include="Data\DbUntypedKeyValueStore.cs" />
