@@ -198,6 +198,7 @@
     <Compile Include="Core\Dependency\InstanceConfigurationExtensions.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
+    <Compile Include="Core\Instances\Cache\FileSystemCacheManager.cs" />
     <Compile Include="Core\Instances\Info\NamedBuild.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
     <Compile Include="Core\Dependency\DependencyException.cs" />
