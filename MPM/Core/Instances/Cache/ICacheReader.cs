@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MPM.Core.Instances.Cache {
 	public interface ICacheReader {
 		IEnumerable<ICacheEntry> Entries { get; }
-		void Contains(string cacheEntryName);
+		bool Contains(string cacheEntryName);
 		ICacheEntry Fetch(string cacheEntryName);
 	}
 }
