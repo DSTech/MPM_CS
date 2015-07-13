@@ -16,13 +16,17 @@ namespace MPMTest {
 				var testProfile = new MutableProfile(Guid.NewGuid(), "testProfile", new Dictionary<string, string> {
 					["testAttribute"] = "testValue",
 				});
-				profMgr.Store(testProfile);//Profiles can be stored
-				var guidToLoad = new Guid(testProfile.Id.ToString());//Guids can be converted to and from strings
-				var loadedProfile = profMgr.Fetch(guidToLoad);//Profiles can be loaded 
-				Assert.Equal(testProfile.Id, loadedProfile.Id);
-				Assert.Equal(testProfile.Name, loadedProfile.Name);
-				foreach (var preferencePair in testProfile.Preferences) {
-					Assert.Equal(preferencePair.Value, loadedProfile.Preferences[preferencePair.Key]);
+				try {
+					profMgr.Store(testProfile);//Profiles can be stored
+					var guidToLoad = new Guid(testProfile.Id.ToString());//Guids can be converted to and from strings
+					var loadedProfile = profMgr.Fetch(guidToLoad);//Profiles can be loaded 
+					Assert.Equal(testProfile.Id, loadedProfile.Id);
+					Assert.Equal(testProfile.Name, loadedProfile.Name);
+					foreach (var preferencePair in testProfile.Preferences) {
+						Assert.Equal(preferencePair.Value, loadedProfile.Preferences[preferencePair.Key]);
+					}
+				} finally {
+					profMgr.Delete(testProfile.Id);
 				}
 			}
 		}
