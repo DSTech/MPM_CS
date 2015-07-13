@@ -83,6 +83,10 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LevelDB.Net, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\LevelDB.Net.1.1.1\lib\net40\LevelDB.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -107,20 +111,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceKit.Text.1.0.10\lib\net35\NServiceKit.Text.dll</HintPath>
     </Reference>
-    <Reference Include="Platform, Version=1.1.0.202, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.1.0.202\lib\net40\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.1.0.204, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.204\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.VirtualFileSystem.1.1.0.102\lib\net40\Platform.VirtualFileSystem.dll</HintPath>
+    <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.109, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.VirtualFileSystem.1.1.0.109\lib\net40\Platform.VirtualFileSystem.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.VirtualFileSystem.Providers.Zip, Version=1.1.0.102, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.102\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
+    <Reference Include="Platform.VirtualFileSystem.Providers.Zip, Version=1.1.0.109, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.109\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.202, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.202\lib\net40\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.204, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.204\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerArgs, Version=2.6.0.1, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
