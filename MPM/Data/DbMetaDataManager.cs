@@ -65,6 +65,10 @@ namespace MPM.Data {
 			db.Clear(key);
 		}
 
+		public void Clear() {
+			db.Clear();
+		}
+
 		public void Dispose() {
 			Dispose(true);
 		}

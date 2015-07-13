@@ -95,6 +95,14 @@ namespace MPM.Data {
 				db.Close();
 			}
 		}
+		public override void Clear() {
+			try {
+				db.Open();
+				db.Execute($"DELETE FROM {tableName}");
+			} finally {
+				db.Close();
+			}
+		}
 
 		public override void Dispose() {
 			Dispose(true);

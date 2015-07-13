@@ -240,7 +240,11 @@
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Instances\Info\PackageInfoParser.cs" />
     <Compile Include="Core\Instances\Info\PackageJsonParser.cs" />
-    <Compile Include="Core\IProfile.cs" />
+    <Compile Include="Core\Profiles\DbProfileManager.cs" />
+    <Compile Include="Core\Profiles\IProfileManager.cs" />
+    <Compile Include="Core\Profiles\IProfileWriter.cs" />
+    <Compile Include="Core\Profiles\IProfileReader.cs" />
+    <Compile Include="Core\Profiles\IProfile.cs" />
     <Compile Include="Core\IServerManager.cs" />
     <Compile Include="Core\GlobalStorage.cs" />
     <Compile Include="Core\Protocols\IProtocolResolver.cs" />

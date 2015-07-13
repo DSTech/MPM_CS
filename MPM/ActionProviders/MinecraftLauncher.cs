@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MPM.Core;
 using MPM.Core.Instances;
+using MPM.Core.Profiles;
 
 namespace MPM {
 	public class MinecraftLauncher : ILauncher, IDisposable {

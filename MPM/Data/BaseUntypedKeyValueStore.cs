@@ -12,6 +12,7 @@ namespace MPM.Data {
 		public abstract object Get(KEYTYPE key, Type type);
 		public abstract void Set(KEYTYPE key, object value, Type type);
 		public abstract void Clear(KEYTYPE key);
+		public abstract void Clear();
 
 		public abstract void Dispose();
 

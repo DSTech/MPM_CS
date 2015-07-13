@@ -13,5 +13,6 @@ namespace MPM.Data {
 		VALUETYPE Get(KEYTYPE key);
 		VALUETYPE Get(KEYTYPE key, VALUETYPE defaultValue);
 		void Clear(KEYTYPE key);
+		void Clear();
 	}
 }
