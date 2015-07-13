@@ -1,5 +1,6 @@
 language: csharp
 mono: latest
 solution: MPM.sln
+sudo: false
 script:
   - xbuild /p:Configuration=Release /tv:4.0 MPM.sln

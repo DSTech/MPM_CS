@@ -21,7 +21,7 @@ namespace MPM.Data {
 			}
 			if ((this.tableName = tableName) == null) {
 				throw new ArgumentNullException(nameof(tableName));
-			};
+			}
 			this.tableName = this.tableName.Replace('`', '_');//No backticks. Because why are you doing that?
 			InitializeTable();
 		}
