@@ -12,7 +12,7 @@ using Platform.VirtualFileSystem.Providers.Local;
 using System.IO;
 using MPM.Data;
 using System.Data;
-using System.Data.SQLite;
+using Community.CsharpSqlite.SQLiteClient;
 
 namespace MPM.Core.Instances {
 	public class Instance {
@@ -25,16 +25,16 @@ namespace MPM.Core.Instances {
 		const string PackageCacheName = "packagecache";
 
 		private IDbConnection CreateDbConnection() {
-			SQLiteConnection connection;
+			SqliteConnection connection;
 			{
 				var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(Location, MpmDirectory, DbDirectory)).FullName, DbName);
 				if (!File.Exists(dbPath)) {
-					SQLiteConnection.CreateFile(dbPath);
+					File.WriteAllBytes(dbPath, new byte[0]);
 				}
-				var connStrBld = new SQLiteConnectionStringBuilder() {
+				var connStrBld = new SqliteConnectionStringBuilder() {
 					DataSource = dbPath,
 				};
-				connection = new SQLiteConnection(connStrBld.ConnectionString);
+				connection = new SqliteConnection(connStrBld.ConnectionString);
 			}
 			return connection;
 		}

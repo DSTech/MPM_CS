@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
-using System.Data.SQLite.Generic;
-using System.Data.SQLite.Linq;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +11,9 @@ namespace MPM.Data {
 	public class DbKeyValueStore<KEYTYPE> : BaseUntypedKeyValueStore<KEYTYPE>, IDisposable {
 		private readonly IDbConnection db;
 		private readonly string tableName;
+		private JsonSerializerSettings serializerSettings = new JsonSerializerSettings() {
+			TypeNameHandling = TypeNameHandling.Auto,
+		};
 
 		public DbKeyValueStore(IDbConnection db, String tableName) {
 			if ((this.db = db) == null) {
@@ -49,7 +49,7 @@ namespace MPM.Data {
 				try {
 					db.Open();
 					return db.Query<string>($"SELECT `k` FROM `{tableName}`")
-						.Select(JsonConvert.DeserializeObject<KEYTYPE>)
+						.Select(v => JsonConvert.DeserializeObject<KEYTYPE>(v, serializerSettings))
 						.ToArray();
 				} finally {
 					db.Close();
@@ -63,8 +63,8 @@ namespace MPM.Data {
 					return db.Query<KVEntry>($"SELECT `k`, `v` FROM `{tableName}`")
 						.Select(entry =>
 							new KeyValuePair<KEYTYPE, object>(
-								JsonConvert.DeserializeObject<KEYTYPE>(entry.k),
-								JsonConvert.DeserializeObject(entry.v)
+								JsonConvert.DeserializeObject<KEYTYPE>(entry.k, serializerSettings),
+								JsonConvert.DeserializeObject(entry.v, serializerSettings)
 							)
 						)
 						.ToArray();
@@ -78,7 +78,7 @@ namespace MPM.Data {
 				try {
 					db.Open();
 					return db.Query<string>($"SELECT `v` FROM `{tableName}`")
-						.Select(JsonConvert.DeserializeObject)
+						.Select(v => JsonConvert.DeserializeObject(v, serializerSettings))
 						.ToArray();
 				} finally {
 					db.Close();
@@ -87,10 +87,10 @@ namespace MPM.Data {
 		}
 
 		public override void Clear(KEYTYPE key) {
-			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, serializerSettings);
 			try {
 				db.Open();
-				db.Execute($"DELETE FROM {tableName} WHERE `k` = @KeyStr", new { KeyStr = keyStr });
+				db.Execute($"DELETE FROM {tableName} WHERE `k` = ?", new { keyStr = keyStr });
 			} finally {
 				db.Close();
 			}
@@ -122,11 +122,11 @@ namespace MPM.Data {
 		}
 
 		public override object Get(KEYTYPE key, Type type) {
-			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, serializerSettings);
 			try {
 				db.Open();
-				return db.Query<string>($"SELECT `v` FROM `{tableName}` WHERE `k` = @KeyStr", new { KeyStr = keyStr })
-					.Select(str => JsonConvert.DeserializeObject(str, type))
+				return db.Query<string>($"SELECT `v` FROM `{tableName}` WHERE `k` = ?", new { keyStr = keyStr })
+					.Select(str => JsonConvert.DeserializeObject(str, type, serializerSettings))
 					.FirstOrDefault();
 			} finally {
 				db.Close();
@@ -134,15 +134,15 @@ namespace MPM.Data {
 		}
 
 		public override void Set(KEYTYPE key, object value, Type type) {
-			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+			var keyStr = JsonConvert.SerializeObject(key, typeof(KEYTYPE), Formatting.None, serializerSettings);
 			try {
 				db.Open();
 				if (value == null) {
-					db.Execute($"DELETE FROM {tableName} WHERE `k` = @KeyStr", new { KeyStr = keyStr });
+					db.Execute($"DELETE FROM {tableName} WHERE `k` = ?", new { keyStr = keyStr });
 					return;
 				} else {
-					var valStr = JsonConvert.SerializeObject(value, type, Formatting.None, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
-					db.Execute($"INSERT OR REPLACE INTO `{tableName}` (`k`, `v`) VALUES (@KeyStr, @ValStr)", new { KeyStr = keyStr, ValStr = valStr });
+					var valStr = JsonConvert.SerializeObject(value, type, Formatting.None, serializerSettings);
+					db.Execute($"INSERT OR REPLACE INTO `{tableName}` (`k`, `v`) VALUES (?, ?)", new { keyStr = keyStr, valStr = valStr });
 				}
 			} finally {
 				db.Close();

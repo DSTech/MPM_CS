@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Community.CsharpSqlite.SQLiteClient;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Profiles;
 using MPM.Data;
@@ -30,16 +30,16 @@ namespace MPM.Core {
 				Environment.GetEnvironmentVariable("HOME") :
 				Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 		private IDbConnection OpenGlobalDb() {
-			SQLiteConnection connection;
+			SqliteConnection connection;
 			{
 				var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(HomePath, mpmDir)).FullName, dbName);
 				if (!File.Exists(dbPath)) {
-					SQLiteConnection.CreateFile(dbPath);
+					File.WriteAllBytes(dbPath, new byte[0]);
 				}
-				var connStrBld = new SQLiteConnectionStringBuilder() {
+				var connStrBld = new SqliteConnectionStringBuilder() {
 					DataSource = dbPath,
 				};
-				connection = new SQLiteConnection(connStrBld.ConnectionString);
+				connection = new SqliteConnection(connStrBld.ConnectionString);
 			}
 			return connection;
 		}
