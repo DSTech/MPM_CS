@@ -23,12 +23,7 @@ namespace MPM.Core {
 		const string dbName = "global.sqlite";
 		const string metaName = "meta";
 		const string profilesName = "profiles";
-		private String HomePath => (
-			Environment.OSVersion.Platform == PlatformID.Unix ||
-			Environment.OSVersion.Platform == PlatformID.MacOSX
-			) ?
-				Environment.GetEnvironmentVariable("HOME") :
-				Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+		private String HomePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 		private IDbConnection OpenGlobalDb() {
 			SqliteConnection connection;
 			{
