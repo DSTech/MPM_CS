@@ -40,18 +40,37 @@ namespace MPM.CLI {
 		}
 
 		[ArgActionMethod]
-		[ArgShortcut("i"), ArgShortcut("init"), ArgShortcut("--init")]
+		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("i"), ArgShortcut("--init")]
 		public void Init(InitArgs args) {
-			Console.WriteLine("Init called, directory was " + args.InstancePath);
+			Console.WriteLine("Initializing instance at path:\n\t{0}", Path.GetFullPath(args.InstancePath));
 			if (!Directory.Exists(args.InstancePath)) {
-				throw new IOException("Directory did not exist");
-			}
-			Console.WriteLine("Directory exists...");
-			if (!args.ForceNonEmptyInstancePath && Directory.GetFiles(args.InstancePath).Length > 0) {
-				throw new IOException("Directory was not empty; Use --force to override.");
+				Console.WriteLine("Directory did not exist. Creating...");
+				Directory.CreateDirectory(args.InstancePath);
+			} else {
+				Console.WriteLine("Directory exists...");
+				var dirEmpty = true;
+				foreach (var fsEntry in Directory.EnumerateFileSystemEntries(args.InstancePath)) {
+					dirEmpty = false;
+					break;
+				}
+				if (!dirEmpty) {
+					if (!args.ForceNonEmptyInstancePath) {
+						Console.WriteLine("Directory was not empty; Use --force to override.");
+						return;
+					} else {
+						Console.WriteLine("Directory contained files but --force was enabled. Overwriting...");
+					}
+				} else {
+					Console.WriteLine("Directory was empty, proceeding...");
+				}
 			}
 			Console.WriteLine("Creating instance...");
-			var instanceArch = SemanticVersion.Parse(args.Arch);
+			SemanticVersion instanceArch;
+			if (args.Arch == "latest") {
+				instanceArch = SemanticVersion.Parse("1.8.4");
+			} else {
+				instanceArch = SemanticVersion.Parse(args.Arch);
+			}
 			InstanceSide instanceSide;
 			switch (args.Side) {
 				case "client":

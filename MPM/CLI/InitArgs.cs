@@ -5,11 +5,11 @@ namespace MPM.CLI {
 		[ArgRequired(PromptIfMissing = true)]
 		[ArgDescription("The directory within which to initialize an instance")]
 		[ArgPosition(1)]
-		[ArgExistingDirectory]
 		[ArgDefaultValue(".")]
 		public string InstancePath { get; set; }
 
 		[ArgShortcut("-f"), ArgShortcut("--force"), ArgShortcut(ArgShortcutPolicy.ShortcutsOnly)]
+		[ArgDefaultValue(false)]
 		public bool ForceNonEmptyInstancePath { get; set; }
 
 		[ArgDescription("The minecraft version to use, eg 1.8")]

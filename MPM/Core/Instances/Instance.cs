@@ -23,6 +23,7 @@ namespace MPM.Core.Instances {
 		const string MetaName = "meta";
 		const string PackageName = "packages";
 		const string PackageCacheName = "packagecache";
+		public String Location { get; set; }
 
 		private IDbConnection CreateDbConnection() {
 			SqliteConnection connection;
@@ -38,11 +39,35 @@ namespace MPM.Core.Instances {
 			}
 			return connection;
 		}
-		public String Name { get; set; }
-		public String Location { get; set; }
-		public Type LauncherType { get; set; } = typeof(MinecraftLauncher);//TODO: Change to a default (ScriptLauncher / ShellLauncher?), or auto-identify launch method
+		public String Name {
+			get {
+				using (var meta = GetDbMeta()) {
+					return meta.Get<String>("name");
+				}
+			}
+			set {
+				using (var meta = GetDbMeta()) {
+					meta.Set<String>("name", value);
+				}
+			}
+		}
+		public Type LauncherType {
+			get {
+				using (var meta = GetDbMeta()) {
+					return meta.Get<Type>("launcherType");
+				}
+			}
+			set {
+				using (var meta = GetDbMeta()) {
+					meta.Set<Type>("launcherType", value);
+				}
+			}
+		}
 
 		public Instance() {
+		}
+		public Instance(String location) {
+			this.Location = location;
 		}
 
 		public IMetaDataManager GetDbMeta() {
