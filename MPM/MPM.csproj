@@ -209,6 +209,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\InitActionProvider.cs" />
     <Compile Include="ActionProviders\MinecraftLauncher.cs" />
     <Compile Include="CLI\InstancePlatform.cs" />
