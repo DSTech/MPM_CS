@@ -278,6 +278,7 @@
     <Compile Include="Data\DbPackageRepositoryCache.cs" />
     <Compile Include="Data\IHashRepository.cs" />
     <Compile Include="Data\IHashRetriever.cs" />
+    <Compile Include="Data\HttpPackageRepository.cs" />
     <Compile Include="Data\ITypedKeyValueStore.cs" />
     <Compile Include="Data\IUntypedKeyValueStore.cs" />
     <Compile Include="Data\IPackageRepository.cs" />

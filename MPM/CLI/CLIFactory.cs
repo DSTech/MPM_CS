@@ -65,7 +65,7 @@ namespace MPM.CLI {
 			cb.Register<IPackageRepository>(ctxt => {
 				using (var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>()) {//Use to fetch custom package repositories
 					var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
-					throw new NotImplementedException();//return new HttpPackageRepository(packageRepositoryUri);
+					return new HttpPackageRepository(packageRepositoryUri);
 				}
 			}).SingleInstance();
 		}
