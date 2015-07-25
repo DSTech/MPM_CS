@@ -19,7 +19,7 @@ namespace MPM.Core.Instances.Info {
 		}
 		public IEnumerable<IFileDeclaration> InstallationScript {
 			get {
-				return InstallationScriptParser.Parse(packageJsonParser.InstallationScript);
+				throw new NotImplementedException();
 			}
 		}
 	}

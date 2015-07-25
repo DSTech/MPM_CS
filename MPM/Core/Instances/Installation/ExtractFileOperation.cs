@@ -45,18 +45,30 @@ namespace MPM.Core.Instances.Installation {
 			if (cacheEntry == null) {
 				throw new KeyNotFoundException($"Cache did not contain entry for {ArchiveCacheEntry}");
 			}
-			using (var zip = new ZipInputStream(cacheEntry.FetchStream()) {
-				IsStreamOwner = true,
-			}) {
-				ZipEntry entry;
-				while ((entry = zip.GetNextEntry()) != null) {
-					if (entry.Name != SourcePath) {
-						continue;
+			var entryStream = cacheEntry.FetchStream();
+			if (entryStream.CanSeek) {
+				using (var zip = new ZipFile(entryStream) { IsStreamOwner = true }) {
+					var entry = zip.GetEntry(SourcePath);
+					using (var zipStream = zip.GetInputStream(entry)) {
+						using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+							zipStream.CopyTo(fileWriter);
+						}
 					}
-					using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
-						zip.CopyTo(fileWriter);
+				}
+			} else {
+				using (var zip = new ZipInputStream(entryStream) {
+					IsStreamOwner = true,
+				}) {
+					ZipEntry entry;
+					while ((entry = zip.GetNextEntry()) != null) {
+						if (entry.Name != SourcePath) {
+							continue;
+						}
+						using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+							zip.CopyTo(fileWriter);
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}

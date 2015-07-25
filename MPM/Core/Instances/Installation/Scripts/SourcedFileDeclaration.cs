@@ -6,36 +6,39 @@ using MPM.Core.Protocols;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
-	public class SourcelessFileDeclaration : IFileDeclaration {
+	public class SourcedFileDeclaration : IFileDeclaration {
 		public string PackageName { get; set; }
 
 		public SemanticVersion PackageVersion { get; set; }
 
 		public string Description { get; set; }
 
-		public byte[] Hash => null;
+		public byte[] Hash { get; set; }
 
-		public string Source => null;
-
-		public SourcelessType @Type { get; set; }
+		public string Source { get; set; }
 
 		public IReadOnlyCollection<string> Targets { get; set; }
+		
+		private string packageCachedName { get; set; }
 
 		public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
-			return;
+			if (!cacheManager.Contains(packageCachedName)) {
+				throw new Exception($"Cache did not contain package \"{packageCachedName}\"");
+			}
+			this.packageCachedName = packageCachedName;
 		}
 
 		public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() {
 			var result = new Dictionary<string, IReadOnlyCollection<IFileOperation>>();
 			foreach (var target in Targets) {
 				result.Add(target, new[] {
-					new ClaimFileOperation(this.PackageName, this.PackageVersion),
+					new ExtractFileOperation(this.PackageName, this.PackageVersion, packageCachedName, Source),//TODO: Allow ExtractFileOperation to check hashes
 				});
 			}
 			return result;
 		}
 		public override string ToString() {
-			return $"{nameof(SourcelessFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n]";
+			return $"{nameof(SourcedFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  {Source} => [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n  ]";
 		}
 	}
 }

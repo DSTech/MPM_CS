@@ -1,0 +1,12 @@
+{
+  "installation": [
+    {
+      "source": "testFile.txt",
+      "target": "mods/testing/testFile.txt"
+    },
+    {
+      "source": "testConfig.cfg",
+      "target": "./config/testing/testConfig.cfg"
+    }
+  ]
+}

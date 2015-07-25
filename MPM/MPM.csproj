@@ -255,9 +255,9 @@
     <Compile Include="Core\Instances\Installation\IFileOperationExtensions.cs" />
     <Compile Include="Core\Instances\Installation\IFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\InstallationException.cs" />
-    <Compile Include="Core\Instances\Info\InstallationScriptParser.cs" />
     <Compile Include="Core\Instances\Installation\Installer.cs" />
     <Compile Include="Core\Instances\ILauncher.cs" />
+    <Compile Include="Core\Instances\Installation\Scripts\SourcedFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessType.cs" />
