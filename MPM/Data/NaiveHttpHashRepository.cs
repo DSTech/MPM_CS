@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MPM.Data {
 	public class NaiveHttpHashRepository : IHashRepository {
-		NaiveHttpHashRepository() { }
-		NaiveHttpHashRepository(Uri baseUri) {
+		public NaiveHttpHashRepository() { }
+		public NaiveHttpHashRepository(Uri baseUri) {
 			BaseUri = baseUri;
 		}
 		public Uri BaseUri { get; set; }

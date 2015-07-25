@@ -16,6 +16,7 @@ namespace MPM.CLI {
 		public IContainer GenerateResolver() {
 			var cb = new ContainerBuilder();
 
+			RegisterGlobalStorage(ref cb);
 			RegisterGlobalMeta(ref cb);
 			RegisterProfiles(ref cb);
 			RegisterCache(ref cb);
@@ -62,15 +63,19 @@ namespace MPM.CLI {
 
 		private void RegisterPackageRepository(ref ContainerBuilder cb) {
 			cb.Register<IPackageRepository>(ctxt => {
-				var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>();//Use to fetch custom package repositories
-				throw new NotImplementedException();
+				using (var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>()) {//Use to fetch custom package repositories
+					var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
+					throw new NotImplementedException();//return new HttpPackageRepository(packageRepositoryUri);
+				}
 			}).SingleInstance();
 		}
 
 		private void RegisterHashStore(ref ContainerBuilder cb) {
 			cb.Register<IHashRepository>(ctxt => {
-				var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>();//Use to fetch custom hash repositories
-				throw new NotImplementedException();
+				using (var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>()) {//Use to fetch custom hash repositories
+					var hashStoreUri = new Uri(meta.Get<String>("hashStoreUri") ?? "http://dst.dessix.net:8951/");
+					return new NaiveHttpHashRepository(hashStoreUri);
+				}
 			}).SingleInstance();
 		}
 	}
