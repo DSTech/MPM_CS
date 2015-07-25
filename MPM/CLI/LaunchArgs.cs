@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using MPM.Core;
+using MPM.Extensions;
 using PowerArgs;
 using semver.tools;
 
