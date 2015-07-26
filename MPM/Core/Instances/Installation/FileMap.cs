@@ -14,6 +14,38 @@ namespace MPM.Core.Instances.Installation {
 		public IFileOperation Operation { get; set; }
 	}
 	public class FileMap : IFileMap {
+		public static IFileMap FromFileOperations(IEnumerable<IReadOnlyDictionary<String, IReadOnlyCollection<IFileOperation>>> operationSets) {
+			var fileMap = new FileMap();
+			foreach (var operationSet in operationSets) {
+				foreach (var operationList in operationSet) {
+					foreach (var operation in operationList.Value) {
+						fileMap.Register(operationList.Key, operation);
+					}
+				}
+			}
+			return fileMap;
+		}
+		public static IFileMap FromFileOperations(IReadOnlyDictionary<String, IReadOnlyCollection<IFileOperation>> operations) {
+			var fileMap = new FileMap();
+			foreach (var operationList in operations) {
+				foreach (var operation in operationList.Value) {
+					fileMap.Register(operationList.Key, operation);
+				}
+			}
+			return fileMap;
+		}
+		public static IFileMap Merge(IEnumerable<IFileMap> fileMaps) => MergeOrdered(fileMaps);
+		public static IFileMap MergeOrdered(IEnumerable<IFileMap> orderedFileMaps) {
+			var res = new FileMap();
+			foreach (var map in orderedFileMaps) {
+				foreach (var target in map) {
+					foreach (var operation in target.Value) {
+						res.Register(target.Key, operation);
+					}
+				}
+			}
+			return res;
+		}
 		private Dictionary<String, Stack<FileMapEntry>> operations = new Dictionary<String, Stack<FileMapEntry>>();
 		public IReadOnlyCollection<IFileOperation> this[String key] {
 			get {

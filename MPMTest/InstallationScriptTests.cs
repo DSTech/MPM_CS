@@ -159,15 +159,8 @@ namespace MPMTest {
 							return decl.GenerateOperations();
 						}).ToArray();
 
-					var fileMap = new FileMap();
-					foreach (var operationSet in operationSets) {
-						foreach (var operationList in operationSet) {
-							foreach (var operation in operationList.Value) {
-								fileMap.Register(operationList.Key, operation);
-							}
-						}
-					}
-					
+					var fileMap = FileMap.FromFileOperations(operationSets);
+
 					foreach (var file in fileMap) {
 						var fileName = file.Key;
 						var fileOps = file.Value;

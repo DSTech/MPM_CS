@@ -47,7 +47,7 @@ namespace MPM.Core.Instances.Installation {
 			}
 			var cacheEntry = cache.Fetch(ArchiveCacheEntry);
 			if (cacheEntry == null) {
-				throw new KeyNotFoundException($"Cache did not contain entry for {ArchiveCacheEntry}");
+				throw new KeyNotFoundException($"Cache did not contain an entry for {ArchiveCacheEntry}");
 			}
 			var entryStream = cacheEntry.FetchStream();
 			if (entryStream.CanSeek) {
@@ -59,18 +59,10 @@ namespace MPM.Core.Instances.Installation {
 					}
 				}
 			} else {
-				using (var zip = new ZipInputStream(entryStream) {
-					IsStreamOwner = true,
-				}) {
-					ZipEntry entry;
-					while ((entry = zip.GetNextEntry()) != null) {
-						if (entry.Name != SourcePath) {
-							continue;
-						}
-						using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
-							zip.CopyTo(fileWriter);
-						}
-						break;
+				using (var zip = new StreamingZipFetcher(entryStream)) {
+					using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+						var sourceFile = zip.FetchFile(SourcePath);
+						fileWriter.Write(sourceFile, 0, sourceFile.Length);
 					}
 				}
 			}
