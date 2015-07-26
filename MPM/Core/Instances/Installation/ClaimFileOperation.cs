@@ -25,7 +25,7 @@ namespace MPM.Core.Instances.Installation {
 		}
 		
 		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
-			fileSystem.ResolveFile(path).Delete();
+			//A no-op
 		}
 	}
 }

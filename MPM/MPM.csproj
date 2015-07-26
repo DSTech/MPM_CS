@@ -261,6 +261,7 @@
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessType.cs" />
+    <Compile Include="Core\Instances\Installation\SeekingZipFetcher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Instances\Info\PackageInfoParser.cs" />
     <Compile Include="Core\Instances\Info\PackageJsonParser.cs" />

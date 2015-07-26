@@ -41,16 +41,19 @@ namespace MPM.Core.Instances.Installation {
 			if (targetFile.Exists) {
 				targetFile.Delete();
 			}
+			var targetDir = targetFile.ResolveDirectory(".");
+			if (!targetDir.Exists) {
+				targetDir.Create(true);
+			}
 			var cacheEntry = cache.Fetch(ArchiveCacheEntry);
 			if (cacheEntry == null) {
 				throw new KeyNotFoundException($"Cache did not contain entry for {ArchiveCacheEntry}");
 			}
 			var entryStream = cacheEntry.FetchStream();
 			if (entryStream.CanSeek) {
-				using (var zip = new ZipFile(entryStream) { IsStreamOwner = true }) {
-					var entry = zip.GetEntry(SourcePath);
-					using (var zipStream = zip.GetInputStream(entry)) {
-						using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+				using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+					using (var seeker = new SeekingZipFetcher(entryStream)) {
+						using (var zipStream = seeker.FetchFileStream(SourcePath)) {
 							zipStream.CopyTo(fileWriter);
 						}
 					}

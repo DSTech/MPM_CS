@@ -37,6 +37,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 			}
 			return result;
 		}
+
 		public override string ToString() {
 			return $"{nameof(SourcedFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  {Source} => [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n  ]";
 		}

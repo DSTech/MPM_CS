@@ -34,8 +34,9 @@ namespace MPM.Core.Instances.Installation.Scripts {
 			}
 			return result;
 		}
+
 		public override string ToString() {
-			return $"{nameof(SourcelessFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n]";
+			return $"{nameof(SourcelessFileDeclaration)} <{PackageName}:{PackageVersion}> => [\n{String.Join(",\n", Targets.Select(t => $"  {t}"))}\n]";
 		}
 	}
 }
