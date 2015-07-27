@@ -1,11 +1,9 @@
 using System;
-using MPM.Core;
-using semver.tools;
 
 namespace MPM.Net.DTO {
 
 	public class Build {
-		public SemanticVersion Version { get; set; }
+		public Version Version { get; set; }
 		public String GivenVersion { get; set; }
 		public String Arch { get; set; }
 		public String Platform { get; set; }

@@ -309,6 +309,8 @@
     <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
+    <Compile Include="Net\DTO\VersionSpec.cs" />
+    <Compile Include="Net\DTO\Version.cs" />
     <Compile Include="VersionSpecConverter.cs" />
     <Compile Include="SemanticVersionConverter.cs" />
     <Compile Include="SolidifyingReadOnlyCollection.cs" />
@@ -331,8 +333,6 @@
     <Compile Include="Net\DTO\PackageDependency.cs" />
     <Compile Include="Net\DTO\InterfaceDependency.cs" />
     <Compile Include="Net\DTO\Package.cs" />
-    <Compile Include="Net\DTO\PackagesRequest.cs" />
-    <Compile Include="Net\DTO\PackageRequest.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\LibraryExtractSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\LibraryNativesSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\LibraryRuleOSSpec.cs" />
