@@ -9,6 +9,7 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+
 	public class DeleteFileOperation : IFileOperation {
 		public bool UsesPreviousContents => false;
 

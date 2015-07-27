@@ -1,28 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Net.DTO;
-using semver.tools;
-using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Data;
+using semver.tools;
 
 namespace MPM.Data {
-	class SyncInfo {
+
+	internal class SyncInfo {
 		public DateTime? LastUpdated { get; set; }
 	}
+
 	public class DbPackageRepositoryCache : IPackageRepositoryCache, IDisposable {
+
 		/// <summary>
-		/// Optionally-disposable, 
+		/// Optionally-disposable,
 		/// </summary>
 		private IPackageRepository repository;
+
 		/// <summary>
 		/// Whether or not the instance owns <see cref="repository"/> and must dispose of it if possible.
 		/// </summary>
 		private bool ownsRepositoryInstance;
+
 		private IUntypedKeyValueStore<String> packageCacheDb;
 		private IMetaDataManager metaDb;
 
@@ -93,9 +98,9 @@ namespace MPM.Data {
 			return FetchPackageList();//Completely disregard updatedAfter constraint, as is allowed by the specification
 		}
 
-		const string SyncInfoMetaName = "syncInfo";
+		private const string SyncInfoMetaName = "syncInfo";
+
 		public async Task Sync() {
-			
 			var syncInfo = metaDb.Get<SyncInfo>(SyncInfoMetaName);
 			DateTime? lastUpdatedTime = syncInfo.LastUpdated;
 			Package[] packageListToSync;
@@ -127,6 +132,7 @@ namespace MPM.Data {
 		public void Dispose() {
 			Dispose(true);
 		}
+
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
 				if (packageCacheDb != null) {

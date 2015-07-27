@@ -18,18 +18,23 @@ using semver.tools;
 using Xunit;
 
 namespace MPMTest {
+
 	public class InstallationScriptTests {
+
 		private JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings() {
 			TypeNameHandling = TypeNameHandling.Auto,
 		};
+
 		private JsonSerializer Serializer => JsonSerializer.Create(_jsonSerializerSettings);
 		private string _testCachePath => Path.GetFullPath("./testCache");
+
 		private ICacheManager FetchTestCache() {
 			if (!Directory.Exists(_testCachePath)) {
 				Directory.CreateDirectory(_testCachePath);
 			}
 			return new FileSystemCacheManager(_testCachePath);
 		}
+
 		public string TestPackageName => "testPackage";
 		public SemanticVersion TestPackageVersion => SemanticVersion.Parse("0.0.0");
 
@@ -138,7 +143,6 @@ namespace MPMTest {
 					Directory.CreateDirectory(testFsPath);
 				}
 				using (var testFs = FileSystemManager.Default.ResolveDirectory(testFsPath).CreateView()) {
-
 					RawBuildInfo packageInfo;
 					using (var zip = new SeekingZipFetcher(testCache.Fetch(testPackageCacheEntry).FetchStream())) {
 						var packageJsonBytes = zip.FetchFile("package.json");

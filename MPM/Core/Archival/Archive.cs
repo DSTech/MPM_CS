@@ -8,10 +8,13 @@ using System.Threading.Tasks;
 using MPM.Core;
 
 namespace MPM.Core.Archival {
+
 	public class Archive : IList<EncryptedChunk> {
+
 		public Archive(IEnumerable<EncryptedChunk> chunks) {
 			this.chunks = new List<EncryptedChunk>(chunks);
 		}
+
 		private IList<EncryptedChunk> chunks;
 
 		public static byte[] ApplyLeadingHash(byte[] contents) {
@@ -24,6 +27,7 @@ namespace MPM.Core.Archival {
 				leadingHash);
 			return Enumerable.Concat(header, contents).ToArray();
 		}
+
 		public static byte[] VerifyLeadingHash(byte[] contents) {
 			var contentsEnumr = contents.AsEnumerable().GetEnumerator();
 			var leadingHashLength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
@@ -36,6 +40,7 @@ namespace MPM.Core.Archival {
 			}
 			return body;
 		}
+
 		public static async Task<Archive> CreateArchive(string packageName, byte[] contents, uint? maxChunkSize = null) {
 			contents = await Task.Run(() => ApplyLeadingHash(contents));
 			RawChunk[] chunks;
@@ -66,6 +71,7 @@ namespace MPM.Core.Archival {
 				return verifiedBody;
 			});
 		}
+
 		private IEnumerable<IEnumerable<byte>> UnpackInternal(string packageName) {
 			var key = System.Text.Encoding.UTF8.GetBytes(packageName);
 			foreach (var chunk in chunks) {

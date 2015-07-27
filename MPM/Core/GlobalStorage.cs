@@ -11,6 +11,7 @@ using MPM.Core.Profiles;
 using MPM.Data;
 
 namespace MPM.Core {
+
 	/// <summary>
 	/// Should:
 	///	 Provide:
@@ -19,11 +20,12 @@ namespace MPM.Core {
 	///   Global Cache: <see cref="Func{ICacheManager}"/>
 	/// </summary>
 	public class GlobalStorage {
-		const string mpmDir = ".mpm";
-		const string dbName = "global.sqlite";
-		const string metaName = "meta";
-		const string profilesName = "profiles";
+		private const string mpmDir = ".mpm";
+		private const string dbName = "global.sqlite";
+		private const string metaName = "meta";
+		private const string profilesName = "profiles";
 		private String HomePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
 		private IDbConnection OpenGlobalDb() {
 			SqliteConnection connection;
 			{
@@ -38,20 +40,24 @@ namespace MPM.Core {
 			}
 			return connection;
 		}
+
 		public IUntypedKeyValueStore<String> FetchDataStore() {
 			return new DbKeyValueStore<String>(OpenGlobalDb(), metaName);
 		}
+
 		public IProfileManager FetchProfileManager() {
 			return new KeyValueStoreProfileManager(
 				new DbKeyValueStore<Guid>(OpenGlobalDb(), profilesName)
 					.Typify().As<IProfile>()
 			);
 		}
+
 		public IProfile FetchProfile(Guid profileId) {
 			using (var profileManager = FetchProfileManager()) {
 				return profileManager.Fetch(profileId);
 			}
 		}
+
 		public ICacheManager FetchGlobalCache() {
 			var cachePath = Directory.CreateDirectory(Path.Combine(HomePath, mpmDir, "cache")).FullName;
 			var cacheManager = new FileSystemCacheManager(cachePath);

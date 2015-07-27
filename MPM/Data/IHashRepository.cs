@@ -4,16 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace MPM.Data {
+
 	public static class IHashRepositoryExtensions {
+
 		public static async Task<IEnumerable<IHashRetriever>> Resolve(this IHashRepository hashRepository, string[] hashes) {
 			return await hashRepository.Resolve(hashes.Select(hash => System.Text.Encoding.UTF8.GetBytes(hash)));
 		}
+
 		public static async Task<IHashRetriever> Resolve(this IHashRepository hashRepository, byte[] hash) {
 			return (await hashRepository.Resolve(new[] { hash })).First();
 		}
+
 		public static async Task<IHashRetriever> Resolve(this IHashRepository hashRepository, string hash) {
 			return await hashRepository.Resolve(System.Text.Encoding.UTF8.GetBytes(hash));
 		}
+
 		/// <summary>
 		/// Collects and assembles an archive's hashes from the given hash repository.
 		/// </summary>
@@ -51,7 +56,9 @@ namespace MPM.Data {
 			return await archive.Unpack(packageName);
 		}
 	}
+
 	public interface IHashRepository {
+
 		/// <summary>
 		/// Resolves a series of hashes into potential methods for fetching, wherein each method may provide caching and other services, and each hash may be fetched via differing methods.
 		/// </summary>

@@ -1,28 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Community.CsharpSqlite.SQLiteClient;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Installation;
+using MPM.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
 using Platform.VirtualFileSystem.Providers.Local;
-using System.IO;
-using MPM.Data;
-using System.Data;
-using Community.CsharpSqlite.SQLiteClient;
 
 namespace MPM.Core.Instances {
+
 	public class Instance {
-		const string MpmDirectory = ".mpm";
-		const string DbDirectory = "db";
-		const string DbName = "mpm.sqlite";
-		const string ConfigurationName = "configuration";
-		const string MetaName = "meta";
-		const string PackageName = "packages";
-		const string PackageCacheName = "packagecache";
+		private const string MpmDirectory = ".mpm";
+		private const string DbDirectory = "db";
+		private const string DbName = "mpm.sqlite";
+		private const string ConfigurationName = "configuration";
+		private const string MetaName = "meta";
+		private const string PackageName = "packages";
+		private const string PackageCacheName = "packagecache";
 		public String Location { get; set; }
 
 		private IDbConnection CreateDbConnection() {
@@ -39,6 +40,7 @@ namespace MPM.Core.Instances {
 			}
 			return connection;
 		}
+
 		public String Name {
 			get {
 				using (var meta = GetDbMeta()) {
@@ -51,6 +53,7 @@ namespace MPM.Core.Instances {
 				}
 			}
 		}
+
 		public Type LauncherType {
 			get {
 				using (var meta = GetDbMeta()) {
@@ -66,6 +69,7 @@ namespace MPM.Core.Instances {
 
 		public Instance() {
 		}
+
 		public Instance(String location) {
 			this.Location = location;
 		}

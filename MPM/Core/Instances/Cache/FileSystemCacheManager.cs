@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 namespace MPM.Core.Instances.Cache {
+
 	//TODO: Replace standard filesystem usage with Platform.VirtualFileSystem
 	public class FileSystemCacheManager : ICacheManager {
 		private string cachePath { get; }

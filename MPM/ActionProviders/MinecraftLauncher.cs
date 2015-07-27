@@ -7,8 +7,10 @@ using MPM.Core.Instances;
 using MPM.Core.Profiles;
 
 namespace MPM {
+
 	public class MinecraftLauncher : ILauncher, IDisposable {
 		public string UserName { get; set; }
+
 		public void Launch(Instance instance, IProfile profile) {
 			throw new NotImplementedException();
 		}

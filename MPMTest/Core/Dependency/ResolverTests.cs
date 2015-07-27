@@ -8,11 +8,14 @@ using semver.tools;
 using Xunit;
 
 namespace MPMTest.Core.Dependency {
+
 	public class ResolverTests {
+
 		[Fact]
 		public async Task Empty() {
 			Assert.True((await new Resolver().Resolve(Configuration.Empty, new TestPackageRepository(new Package[0]))).Packages.Length == 0);
 		}
+
 		[Fact]
 		public async Task ResolutionNoDependencies() {
 			var resolver = new Resolver();
@@ -76,6 +79,7 @@ namespace MPMTest.Core.Dependency {
 			);
 			Assert.True(resultant.Packages.Any(build => build.Name == testPackageSpec.Name));
 		}
+
 		[Fact]
 		public async Task ResolutionWithDependencies() {
 			var resolver = new Resolver();
@@ -175,6 +179,7 @@ namespace MPMTest.Core.Dependency {
 				"All manual packages must be accounted for in the resulting configuration"
 			);
 		}
+
 		[Fact]
 		public async Task ResolutionSideDependencies() {
 			var resolver = new Resolver();
@@ -321,6 +326,7 @@ namespace MPMTest.Core.Dependency {
 				"Packages should prefer those of the higher version, even when the preferred side are available for a lower version"
 			);
 		}
+
 		[Fact]
 		public void SortBuilds() {
 			var r = new Resolver();

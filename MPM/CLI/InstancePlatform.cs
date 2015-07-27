@@ -1,4 +1,5 @@
 namespace MPM.CLI {
+
 	public enum InstancePlatform {
 		Lin32,
 		Lin64,

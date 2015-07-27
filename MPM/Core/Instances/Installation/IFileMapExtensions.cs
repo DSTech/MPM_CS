@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Installation {
+
 	public static class IFileMapExtensions {
+
 		/// <summary>
 		/// Produces a list of operations that must be undertaken to produce the difference between one FileMap and another.
 		/// </summary>
@@ -45,7 +47,7 @@ namespace MPM.Core.Instances.Installation {
 			}
 
 			var creationOperations = new List<Tuple<String, IFileOperation[]>>(created.Length);
-			//Fill with operation contents from destination entry 
+			//Fill with operation contents from destination entry
 			foreach (var creationPath in created) {
 				Debug.Assert(destination.ContainsKey(creationPath));
 				var creationSteps = destination[creationPath];

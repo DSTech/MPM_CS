@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Data {
+
 	public interface IMetaDataManager : IUntypedKeyValueStore<String>, IDisposable {
 	}
 }

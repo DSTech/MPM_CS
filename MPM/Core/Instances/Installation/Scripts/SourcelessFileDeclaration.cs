@@ -6,6 +6,7 @@ using MPM.Core.Protocols;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
+
 	public class SourcelessFileDeclaration : IFileDeclaration {
 		public string PackageName { get; set; }
 

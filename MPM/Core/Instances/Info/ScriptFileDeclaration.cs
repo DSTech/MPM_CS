@@ -1,6 +1,7 @@
 using System;
 
 namespace MPM.Core.Instances.Info {
+
 	public class ScriptFileDeclaration {
 		public String Type { get; set; }
 		public String Description { get; set; }

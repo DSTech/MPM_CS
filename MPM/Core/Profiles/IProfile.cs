@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Profiles {
+
 	/// <summary>
 	/// Stores anything user-specific that may be needed by a launcher on a multi-instance basis.
 	/// </summary>

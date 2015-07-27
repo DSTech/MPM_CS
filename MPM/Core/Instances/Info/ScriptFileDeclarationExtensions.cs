@@ -4,7 +4,9 @@ using Newtonsoft.Json;
 using semver.tools;
 
 namespace MPM.Core.Instances.Info {
+
 	public static class ScriptFileDeclarationExtensions {
+
 		public static IFileDeclaration Parse(this ScriptFileDeclaration declaration, String packageName, SemanticVersion packageVersion) {
 			var targets = (declaration.Target != null ? new[] { declaration.Target } : declaration.Targets ?? new String[0]);
 			var hash = (declaration.Hash != null) ? Convert.FromBase64String(declaration.Hash) : null;

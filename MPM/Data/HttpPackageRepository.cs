@@ -11,6 +11,7 @@ using NServiceKit.Common;
 using semver.tools;
 
 namespace MPM.Data {
+
 	public class HttpPackageRepository : IPackageRepository {
 		private readonly Uri baseUri;
 

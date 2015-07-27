@@ -1,17 +1,19 @@
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using MPM.CLI;
 using NServiceKit.Text;
 
 namespace MPM {
+
 	public class SolidifyingReadOnlyCollection<T> : IReadOnlyCollection<T> {
 		private IEnumerable<T> source;
 		private IReadOnlyCollection<T> solidified;
 		public int Count => Cache().Count;
+
 		public SolidifyingReadOnlyCollection(IEnumerable<T> source) {
 			if (source == null) {
 				throw new ArgumentNullException(nameof(source));
@@ -28,15 +30,18 @@ namespace MPM {
 				solidified = listSource;
 			}
 		}
+
 		private IReadOnlyCollection<T> Cache() {
 			if (solidified == null) {
 				solidified = source.ToArray();
 			}
 			return solidified;
 		}
+
 		public IEnumerator<T> GetEnumerator() {
 			return Cache().GetEnumerator();
 		}
+
 		IEnumerator IEnumerable.GetEnumerator() {
 			return Cache().GetEnumerator();
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 using MPM.Data;
 
 namespace MPM.Core.Profiles {
+
 	public class KeyValueStoreProfileManager : IProfileManager, IDisposable {
 		private readonly ITypedKeyValueStore<Guid, IProfile> store;
+
 		public KeyValueStoreProfileManager(ITypedKeyValueStore<Guid, IProfile> store) {
 			this.store = store;
 		}
+
 		public void Dispose() => Dispose(true);
-		bool disposed = false;
+
+		private bool disposed = false;
+
 		protected virtual void Dispose(bool disposing) {
 			if (!disposing || disposed) {
 				return;

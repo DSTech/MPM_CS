@@ -8,6 +8,7 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+
 	/// <summary>
 	/// A single operation upon a specific filepath.
 	/// </summary>
@@ -15,14 +16,17 @@ namespace MPM.Core.Instances.Installation {
 	/// Lossy operations must not be reversible.
 	/// </remarks>
 	public interface IFileOperation {
+
 		/// <summary>
 		/// Name of the package that created the operation.
 		/// </summary>
 		String PackageName { get; }
+
 		/// <summary>
 		/// Version of the package that created the operation.
 		/// </summary>
 		SemanticVersion PackageVersion { get; }
+
 		/// <summary>
 		/// Performs the operation upon the specified path within the given filesystem.
 		/// </summary>

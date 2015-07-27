@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Dependency;
 using MPM.Data;
 using MPM.Net.DTO;
 using semver.tools;
-using MPM.Core.Dependency;
 using Xunit;
 
 namespace MPMTest.Core.Dependency {
+
 	public class TestPackageRepositoryTests {
+
 		[Fact]
 		public static async Task TestPackageRepositoryOrdering() {
 			var repo = new TestPackageRepository(new[] {
@@ -58,6 +60,7 @@ namespace MPMTest.Core.Dependency {
 			Assert.True(lookupRes.First().Version == SemanticVersion.Parse("1.0.4"), "The highest conforming version should be returned by the repository");
 		}
 	}
+
 	public class TestPackageRepository : IPackageRepository {
 		private Package[] packages;
 
@@ -66,6 +69,7 @@ namespace MPMTest.Core.Dependency {
 		}
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, PackageSide side, String arch, String platform) {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			return packages
@@ -78,6 +82,7 @@ namespace MPMTest.Core.Dependency {
 		}
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		public async Task<Package> FetchBuilds(string packageName, VersionSpec versionSpec) {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			var basePackage = packages.FirstOrDefault(p => p.Name == packageName);
@@ -97,6 +102,7 @@ namespace MPMTest.Core.Dependency {
 		}
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		public async Task<Package> FetchPackage(string packageName) {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			var basePackage = packages.FirstOrDefault(p => p.Name == packageName);
@@ -115,12 +121,14 @@ namespace MPMTest.Core.Dependency {
 		}
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		public async Task<IEnumerable<Package>> FetchPackageList() {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			return packages;
 		}
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		public async Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter) {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			return packages;

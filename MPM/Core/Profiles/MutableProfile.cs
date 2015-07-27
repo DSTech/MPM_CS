@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Profiles {
+
 	public class MutableProfile : IProfile {
+
 		public MutableProfile() {
 		}
 

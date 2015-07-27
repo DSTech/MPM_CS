@@ -1,4 +1,5 @@
 namespace MPM.Net.Protocols.Minecraft.DTO {
+
 	/// <summary>
 	/// Contains native-library inclusions for each particular operating system, with an optional ${arch} placeholder in circumstances where bitness matters
 	/// </summary>
@@ -10,14 +11,17 @@ namespace MPM.Net.Protocols.Minecraft.DTO {
 	/// }
 	/// </example>
 	public class LibraryNativesSpec {
+
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>
 		public string Windows { get; set; }
+
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>
 		public string Linux { get; set; }
+
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>

@@ -1,25 +1,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
-using System.IO;
 
 namespace MPM.Core.Archival {
+
 	public class RawChunk : IEnumerable<byte> {
+
 		public RawChunk(IEnumerable<byte> contents) {
 			this.contents = contents.ToArray();
 		}
+
 		private byte[] contents;
 
 		public EncryptedChunk Encrypt(byte[] encryptionKey) {
 			return new EncryptedChunk(EncryptionGenerator(encryptionKey));
 		}
+
 		private IEnumerable<byte> EncryptionGenerator(byte[] encryptionKey) {
 			return EnumerableEx.Concat<byte>(EncryptionGeneratorInternal(encryptionKey));
 		}
+
 		private IEnumerable<byte[]> EncryptionGeneratorInternal(byte[] encryptionKey) {
 			byte[] result;
 			using (var rijndael = new RijndaelManaged()) {
@@ -50,13 +55,16 @@ namespace MPM.Core.Archival {
 			return ((IEnumerable<byte>)contents).GetEnumerator();
 		}
 	}
+
 	public class EncryptedChunk : IEnumerable<byte> {
+
 		public EncryptedChunk(IEnumerable<byte> contents) {
 			var contentsEnumr = contents.GetEnumerator();
 			var IVlength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
-            IV = contentsEnumr.Take(IVlength).ToArray();
+			IV = contentsEnumr.Take(IVlength).ToArray();
 			this.contents = contentsEnumr.AsEnumerable().ToArray();
 		}
+
 		private byte[] IV;
 		private byte[] contents;
 

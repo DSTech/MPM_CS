@@ -2,6 +2,7 @@ using System;
 using System.IO;
 
 namespace MPM.Core.Instances.Cache {
+
 	public class FileSystemCacheEntry : ICacheEntry {
 		private string cachePath;
 

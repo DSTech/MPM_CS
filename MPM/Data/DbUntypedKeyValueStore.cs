@@ -8,9 +8,11 @@ using Dapper;
 using Newtonsoft.Json;
 
 namespace MPM.Data {
+
 	public class DbKeyValueStore<KEYTYPE> : BaseUntypedKeyValueStore<KEYTYPE>, IDisposable {
 		private readonly IDbConnection db;
 		private readonly string tableName;
+
 		private JsonSerializerSettings serializerSettings = new JsonSerializerSettings() {
 			TypeNameHandling = TypeNameHandling.Auto,
 		};
@@ -34,16 +36,21 @@ namespace MPM.Data {
 				db.Close();
 			}
 		}
+
 		private class KVEntry {
+
 			public KVEntry() {
 			}
+
 			public KVEntry(String k, String v) {
 				this.k = k;
 				this.v = v;
 			}
+
 			public String k;
 			public String v;
 		}
+
 		public override IEnumerable<KEYTYPE> Keys {
 			get {
 				try {
@@ -56,6 +63,7 @@ namespace MPM.Data {
 				}
 			}
 		}
+
 		public override IEnumerable<KeyValuePair<KEYTYPE, object>> Pairs {
 			get {
 				try {
@@ -73,6 +81,7 @@ namespace MPM.Data {
 				}
 			}
 		}
+
 		public override IEnumerable<object> Values {
 			get {
 				try {
@@ -95,6 +104,7 @@ namespace MPM.Data {
 				db.Close();
 			}
 		}
+
 		public override void Clear() {
 			try {
 				db.Open();
@@ -108,7 +118,8 @@ namespace MPM.Data {
 			Dispose(true);
 		}
 
-		bool disposed;
+		private bool disposed;
+
 		protected virtual void Dispose(bool disposing) {
 			if (disposed) {
 				return;

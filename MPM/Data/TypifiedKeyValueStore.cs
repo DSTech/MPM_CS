@@ -5,20 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Data {
+
 	public struct KeyValueStoreTypifier<KEYTYPE> {
 		public IUntypedKeyValueStore<KEYTYPE> UntypedValueStore { get; }
+
 		public KeyValueStoreTypifier(IUntypedKeyValueStore<KEYTYPE> untypedValueStore) {
 			this.UntypedValueStore = untypedValueStore;
 		}
+
 		public TypifiedKeyValueStore<KEYTYPE, VALUETYPE> As<VALUETYPE>() {
 			return new TypifiedKeyValueStore<KEYTYPE, VALUETYPE>(UntypedValueStore);
 		}
 	}
+
 	public static class IUntypedKeyValueStoreExtensions {
+
 		public static KeyValueStoreTypifier<KEYTYPE> Typify<KEYTYPE>(this IUntypedKeyValueStore<KEYTYPE> keyValueStore) {
 			return new KeyValueStoreTypifier<KEYTYPE>(keyValueStore);
 		}
 	}
+
 	public class TypifiedKeyValueStore<KEYTYPE, VALUETYPE> : ITypedKeyValueStore<KEYTYPE, VALUETYPE> {
 		private IUntypedKeyValueStore<KEYTYPE> store { get; }
 
@@ -47,6 +53,7 @@ namespace MPM.Data {
 		public void Clear(KEYTYPE key) {
 			store.Clear(key);
 		}
+
 		public void Clear() {
 			store.Clear();
 		}

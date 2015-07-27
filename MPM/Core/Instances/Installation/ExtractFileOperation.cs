@@ -4,14 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.SharpZipLib;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using MPM.Core.Instances.Cache;
 using Platform.VirtualFileSystem;
-using ICSharpCode.SharpZipLib;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+
 	/// <summary>
 	/// An operation to extract a file from a cached archive to a specified target.
 	/// </summary>

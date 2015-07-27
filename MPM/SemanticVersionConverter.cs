@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using semver.tools;
 
 namespace MPM {
+
 	public class SemanticVersionConverter : JsonConverter {
+
 		public override bool CanConvert(Type objectType) {
 			return (objectType == typeof(SemanticVersion));
 		}

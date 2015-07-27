@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace MPM.Core.Instances.Installation {
+
 	public sealed class SeekingZipFetcher : IDisposable {
 		private readonly ZipFile zipFile;
 
@@ -16,6 +17,7 @@ namespace MPM.Core.Instances.Installation {
 			}
 			this.zipFile = new ZipFile(seekableStream) { IsStreamOwner = true };
 		}
+
 		public byte[] FetchFile(String path) {
 			var entry = zipFile.GetEntry(path);
 			if (entry == null) {
@@ -25,6 +27,7 @@ namespace MPM.Core.Instances.Installation {
 				return zipStream.ReadToEnd();
 			}
 		}
+
 		public Stream FetchFileStream(String path) {
 			var entry = zipFile.GetEntry(path);
 			if (entry == null) {
@@ -32,6 +35,7 @@ namespace MPM.Core.Instances.Installation {
 			}
 			return zipFile.GetInputStream(entry);
 		}
+
 		public void Dispose() {
 			using (zipFile) { }
 		}

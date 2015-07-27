@@ -16,7 +16,9 @@ using Nito.AsyncEx.Synchronous;
 using semver.tools;
 
 namespace MPM.CLI {
+
 	public class InitActionProvider {
+
 		public void Provide(IContainer factory, InitArgs args) {
 			Console.WriteLine("Initializing instance at path:\n\t{0}", Path.GetFullPath(args.InstancePath));
 			if (!Directory.Exists(args.InstancePath)) {
@@ -125,7 +127,7 @@ namespace MPM.CLI {
 			//TODO: Install arch pseudopackage
 			var resolver = factory.Resolve<IResolver>();
 			var repository = factory.Resolve<IPackageRepository>();
-			
+
 			Console.WriteLine("Generating configuration...");
 			var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
 

@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using PowerArgs;
 
 namespace MPM {
+
 	public class Program {
+
 		public static void Main(string[] args) {
 			JsonConvert.DefaultSettings = () => new JsonSerializerSettings {
 				TypeNameHandling = TypeNameHandling.Auto,

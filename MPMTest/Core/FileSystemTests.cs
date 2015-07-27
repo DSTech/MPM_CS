@@ -9,7 +9,9 @@ using MPM;
 using Xunit;
 
 namespace MPMTest.Core {
+
 	public class FileSystemTests {
+
 		[Fact]
 		public void ArchiveFileSystemTest() {
 			//ArchiveFileSystem.FromData(File.OpenRead("test.zip").ReadToEnd());

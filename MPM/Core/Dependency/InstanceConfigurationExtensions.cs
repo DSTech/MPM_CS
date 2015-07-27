@@ -7,7 +7,9 @@ using MPM.Net;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
+
 	public static class InstanceConfigurationExtensions {
+
 		/// <summary>
 		/// Checks for conflicts in the specified configuration.
 		/// </summary>
@@ -50,6 +52,7 @@ namespace MPM.Core.Dependency {
 				}
 			}
 		}
+
 		public static IFileMap GenerateFileMap(this InstanceConfiguration instanceConfiguration) {
 			throw new NotImplementedException();
 		}

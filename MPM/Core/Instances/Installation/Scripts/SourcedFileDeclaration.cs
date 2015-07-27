@@ -6,6 +6,7 @@ using MPM.Core.Protocols;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
+
 	public class SourcedFileDeclaration : IFileDeclaration {
 		public string PackageName { get; set; }
 
@@ -18,7 +19,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 		public string Source { get; set; }
 
 		public IReadOnlyCollection<string> Targets { get; set; }
-		
+
 		private string packageCachedName { get; set; }
 
 		public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {

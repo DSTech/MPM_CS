@@ -14,6 +14,7 @@ namespace MPM.CLI {
 
 	[ArgExceptionBehavior(ArgExceptionPolicy.StandardExceptionHandling)]
 	public class LaunchArgs {
+
 		[ArgIgnore]
 		public Autofac.IContainer Resolver { get; set; }
 

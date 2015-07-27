@@ -1,7 +1,9 @@
 using PowerArgs;
 
 namespace MPM.CLI {
+
 	public class InitArgs {
+
 		[ArgRequired(PromptIfMissing = true)]
 		[ArgDescription("The directory within which to initialize an instance")]
 		[ArgPosition(1)]

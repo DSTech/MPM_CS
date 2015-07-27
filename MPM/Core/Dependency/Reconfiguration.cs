@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Dependency {
+
 	public class Reconfiguration {
 	}
 }

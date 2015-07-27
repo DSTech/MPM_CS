@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data;
 
 namespace MPM.Data {
+
 	public class DbMetaDataManager : IMetaDataManager, IDisposable {
 		private IUntypedKeyValueStore<String> db;
 
@@ -14,11 +15,13 @@ namespace MPM.Data {
 				return db.Keys;
 			}
 		}
+
 		public IEnumerable<KeyValuePair<string, object>> Pairs {
 			get {
 				return db.Pairs;
 			}
 		}
+
 		public IEnumerable<object> Values {
 			get {
 				return db.Values;
@@ -33,11 +36,13 @@ namespace MPM.Data {
 				throw new ArgumentNullException(nameof(db));
 			}
 		}
+
 		public DbMetaDataManager(IUntypedKeyValueStore<String> db) {
 			if ((this.db = db) == null) {
 				throw new ArgumentNullException(nameof(db));
 			}
 		}
+
 		public void Set(String key, object value, Type type) {
 			db.Set(key, value, type);
 		}
@@ -69,6 +74,7 @@ namespace MPM.Data {
 		public void Dispose() {
 			Dispose(true);
 		}
+
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
 				if (db != null) {

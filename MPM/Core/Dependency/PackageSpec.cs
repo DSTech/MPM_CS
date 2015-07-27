@@ -9,7 +9,9 @@ using NServiceKit.Common;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
+
 	public static class PackageSpecExtensions {
+
 		public static PackageSpec ToSpec(this Net.DTO.PackageDependency dependency, string arch, string platform, bool manual = false) {
 			return new PackageSpec {
 				Manual = manual,
@@ -17,6 +19,7 @@ namespace MPM.Core.Dependency {
 				Platform = platform,
 			}.PopulateWithNonDefaultValues(dependency);
 		}
+
 		/// <summary>
 		/// Checks if a build satisfies the given specification.
 		/// </summary>
@@ -32,6 +35,7 @@ namespace MPM.Core.Dependency {
 				)
 				&& spec.Version.Satisfies(namedBuild.Version);
 		}
+
 		/// <summary>
 		/// Looks up a package, returning named builds qualifying for the specification.
 		/// Must return in descending order of version.
@@ -57,11 +61,12 @@ namespace MPM.Core.Dependency {
 
 		public override bool Equals(object obj) {
 			var packageSpec = obj as PackageSpec;
-			if(packageSpec == null) {
+			if (packageSpec == null) {
 				return obj == null;
 			}
 			return Equals(packageSpec);
 		}
+
 		public override int GetHashCode() {
 			return
 				(Name?.GetHashCode() ?? 0)
@@ -70,6 +75,7 @@ namespace MPM.Core.Dependency {
 				+ (Version != null ? GetVersionSpecHashCode(Version) : 0)
 				+ Manual.GetHashCode();
 		}
+
 		private int GetVersionSpecHashCode(VersionSpec spec) {
 			return
 				unchecked(
@@ -78,6 +84,7 @@ namespace MPM.Core.Dependency {
 					spec.MinVersion.GetHashCode() +
 					spec.MaxVersion.GetHashCode());
 		}
+
 		private bool VersionSpecsEqual(VersionSpec first, VersionSpec second) {
 			return
 				first.IsMinInclusive == second.IsMinInclusive &&
@@ -85,6 +92,7 @@ namespace MPM.Core.Dependency {
 				first.MinVersion.Equals(second.MinVersion) &&
 				first.MaxVersion.Equals(second.MaxVersion);
 		}
+
 		public bool Equals(PackageSpec other) {
 			return
 				Name == other.Name

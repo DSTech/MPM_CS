@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 public static class Equality<T> {
+
 	public static IEqualityComparer<T> CreateComparer<V>(Func<T, V> keySelector) {
 		return CreateComparer(keySelector, null);
 	}
@@ -10,9 +11,9 @@ public static class Equality<T> {
 		return new KeyEqualityComparer<V>(keySelector, comparer);
 	}
 
-	class KeyEqualityComparer<V> : IEqualityComparer<T> {
-		readonly Func<T, V> keySelector;
-		readonly IEqualityComparer<V> comparer;
+	private class KeyEqualityComparer<V> : IEqualityComparer<T> {
+		private readonly Func<T, V> keySelector;
+		private readonly IEqualityComparer<V> comparer;
 
 		public KeyEqualityComparer(Func<T, V> keySelector, IEqualityComparer<V> comparer) {
 			if (keySelector == null)

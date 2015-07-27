@@ -4,7 +4,9 @@ using semver.tools;
 using Xunit;
 
 namespace MPMTest.Core.Dependency {
+
 	public class PackageSpecTests {
+
 		[Fact]
 		public void Equality() {
 			var first = new PackageSpec {

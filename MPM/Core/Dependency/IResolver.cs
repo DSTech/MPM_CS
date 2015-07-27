@@ -8,9 +8,12 @@ using MPM.Data;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
+
 	public static class IResolverExtensions {
 	}
+
 	public interface IResolver {
+
 		/// <summary>
 		/// Returns a configuration containing the non-manual dependencies required for installation.
 		/// All targetted "Manual" package specifications must be included in the output.
@@ -26,6 +29,7 @@ namespace MPM.Core.Dependency {
 		/// </param>
 		/// <returns>Configuration with dependencies fulfilled</returns>
 		Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository packageRepository);
+
 		/// <summary>
 		/// Returns a build that qualifies with the specified dependency constraints.
 		/// </summary>
@@ -38,6 +42,7 @@ namespace MPM.Core.Dependency {
 		/// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
 		/// <returns>A set of builds satisfying the spec, qualifying with all constraints, resolved with the specified behavior, ordered from most to least prefered</returns>
 		Task<NamedBuild[]> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide side = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+
 		/// <summary>
 		/// A variant of ResolveDependency which should implement additional constraints on each cycle until a dependency tree can be resolved as non-null.
 		/// Should attempt to resolve each subsequent build in the package spec,
@@ -58,5 +63,5 @@ namespace MPM.Core.Dependency {
 		/// Null if resolution fails.
 		/// </returns>
 		Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
-    }
+	}
 }

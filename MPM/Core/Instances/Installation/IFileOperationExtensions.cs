@@ -5,7 +5,9 @@ using System.Linq;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
+
 	public static class IFileOperationExtensions {
+
 		/// <summary>
 		/// Reduces a sequence of operations to the minimal set that does not ignore existing contents.
 		/// </summary>

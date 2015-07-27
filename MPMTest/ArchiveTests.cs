@@ -4,7 +4,9 @@ using MPM.Core.Archival;
 using Xunit;
 
 namespace MPMTest {
+
 	public class LeadingHashTests {
+
 		[Fact]
 		public void LeadingHashVerification() {
 			string testString = DateTime.Today.ToString();
@@ -17,7 +19,9 @@ namespace MPMTest {
 			Assert.Equal(testString, System.Text.Encoding.UTF8.GetString(verifiedResult));
 		}
 	}
+
 	public class ArchiveTests {
+
 		[Fact]
 		public async Task ArchiveVerificationSplit() {
 			const string packageName = "testingArchive";

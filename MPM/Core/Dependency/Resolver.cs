@@ -5,58 +5,20 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Instances.Info;
+using MPM.Data;
 using MPM.Net.DTO;
 using QuickGraph;
 using QuickGraph.Algorithms;
-using QuickGraph.Algorithms.TopologicalSort;
-using QuickGraph.Data;
-using QuickGraph.Collections;
 using QuickGraph.Algorithms.Search;
-using MPM.Data;
-using MPM.Core.Instances.Info;
+using QuickGraph.Algorithms.TopologicalSort;
+using QuickGraph.Collections;
+using QuickGraph.Data;
 
 namespace MPM.Core.Dependency {
+
 	public class Resolver : IResolver {
-		/// <summary>
-		/// Sorts builds topologically, from least-dependent to most-dependent.
-		/// </summary>
-		/// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
-		/// <returns>A sorted array of builds, with the least-dependent first</returns>
-		public IEnumerable<NamedBuild> SortBuilds(IEnumerable<NamedBuild> builds) {
-			var buildMap = builds.Distinct(b => b.Name).ToArray();
 
-			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false);
-			adjGraph.AddVertexRange(Enumerable.Range(0, buildMap.Length));
-			foreach (var buildIndex in Enumerable.Range(0, buildMap.Length)) {
-				adjGraph.AddEdgeRange(
-					buildMap
-						.ElementAt(buildIndex)
-						.Dependencies
-						.Packages
-						.Select(dep => Array.FindIndex<NamedBuild>(buildMap, nb => nb.Name == dep.Name))
-						.Where(depIndex => depIndex != -1)
-						.Select(destination => new Edge<int>(buildIndex, destination))
-				);
-			}
-			var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
-			var onBackEdge = new EdgeAction<int, Edge<int>>(e => {
-				var edge = (Edge<int>)e;
-				adjGraph.RemoveEdge(edge);
-			});
-			try {
-				dfs.BackEdge += onBackEdge;
-				dfs.Compute();
-			} finally {
-				dfs.BackEdge -= onBackEdge;
-			}
-
-			var results = adjGraph
-				.TopologicalSort()
-				.Reverse()
-				.Select(index => buildMap[index])
-				.ToArray();
-			return results;
-		}
 		public async Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository repository) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
 			var output = new List<NamedBuild>();
@@ -140,6 +102,47 @@ namespace MPM.Core.Dependency {
 			nextBuild: continue;
 			}
 			throw new DependencyException("Could not resolve package, no viable dependency tree found", packageSpec);
+		}
+
+		/// <summary>
+		/// Sorts builds topologically, from least-dependent to most-dependent.
+		/// </summary>
+		/// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
+		/// <returns>A sorted array of builds, with the least-dependent first</returns>
+		public IEnumerable<NamedBuild> SortBuilds(IEnumerable<NamedBuild> builds) {
+			var buildMap = builds.Distinct(b => b.Name).ToArray();
+
+			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false);
+			adjGraph.AddVertexRange(Enumerable.Range(0, buildMap.Length));
+			foreach (var buildIndex in Enumerable.Range(0, buildMap.Length)) {
+				adjGraph.AddEdgeRange(
+					buildMap
+						.ElementAt(buildIndex)
+						.Dependencies
+						.Packages
+						.Select(dep => Array.FindIndex<NamedBuild>(buildMap, nb => nb.Name == dep.Name))
+						.Where(depIndex => depIndex != -1)
+						.Select(destination => new Edge<int>(buildIndex, destination))
+				);
+			}
+			var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
+			var onBackEdge = new EdgeAction<int, Edge<int>>(e => {
+				var edge = (Edge<int>)e;
+				adjGraph.RemoveEdge(edge);
+			});
+			try {
+				dfs.BackEdge += onBackEdge;
+				dfs.Compute();
+			} finally {
+				dfs.BackEdge -= onBackEdge;
+			}
+
+			var results = adjGraph
+				.TopologicalSort()
+				.Reverse()
+				.Select(index => buildMap[index])
+				.ToArray();
+			return results;
 		}
 	}
 }

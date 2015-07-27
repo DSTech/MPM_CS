@@ -11,6 +11,7 @@ using MPM.Net.DTO;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
+
 	public class Installer {
 		private readonly Instance instance;
 		private readonly IFileSystem fileSystem;
@@ -23,6 +24,7 @@ namespace MPM.Core.Instances.Installation {
 			this.hashRepository = hashRepository;
 			fileSystem = instance.GetFileSystem();
 		}
+
 		/// <summary>
 		/// Adds a package to an instance's configuration, then performs necessary filesystem modifications the package requests.
 		/// </summary>

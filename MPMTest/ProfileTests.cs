@@ -7,7 +7,9 @@ using MPM.Core.Profiles;
 using Xunit;
 
 namespace MPMTest {
+
 	public class ProfileTests {
+
 		[Fact]
 		public void ProfileSaving() {
 			if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) {
@@ -25,7 +27,7 @@ namespace MPMTest {
 				try {
 					profMgr.Store(testProfile);//Profiles can be stored
 					var guidToLoad = new Guid(testProfile.Id.ToString());//Guids can be converted to and from strings
-					var loadedProfile = profMgr.Fetch(guidToLoad);//Profiles can be loaded 
+					var loadedProfile = profMgr.Fetch(guidToLoad);//Profiles can be loaded
 					Assert.Equal(testProfile.Id, loadedProfile.Id);
 					Assert.Equal(testProfile.Name, loadedProfile.Name);
 					foreach (var preferencePair in testProfile.Preferences) {

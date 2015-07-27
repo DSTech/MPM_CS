@@ -8,7 +8,9 @@ using MPM.Net;
 using MPM.Net.DTO;
 
 namespace MPM.Core.Dependency {
+
 	public static class ConfigurationExtensions {
+
 		//Returns conflicts caused by particular builds
 		//LookupBuild should return a package with exactly one build
 		public static IEnumerable<Tuple<PackageSpec, Build, PackageConflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Package> lookupBuild) {
@@ -60,10 +62,13 @@ namespace MPM.Core.Dependency {
 			}
 		}
 	}
+
 	public class Configuration {
+
 		public static Configuration Empty { get; } = new Configuration {
 			Packages = new PackageSpec[0],
 		};
+
 		public PackageSpec[] Packages { get; set; }
 		public PackageSide Side { get; set; } = PackageSide.Universal;
 	}

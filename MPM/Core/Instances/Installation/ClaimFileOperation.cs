@@ -9,6 +9,7 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+
 	public class ClaimFileOperation : IFileOperation {
 		public bool UsesPreviousContents => true;
 
@@ -23,7 +24,7 @@ namespace MPM.Core.Instances.Installation {
 			this.PackageName = packageName;
 			this.PackageVersion = packageVersion;
 		}
-		
+
 		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
 			//A no-op
 		}

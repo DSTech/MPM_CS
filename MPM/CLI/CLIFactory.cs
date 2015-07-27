@@ -12,7 +12,9 @@ using MPM.Core.Profiles;
 using MPM.Data;
 
 namespace MPM.CLI {
+
 	public class CLIFactory {
+
 		public IContainer GenerateResolver() {
 			var cb = new ContainerBuilder();
 

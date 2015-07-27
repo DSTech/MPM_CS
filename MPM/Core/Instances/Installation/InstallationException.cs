@@ -2,8 +2,10 @@ using System;
 using System.Runtime.Serialization;
 
 namespace MPM.Core.Instances.Installation {
+
 	[Serializable]
 	public class InstallationException : Exception {
+
 		public InstallationException() {
 		}
 
