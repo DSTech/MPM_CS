@@ -9,9 +9,8 @@ namespace MPM.Net.DTO {
 		public String Arch { get; set; }
 		public String Platform { get; set; }
 		public PackageSide Side { get; set; } = PackageSide.Universal;
-		public InterfaceProvision[] InterfaceProvisions { get; set; }
-		public InterfaceDependency[] InterfaceRequirements { get; set; }
-		public PackageDependency[] Dependencies { get; set; }
+		public InterfaceProvision[] Interfaces { get; set; }
+		public DependencySpec Dependencies { get; set; }
 		public PackageConflict[] Conflicts { get; set; }
 		public String[] Hashes { get; set; }
 		public bool Stable { get; set; }

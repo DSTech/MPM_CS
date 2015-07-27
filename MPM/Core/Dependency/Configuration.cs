@@ -26,7 +26,7 @@ namespace MPM.Core.Dependency {
 						.Where(spec => spec.Name != packageDetails.Name)
 						.ToArray(),
 					lookupBuild
-                );
+				);
 				foreach (var conflict in conflicts) {
 					yield return Tuple.Create(package, build, conflict);
 				}
@@ -50,7 +50,7 @@ namespace MPM.Core.Dependency {
 			var interfaceNames = packages
 				.FirstOrDefault()
 				.Builds
-				.SelectMany(b => b.InterfaceProvisions)
+				.SelectMany(b => b.Interfaces)
 				.Select(b => b.Name)
 				.ToArray();
 			foreach (var conflict in build.Conflicts) {
@@ -66,5 +66,5 @@ namespace MPM.Core.Dependency {
 		};
 		public PackageSpec[] Packages { get; set; }
 		public PackageSide Side { get; set; } = PackageSide.Universal;
-    }
+	}
 }

@@ -36,7 +36,8 @@ var routes = [];
 var mysql_params = {
     "user":     null,
     "password": null,
-    "database": null
+    "database": null,
+    "host": null,
 };
 
 
@@ -584,6 +585,7 @@ try {
     mysql_params.user     = config.user;
     mysql_params.password = config.password;
     mysql_params.database = config.database;
+    mysql_params.host = config.host;
 } catch( err ) {
     console.error( "An error occurred reading \"" + configfile + "\". Details: " + err );
     process.exit( 1 );

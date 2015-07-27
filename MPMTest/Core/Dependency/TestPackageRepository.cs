@@ -20,11 +20,10 @@ namespace MPMTest.Core.Dependency {
 					Builds = new[] {
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new PackageDependency[0],
+							Dependencies = new DependencySpec(),
 							Hashes = new string[0],
 							GivenVersion = "1.0RC3_Universal",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new InterfaceDependency[0],
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = SemanticVersion.Parse("1.0.3"),
 							Side = PackageSide.Universal,
@@ -33,11 +32,10 @@ namespace MPMTest.Core.Dependency {
 						},
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new PackageDependency[0],
+							Dependencies = new DependencySpec(),
 							Hashes = new string[0],
 							GivenVersion = "1.0RC4_Universal",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new InterfaceDependency[0],
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = SemanticVersion.Parse("1.0.4"),
 							Side = PackageSide.Universal,
@@ -102,7 +100,7 @@ namespace MPMTest.Core.Dependency {
 		public async Task<Package> FetchPackage(string packageName) {
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			var basePackage = packages.FirstOrDefault(p => p.Name == packageName);
-			if(basePackage == null) {
+			if (basePackage == null) {
 				return null;
 			}
 			return new Package {

@@ -5,9 +5,11 @@
   "arch": "1.8.4",
   "side": "universal",
   "platform": "universal",
-  "interfaceProvisions": [],
-  "interfaceRequirements": [],
-  "dependencies": [],
+  "interfaces": [],
+  "dependencies": {
+    "packages": [],
+    "interfaces": [],
+  },
   "conflicts": [],
   "stable": false,
   "installation": [

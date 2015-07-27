@@ -1,5 +1,6 @@
 {
     "user":     "mpm",
     "password": "mpm",
-    "database": "mpm"
+    "database": "mpm",
+    "host": "localhost",
 }

@@ -123,6 +123,18 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nito.AsyncEx, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\net45\Nito.AsyncEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\net45\Nito.AsyncEx.Concurrent.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Enlightenment, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NServiceKit, Version=1.0.35.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NServiceKit.1.0.35\lib\net35\NServiceKit.dll</HintPath>
       <Private>True</Private>
@@ -211,6 +223,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\CLIFactory.cs" />
+    <Compile Include="CLI\ListArgs.cs" />
+    <Compile Include="CLI\ListActionProvider.cs" />
     <Compile Include="CLI\InitActionProvider.cs" />
     <Compile Include="ActionProviders\MinecraftLauncher.cs" />
     <Compile Include="CLI\InstancePlatform.cs" />
@@ -294,6 +308,9 @@
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Net\DTO\DependencySpec.cs" />
+    <Compile Include="VersionSpecConverter.cs" />
+    <Compile Include="SemanticVersionConverter.cs" />
     <Compile Include="SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgExtensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />

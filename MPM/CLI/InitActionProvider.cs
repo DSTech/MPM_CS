@@ -11,6 +11,8 @@ using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Data;
 using MPM.Net.DTO;
+using Nito.AsyncEx;
+using Nito.AsyncEx.Synchronous;
 using semver.tools;
 
 namespace MPM.CLI {
@@ -84,7 +86,7 @@ namespace MPM.CLI {
 				default:
 					throw new ArgumentOutOfRangeException(nameof(instancePlatform));
 			}
-			this.Init(factory, instanceArch, instanceSide, instancePlatform, args.InstancePath);
+			this.Init(factory, instanceArch, instanceSide, instancePlatform, args.InstancePath).WaitAndUnwrapException();
 		}
 
 		public Configuration GenerateArchConfiguration(SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform) {
@@ -113,7 +115,7 @@ namespace MPM.CLI {
 			};
 		}
 
-		public void Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform, string instancePath) {
+		public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform, string instancePath) {
 			var instance = new Instance(instancePath) {
 				Name = $"{instanceArch}_{instanceSide}_{instancePlatform}",//TODO: make configurable and able to be immediately registered upon creation
 				LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden
@@ -128,7 +130,7 @@ namespace MPM.CLI {
 			var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
 
 			Console.WriteLine("Attempting to resolve packages...");
-			var resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
+			var resolvedArchConfiguration = await resolver.Resolve(archConfiguration, repository);
 			Console.WriteLine("Configuration resolved.");
 
 			//var cacheManager = factory.Resolve<ICacheManager>();

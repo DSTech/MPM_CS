@@ -32,6 +32,7 @@ namespace MPM.Core.Dependency {
 					buildMap
 						.ElementAt(buildIndex)
 						.Dependencies
+						.Packages
 						.Select(dep => Array.FindIndex<NamedBuild>(buildMap, nb => nb.Name == dep.Name))
 						.Where(depIndex => depIndex != -1)
 						.Select(destination => new Edge<int>(buildIndex, destination))
@@ -121,7 +122,7 @@ namespace MPM.Core.Dependency {
 				var output = new List<NamedBuild>();
 				Debug.Assert(possibleBuild != null, "ResolveDependency must not return null elements");
 				output.Add(possibleBuild);
-				foreach (var dependency in possibleBuild.Dependencies) {
+				foreach (var dependency in possibleBuild.Dependencies.Packages) {
 					var depSpec = dependency.ToSpec(packageSpec.Arch, packageSpec.Platform);
 					if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
 						continue;
@@ -136,8 +137,8 @@ namespace MPM.Core.Dependency {
 					output.AddRange(resolvedDeps);
 				}
 				return SortBuilds(output).ToArray();
-				nextBuild: continue;
-            }
+			nextBuild: continue;
+			}
 			throw new DependencyException("Could not resolve package, no viable dependency tree found", packageSpec);
 		}
 	}

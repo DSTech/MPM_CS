@@ -35,11 +35,10 @@ namespace MPMTest.Core.Dependency {
 					Builds = new[] {
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new PackageDependency[0],
+							Dependencies = new DependencySpec(),
 							Hashes = new string[0],
 							GivenVersion = "0.0.1.218",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new InterfaceDependency[0],
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = SemanticVersion.Parse("0.0.1"),
 							Arch = "testArch",
@@ -47,11 +46,10 @@ namespace MPMTest.Core.Dependency {
 						},
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new PackageDependency[0],
+							Dependencies = new DependencySpec(),
 							Hashes = new string[0],
 							GivenVersion = "0.0.2.219",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new InterfaceDependency[0],
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = SemanticVersion.Parse("0.0.2"),
 							Arch = "testArch",
@@ -100,16 +98,17 @@ namespace MPMTest.Core.Dependency {
 					Builds = new[] {
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new [] {
-								new PackageDependency {
-									Name = "anticedentPackage",
-									Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
+							Dependencies = new DependencySpec {
+								Packages = new [] {
+									new PackageDependency {
+										Name = "anticedentPackage",
+										Version = new VersionSpec(SemanticVersion.Parse("0.0.4")),
+									},
 								},
 							},
 							Hashes = new string[0],
 							GivenVersion = "0.0.1.218",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new InterfaceDependency[0],
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = semver.tools.SemanticVersion.Parse("0.0.1"),
 							Side = PackageSide.Universal,
@@ -118,18 +117,20 @@ namespace MPMTest.Core.Dependency {
 						},
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new [] {
-								new PackageDependency {
-									Name = "anticedentPackage",
-									Version = new VersionSpec(SemanticVersion.Parse("0.0.9")),
+							Dependencies = new DependencySpec() {
+								Packages = new [] {
+									new PackageDependency {
+										Name = "anticedentPackage",
+										Version = new VersionSpec(SemanticVersion.Parse("0.0.9")),
+									},
+								},
+								Interfaces = new [] {
+									new InterfaceDependency { Name = "anticedentInterface" },
 								},
 							},
 							Hashes = new string[0],
 							GivenVersion = "0.0.2.219",
-							InterfaceProvisions = new InterfaceProvision[0],
-							InterfaceRequirements = new [] {
-								new InterfaceDependency { Name = "anticedentInterface" },
-							},
+							Interfaces = new InterfaceProvision[0],
 							Stable = true,
 							Version = semver.tools.SemanticVersion.Parse("0.0.2"),
 							Side = PackageSide.Universal,
@@ -144,13 +145,14 @@ namespace MPMTest.Core.Dependency {
 					Builds = new[] {
 						new Build {
 							Conflicts = new PackageConflict[0],
-							Dependencies = new PackageDependency[0],
+							Dependencies = new DependencySpec {
+								Interfaces = new InterfaceDependency[0],
+							},
 							Hashes = new string[0],
 							GivenVersion = "1.0RC3",
-							InterfaceProvisions = new[] {
+							Interfaces = new[] {
 								new InterfaceProvision { Name = "anticedentInterface" },
 							},
-							InterfaceRequirements = new InterfaceDependency[0],
 							Stable = true,
 							Version = SemanticVersion.Parse("0.0.4"),
 							Side = PackageSide.Universal,
@@ -179,16 +181,17 @@ namespace MPMTest.Core.Dependency {
 			var dependentPackageBuilds = new[] {
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.3"), true),
+					Dependencies = new DependencySpec() {
+						Packages = new [] {
+							new PackageDependency {
+								Name = "anticedentPackage",
+								Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.3"), true),
+							},
 						},
 					},
 					Hashes = new string[0],
 					GivenVersion = "0.0.1.218",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.1"),
 					Side = PackageSide.Universal,
@@ -197,16 +200,17 @@ namespace MPMTest.Core.Dependency {
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "anticedentPackage",
-							Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.4"), true),
+					Dependencies = new DependencySpec() {
+						Packages = new [] {
+							new PackageDependency {
+								Name = "anticedentPackage",
+								Version = new VersionSpec(SemanticVersion.Parse("1.0.0"), true, SemanticVersion.Parse("1.0.4"), true),
+							},
 						},
 					},
 					Hashes = new string[0],
 					GivenVersion = "0.0.2.219",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = semver.tools.SemanticVersion.Parse("0.0.2"),
 					Side = PackageSide.Universal,
@@ -217,11 +221,10 @@ namespace MPMTest.Core.Dependency {
 			var anticedentPackageBuilds = new[] {
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new DependencySpec(),
 					Hashes = new string[0],
 					GivenVersion = "1.0RC2_Universal",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.2"),
 					Side = PackageSide.Universal,
@@ -230,11 +233,10 @@ namespace MPMTest.Core.Dependency {
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new DependencySpec(),
 					Hashes = new string[0],
 					GivenVersion = "1.0RC3_Client",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.3"),
 					Side = PackageSide.Client,
@@ -243,11 +245,10 @@ namespace MPMTest.Core.Dependency {
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new DependencySpec(),
 					Hashes = new string[0],
 					GivenVersion = "1.0RC3_Universal",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.3"),
 					Side = PackageSide.Universal,
@@ -256,11 +257,10 @@ namespace MPMTest.Core.Dependency {
 				},
 				new Build {
 					Conflicts = new PackageConflict[0],
-					Dependencies = new PackageDependency[0],
+					Dependencies = new DependencySpec(),
 					Hashes = new string[0],
 					GivenVersion = "1.0RC4_Universal",
-					InterfaceProvisions = new InterfaceProvision[0],
-					InterfaceRequirements = new InterfaceDependency[0],
+					Interfaces = new InterfaceProvision[0],
 					Stable = true,
 					Version = SemanticVersion.Parse("1.0.4"),
 					Side = PackageSide.Universal,
@@ -327,51 +327,57 @@ namespace MPMTest.Core.Dependency {
 			var builds = new NamedBuild[] {
 				new NamedBuild {
 					Name = "A",
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "B"
-						},
-						new PackageDependency {
-							Name = "C"
+					Dependencies = new DependencySpec() {
+						Packages = new [] {
+							new PackageDependency {
+								Name = "B"
+							},
+							new PackageDependency {
+								Name = "C"
+							},
 						},
 					},
 				},
 				new NamedBuild {
 					Name = "B",
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "A"
-						},
-						new PackageDependency {
-							Name = "D"
+					Dependencies = new DependencySpec() {
+						Packages = new [] {
+							new PackageDependency {
+								Name = "A"
+							},
+							new PackageDependency {
+								Name = "D"
+							},
 						},
 					},
 				},
 				new NamedBuild {
 					Name = "C",
-					Dependencies = new [] {
-						new PackageDependency {
-							Name = "D"
+					Dependencies = new DependencySpec() {
+						Packages = new [] {
+							new PackageDependency {
+								Name = "D"
+							},
 						},
 					},
 				},
 				new NamedBuild {
 					Name = "D",
-					Dependencies = new PackageDependency[0],
+					Dependencies = new DependencySpec(),
 				},
 			};
 			//Input must not contain self-dependency
-			Assert.False(builds.Any(build => build.Dependencies.Any(dependency => dependency.Name == build.Name)), "The input must not contain self-dependent packages");
+			Assert.False(builds.Any(build => build.Dependencies.Packages.Any(dependency => dependency.Name == build.Name)), "The input must not contain self-dependent packages");
 			//At least one input must be circularly-dependent
 			{
 				var wasCircular = false;
 				foreach (var build in builds) {
 					//A build must refer to something that refers back to this one
-					if (build.Dependencies.Any(
+					if (build.Dependencies.Packages.Any(
 						second => builds
 							.Where(other => other.Name == second.Name)
 							.Select(other => other.Dependencies)
-							.Any(otherDeps => otherDeps.Any(dep => dep.Name == build.Name))
+							.Any(otherDeps => otherDeps.Packages.Any(dep => dep.Name == build.Name))
 					)) {
 						wasCircular = true;
 						break;
@@ -386,7 +392,7 @@ namespace MPMTest.Core.Dependency {
 			{
 				var packageNames = new SortedSet<string>(builds.Select(b => b.Name));
 				foreach (var build in builds) {
-					foreach (var dep in build.Dependencies) {
+					foreach (var dep in build.Dependencies.Packages) {
 						Assert.True(packageNames.Contains(dep.Name), "The input build array should contain all dependencies to allow sorting");
 					}
 				}
@@ -397,7 +403,7 @@ namespace MPMTest.Core.Dependency {
 				bool sorted = true;
 				foreach (var build in builds) {
 					namesSeen.Add(build.Name);
-					foreach (var dep in build.Dependencies) {
+					foreach (var dep in build.Dependencies.Packages) {
 						if (!namesSeen.Contains(dep.Name)) {
 							sorted = false;
 							break;
@@ -424,7 +430,7 @@ namespace MPMTest.Core.Dependency {
 				var namesSeen = new SortedSet<string>();
 				foreach (var build in output) {
 					namesSeen.Add(build.Name);
-					foreach (var dep in build.Dependencies) {
+					foreach (var dep in build.Dependencies.Packages) {
 						if (!namesSeen.Contains(dep.Name)) {
 							//Only fail here if the object is not codependent with the dependency and the dependency is not previously seen
 							Assert.True(
@@ -432,7 +438,7 @@ namespace MPMTest.Core.Dependency {
 								output
 									.Where(other => other.Name == dep.Name)
 									.Select(other => other.Dependencies)
-									.Any(otherDeps => otherDeps.Any(dependency => dependency.Name == build.Name)),
+									.Any(otherDeps => otherDeps.Packages.Any(dependency => dependency.Name == build.Name)),
 								"The output build array must be sorted"
 							);
 						}

@@ -54,6 +54,24 @@ namespace MPM.CLI {
 		}
 
 		[ArgActionMethod]
+		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("list"), ArgShortcut("--list")]
+		public void ListPackages(ListArgs args) {
+			using (var factory = new CLIFactory().GenerateResolver()) {
+				var listActionProvider = new ListActionProvider();
+				listActionProvider.Provide(factory, args);
+			}
+		}
+
+		/*[ArgActionMethod]
+		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("s"), ArgShortcut("--sync")]
+		public void Sync(InitArgs args) {
+			using (var factory = new CLIFactory().GenerateResolver()) {
+				var syncActionProvider = new SyncActionProvider();
+				syncActionProvider.Provide(factory, args);
+			}
+		}*/
+
+		[ArgActionMethod]
 		[ArgShortcut("l"), ArgShortcut("-l"), ArgShortcut("--launch")]
 		public void LaunchMinecraft(LaunchMinecraftArgs args) {
 			using (var minecraftLauncher = args.ToConfiguredLauncher()) {
