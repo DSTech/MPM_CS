@@ -322,6 +322,8 @@
     <Compile Include="Types\InstallationConflictResolution.cs" />
     <Compile Include="Types\InterfaceDependency.cs" />
     <Compile Include="Types\InterfaceProvision.cs" />
+    <Compile Include="Types\Mapping\DTOMappings.cs" />
+    <Compile Include="Types\Mapping\Mappings.cs" />
     <Compile Include="Types\Package.cs" />
     <Compile Include="Types\CompatibilitySide.cs" />
     <Compile Include="Types\Conflict.cs" />

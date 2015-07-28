@@ -11,7 +11,7 @@ namespace MPM.Types {
 			this.InterfaceNames = interfaceNames.ToArray();
 		}
 
-		private IReadOnlyCollection<String> PackageNames { get; }
-		private IReadOnlyCollection<String> InterfaceNames { get; }
+		public IReadOnlyCollection<String> PackageNames { get; }
+		public IReadOnlyCollection<String> InterfaceNames { get; }
 	}
 }
