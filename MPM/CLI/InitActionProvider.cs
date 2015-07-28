@@ -10,7 +10,7 @@ using MPM.Core.Instances;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Data;
-using MPM.Net.DTO;
+using MPM.Types;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 using semver.tools;
@@ -91,30 +91,38 @@ namespace MPM.CLI {
 			this.Init(factory, instanceArch, instanceSide, instancePlatform, args.InstancePath).WaitAndUnwrapException();
 		}
 
+		public CompatibilityPlatform ConvertToCompatibility(InstancePlatform instancePlatform) {
+			switch (instancePlatform) {
+				case InstancePlatform.Lin32: return CompatibilityPlatform.Lin32;
+				case InstancePlatform.Lin64: return CompatibilityPlatform.Lin64;
+				case InstancePlatform.Win32: return CompatibilityPlatform.Win32;
+				case InstancePlatform.Win64: return CompatibilityPlatform.Win64;
+				default: return CompatibilityPlatform.Universal;
+			}
+		}
+
 		public Configuration GenerateArchConfiguration(SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform) {
-			PackageSide packageSide;
+			CompatibilitySide packageSide;
 			switch (instanceSide) {
 				case InstanceSide.Client:
-					packageSide = PackageSide.Client;
+					packageSide = CompatibilitySide.Client;
 					break;
 				case InstanceSide.Server:
-					packageSide = PackageSide.Server;
+					packageSide = CompatibilitySide.Server;
 					break;
 				default:
 					throw new NotSupportedException();
 			};
-			return new Configuration() {
-				Packages = new[] {
-					new PackageSpec {
-						Name = "minecraft",
-						Arch = instanceArch.ToString(),
-						Manual = true,
-						Platform = instancePlatform.ToString(),
-						Side = packageSide,
-						Version = new VersionSpec(SemanticVersion.Parse("0.0.0"), true, SemanticVersion.Parse("9999.9999.9999"), true),
-					},
+			return new Configuration(new[] {
+				new PackageSpec {
+					Name = "minecraft",
+					Arch = new Arch(instanceArch.ToString()),
+					Manual = true,
+					Platform = ConvertToCompatibility(instancePlatform),
+					Side = packageSide,
+					VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.0"), true, SemanticVersion.Parse("9999.9999.9999"), true),
 				},
-			};
+			});
 		}
 
 		public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform, string instancePath) {

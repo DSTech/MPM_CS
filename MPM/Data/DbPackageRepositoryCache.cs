@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MPM.Net.DTO;
+using MPM.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using semver.tools;
@@ -42,30 +42,25 @@ namespace MPM.Data {
 			this.metaDb = metaDb;
 		}
 
-		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, PackageSide side, string arch, string platform) {
-			var package = await FetchBuilds(packageName, new VersionSpec(version));
-			var build = package
-				.Builds
-				.Where(b => b.Version == version && b.Arch == arch && b.Platform == platform && (b.Side == side || b.Side == PackageSide.Universal))
+		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
+			var builds = await FetchBuilds(packageName, new VersionSpec(version));
+			var build = builds
+				.Where(b => b.Version == version && b.Arch == arch && b.Platform == platform && (b.Side == side || b.Side == CompatibilitySide.Universal))
 				.OrderByDescending(b => b.Version)//Prefer higher versions
-				.ThenByDescending(b => b.Side != PackageSide.Universal)//Prefer side-specific
+				.ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
 				.FirstOrDefault();
 			return build;
 		}
 
-		public async Task<Package> FetchBuilds(string packageName, VersionSpec versionSpec) {
+		public async Task<IEnumerable<Build>> FetchBuilds(string packageName, VersionSpec versionSpec) {
 			var package = await FetchPackage(packageName);
 			var builds = package
 				.Builds
 				.Where(b => versionSpec.Satisfies(b.Version))
 				.OrderByDescending(b => b.Version)//Prefer higher versions
-				.ThenByDescending(b => b.Side != PackageSide.Universal)//Prefer side-specific
+				.ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
 				.ToArray();
-			return new Package {
-				Name = package.Name,
-				Authors = package.Authors,
-				Builds = builds,
-			};
+			return builds;
 		}
 
 		public async Task<Package> FetchPackage(string packageName) {
@@ -77,14 +72,10 @@ namespace MPM.Data {
 				var builds = package
 					.Builds
 					.OrderByDescending(b => b.Version)//Prefer higher versions
-					.ThenByDescending(b => b.Side != PackageSide.Universal)//Prefer side-specific
+					.ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
 					.ToArray();
 
-				return new Package {
-					Name = package.Name,
-					Authors = package.Authors,
-					Builds = builds,
-				};
+				return new Package(package.Name, package.Authors, builds);
 			});
 		}
 

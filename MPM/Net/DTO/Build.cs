@@ -3,6 +3,7 @@ using System;
 namespace MPM.Net.DTO {
 
 	public class Build {
+		public String Package { get; set; }
 		public Version Version { get; set; }
 		public String GivenVersion { get; set; }
 		public String Arch { get; set; }
@@ -13,5 +14,6 @@ namespace MPM.Net.DTO {
 		public PackageConflict[] Conflicts { get; set; }
 		public String[] Hashes { get; set; }
 		public bool Stable { get; set; }
+		public bool Recommended { get; set; }
 	}
 }

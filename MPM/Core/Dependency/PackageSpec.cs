@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
-using MPM.Net.DTO;
+using MPM.Types;
 using NServiceKit.Common;
 using semver.tools;
 
@@ -12,7 +12,7 @@ namespace MPM.Core.Dependency {
 
 	public static class PackageSpecExtensions {
 
-		public static PackageSpec ToSpec(this Net.DTO.PackageDependency dependency, string arch, string platform, bool manual = false) {
+		public static PackageSpec ToSpec(this PackageDependency dependency, Arch arch, CompatibilityPlatform platform, bool manual = false) {
 			return new PackageSpec {
 				Manual = manual,
 				Arch = arch,
@@ -24,16 +24,16 @@ namespace MPM.Core.Dependency {
 		/// Checks if a build satisfies the given specification.
 		/// </summary>
 		/// <param name="spec">Specification to check against</param>
-		/// <param name="namedBuild">Build to check. Assumes </param>
+		/// <param name="build">Build to check. Assumes (What?)</param>
 		/// <returns></returns>
-		public static bool Satisfies(this PackageSpec spec, NamedBuild namedBuild) {
-			return spec.Name == namedBuild.Name
-				&& spec.Arch == namedBuild.Arch
-				&& spec.Platform == namedBuild.Platform
+		public static bool Satisfies(this PackageSpec spec, Build build) {
+			return spec.Name == build.PackageName
+				&& spec.Arch == build.Arch
+				&& spec.Platform == build.Platform
 				&& (
-					spec.Side == namedBuild.Side || namedBuild.Side == PackageSide.Universal
+					spec.Side == build.Side || build.Side == CompatibilitySide.Universal
 				)
-				&& spec.Version.Satisfies(namedBuild.Version);
+				&& spec.VersionSpec.Satisfies(build.Version);
 		}
 
 		/// <summary>
@@ -43,20 +43,19 @@ namespace MPM.Core.Dependency {
 		/// <param name="packageSpec">Specification to look up</param>
 		/// <returns>Builds in descending order of version</returns>
 		/// <remarks>Should be converted to return IQueryable to allow optimized behavior with constraint lookup</remarks>
-		public static async Task<IEnumerable<NamedBuild>> LookupSpec(this IPackageRepository repository, PackageSpec packageSpec) {
-			var package = await repository.FetchBuilds(packageSpec.Name, packageSpec.Version);
+		public static async Task<IEnumerable<Build>> LookupSpec(this IPackageRepository repository, PackageSpec packageSpec) {
+			var package = await repository.FetchBuilds(packageSpec.Name, packageSpec.VersionSpec);
 			return package
-				.ToNamedBuilds()
 				.Where(b => packageSpec.Satisfies(b));
 		}
 	}
 
 	public class PackageSpec : IEquatable<PackageSpec> {
 		public String Name { get; set; }
-		public String Arch { get; set; }
-		public String Platform { get; set; }
-		public VersionSpec Version { get; set; }
-		public PackageSide Side { get; set; } = PackageSide.Universal;
+		public Arch Arch { get; set; }
+		public CompatibilityPlatform Platform { get; set; }
+		public VersionSpec @VersionSpec { get; set; }
+		public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
 		public bool Manual { get; set; } = false;
 
 		public override bool Equals(object obj) {
@@ -71,8 +70,8 @@ namespace MPM.Core.Dependency {
 			return
 				(Name?.GetHashCode() ?? 0)
 				+ (Arch?.GetHashCode() ?? 0)
-				+ (Platform?.GetHashCode() ?? 0)
-				+ (Version != null ? GetVersionSpecHashCode(Version) : 0)
+				+ Platform.GetHashCode()
+				+ (VersionSpec != null ? GetVersionSpecHashCode(VersionSpec) : 0)
 				+ Manual.GetHashCode();
 		}
 
@@ -98,7 +97,7 @@ namespace MPM.Core.Dependency {
 				Name == other.Name
 				&& this.Arch == other.Arch
 				&& this.Platform == other.Platform
-				&& this.Version.ToString() == other.Version.ToString()
+				&& this.VersionSpec.ToString() == other.VersionSpec.ToString()
 				&& this.Manual == other.Manual;
 		}
 	}

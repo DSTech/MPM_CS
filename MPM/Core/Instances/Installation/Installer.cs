@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Info;
 using MPM.Data;
-using MPM.Net.DTO;
+using MPM.Types;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
@@ -25,6 +25,8 @@ namespace MPM.Core.Instances.Installation {
 			fileSystem = instance.GetFileSystem();
 		}
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 		/// <summary>
 		/// Adds a package to an instance's configuration, then performs necessary filesystem modifications the package requests.
 		/// </summary>
@@ -34,7 +36,8 @@ namespace MPM.Core.Instances.Installation {
 		/// <exception cref="Exception">Thrown when a package fails to resolve or install. All existing changes will be reverted before throwing.</exception>
 		/// <exception cref="InvalidOperationException">Thrown when a version of the specified package is already installed.</exception>
 		/// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
-		public async Task<InstanceConfiguration> Install(NamedBuild build) {
+		public async Task<InstanceConfiguration> Install(Build build) {
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 			//TODO: Persist the package-data for the NamedBuild being installed
 			//TODO: Error if any builds of the same package are already installed
 			/*var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using MPM.Net.DTO;
+using AutoMapper;
+using MPM.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NServiceKit.Common;
@@ -19,23 +20,26 @@ namespace MPM.Data {
 			this.baseUri = baseUri;
 		}
 
-		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, PackageSide side, string arch, string platform) {
+		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
+			//TODO: Support "arch" and "platform" filters?
 			var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{packageName}/{version}"));
 			var response = await req.GetResponseAsync();
 			byte[] responseData;
 			using (var responseStream = response.GetResponseStream()) {
 				responseData = await responseStream.ReadToEndAsync();
 			}
-			var build = JsonConvert.DeserializeObject<Build>(Encoding.UTF8.GetString(responseData));
-			return build;
+			var build = JsonConvert.DeserializeObject<MPM.Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
+			build.Package = build.Package ?? packageName;
+			return Mapper.Map<Build>(build);
 		}
 
-		public async Task<Package> FetchBuilds(string packageName, VersionSpec versionSpec) {
+		public async Task<IEnumerable<Build>> FetchBuilds(string packageName, VersionSpec versionSpec) {
 			var package = await FetchPackage(packageName);
-			var matchingBuilds = package.Builds.Where(b => versionSpec.Satisfies(b.Version));
-			var filteredPackage = new Package().PopulateWithNonDefaultValues(package);
-			filteredPackage.Builds = matchingBuilds.ToArray();
-			return filteredPackage;
+			var matchingBuilds = package
+				.Builds
+				.Where(b => versionSpec.Satisfies(b.Version))
+				.ToArray();
+			return matchingBuilds;
 		}
 
 		public async Task<Package> FetchPackage(string packageName) {
@@ -45,8 +49,8 @@ namespace MPM.Data {
 			using (var responseStream = response.GetResponseStream()) {
 				responseData = await responseStream.ReadToEndAsync();
 			}
-			var package = JsonConvert.DeserializeObject<Package>(Encoding.UTF8.GetString(responseData));
-			return package;
+			var package = JsonConvert.DeserializeObject<MPM.Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
+			return Mapper.Map<Package>(package);
 		}
 
 		public async Task<IEnumerable<Package>> FetchPackageList() {
@@ -56,8 +60,8 @@ namespace MPM.Data {
 			using (var responseStream = response.GetResponseStream()) {
 				responseData = await responseStream.ReadToEndAsync();
 			}
-			var packageList = JsonConvert.DeserializeObject<IEnumerable<Package>>(Encoding.UTF8.GetString(responseData));
-			return packageList;
+			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+			return Mapper.Map<IEnumerable<Package>>(packageList);
 		}
 
 		public async Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter) {
@@ -68,8 +72,8 @@ namespace MPM.Data {
 			using (var responseStream = response.GetResponseStream()) {
 				responseData = await responseStream.ReadToEndAsync();
 			}
-			var packageList = JsonConvert.DeserializeObject<IEnumerable<Package>>(Encoding.UTF8.GetString(responseData));
-			return packageList;
+			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+			return Mapper.Map<IEnumerable<Package>>(packageList);
 		}
 	}
 }

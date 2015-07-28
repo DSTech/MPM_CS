@@ -1,11 +1,11 @@
 using System.Linq;
-using MPM.Net.DTO;
+using MPM.Types;
 
-namespace MPM.Net {
+namespace MPM.Extensions {
 
 	public static class PackageConflictExtensions {
 
-		public static bool CheckPackageConflict(this PackageConflict packageConflict, string[] packages, string[] interfaces) {
+		public static bool CheckPackageConflict(this Conflict packageConflict, string[] packages, string[] interfaces) {
 			if (packageConflict.Condition == null) {
 				return false;
 			}
@@ -13,10 +13,10 @@ namespace MPM.Net {
 		}
 
 		public static bool CheckPackageConflictCondition(this ConflictCondition conflictCondition, string[] packages, string[] interfaces) {
-			if (conflictCondition.Package != null && !packages.Contains(conflictCondition.Package)) {
+			if (conflictCondition.PackageName != null && !packages.Contains(conflictCondition.PackageName)) {
 				return false;
 			}
-			if (conflictCondition.Interface != null && !interfaces.Contains(conflictCondition.Interface)) {
+			if (conflictCondition.InterfaceName != null && !interfaces.Contains(conflictCondition.InterfaceName)) {
 				return false;
 			}
 			bool anyOrs;

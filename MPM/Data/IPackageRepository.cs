@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MPM.Net.DTO;
+using MPM.Types;
 using semver.tools;
 
 namespace MPM.Data {
@@ -37,7 +37,7 @@ namespace MPM.Data {
 		/// A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package within the specified constraints was found.
 		/// Builds must be returned in descending order of version, with side-specific returned before universal packages.
 		/// </returns>
-		Task<Build> FetchBuild(String packageName, SemanticVersion version, PackageSide side, String arch, String platform);
+		Task<Build> FetchBuild(String packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform);
 
 		/// <summary>
 		/// Looks up a package for any versions matching a specifier.
@@ -48,6 +48,6 @@ namespace MPM.Data {
 		/// A <see cref="Package"/> instance containing only builds which comply with the <paramref name="versionSpec"/> given. Null when no package of the specified name was found.
 		/// Builds must be returned in descending order of version, with side-specific returned before universal packages.
 		/// </returns>
-		Task<Package> FetchBuilds(String packageName, VersionSpec versionSpec);
+		Task<IEnumerable<Build>> FetchBuilds(String packageName, VersionSpec versionSpec);
 	}
 }

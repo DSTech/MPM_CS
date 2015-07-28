@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MPM.Net;
-using MPM.Net.DTO;
+using MPM.Extensions;
+using MPM.Types;
 
 namespace MPM.Core.Dependency {
 
@@ -13,13 +13,13 @@ namespace MPM.Core.Dependency {
 
 		//Returns conflicts caused by particular builds
 		//LookupBuild should return a package with exactly one build
-		public static IEnumerable<Tuple<PackageSpec, Build, PackageConflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Package> lookupBuild) {
+		public static IEnumerable<Tuple<PackageSpec, Build, Conflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Package> lookupBuild) {
 			foreach (var package in configuration.Packages) {
 				var packageDetails = lookupBuild(package);
 				if (packageDetails == null) {
 					throw new Exception("Package details could not be found");
 				}
-				Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Length == 1);
+				Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Count == 1);
 				var build = packageDetails.Builds.First();
 
 				var conflicts = build.FindConflicts(
@@ -38,11 +38,11 @@ namespace MPM.Core.Dependency {
 		//Returns any conflicts triggered by a particular set of packages interacting with the given package
 		//LookupBuild should return a package with exactly one build
 		//These interactions are one-way: other packages must check their conflicts with the source as well
-		public static IEnumerable<PackageConflict> FindConflicts(this Build build, PackageSpec[] otherPackageSpecs, Func<PackageSpec, Package> lookupBuild) {
+		public static IEnumerable<Conflict> FindConflicts(this Build build, PackageSpec[] otherPackageSpecs, Func<PackageSpec, Package> lookupBuild) {
 			var packages = otherPackageSpecs
 				.Select(spec => {
 					var packageDetails = lookupBuild(spec);
-					Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Length == 1);
+					Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Count == 1);
 					return packageDetails;
 				})
 				.ToArray();
@@ -52,8 +52,8 @@ namespace MPM.Core.Dependency {
 			var interfaceNames = packages
 				.FirstOrDefault()
 				.Builds
-				.SelectMany(b => b.Interfaces)
-				.Select(b => b.Name)
+				.SelectMany(b => b.InterfaceProvisions)
+				.Select(b => b.InterfaceName)
 				.ToArray();
 			foreach (var conflict in build.Conflicts) {
 				if (conflict.CheckPackageConflict(packageNames, interfaceNames)) {
@@ -65,11 +65,14 @@ namespace MPM.Core.Dependency {
 
 	public class Configuration {
 
-		public static Configuration Empty { get; } = new Configuration {
-			Packages = new PackageSpec[0],
-		};
+		public Configuration(IEnumerable<PackageSpec> packageSpecifications, CompatibilitySide side = CompatibilitySide.Universal) {
+			this.Packages = packageSpecifications.ToArray();
+			this.Side = side;
+		}
 
-		public PackageSpec[] Packages { get; set; }
-		public PackageSide Side { get; set; } = PackageSide.Universal;
+		public IReadOnlyCollection<PackageSpec> Packages { get; }
+		public CompatibilitySide Side { get; }
+
+		public static Configuration Empty { get; } = new Configuration(Enumerable.Empty<PackageSpec>());
 	}
 }

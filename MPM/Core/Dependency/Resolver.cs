@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
-using MPM.Net.DTO;
+using MPM.Types;
 using QuickGraph;
 using QuickGraph.Algorithms;
 using QuickGraph.Algorithms.Search;
@@ -21,14 +21,14 @@ namespace MPM.Core.Dependency {
 
 		public async Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository repository) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
-			var output = new List<NamedBuild>();
+			var output = new List<Build>();
 
 			foreach (var packageSpec in target.Packages) {
 				if (!packageSpec.Manual) {
 					continue;
 				}
 
-				NamedBuild[] resolvedSet;
+				IReadOnlyCollection<Build> resolvedSet;
 				try {
 					resolvedSet = await ResolveRecursive(packageSpec, repository);
 					Debug.Assert(resolvedSet != null);
@@ -42,27 +42,25 @@ namespace MPM.Core.Dependency {
 				output.Clear();
 				output.AddRange(SortBuilds(unsortedOutput));
 			}
-			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.Name).Count());
-			return new InstanceConfiguration {
-				Packages = output.ToArray(),
-			};
+			Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.PackageName).Count());
+			return new InstanceConfiguration(output);
 		}
 
-		public async Task<NamedBuild[]> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public async Task<IReadOnlyCollection<Build>> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
 			var namedBuilds = await repository.LookupSpec(packageSpec);
-			NamedBuild[] result;
+			Build[] result;
 			switch (resolutionMode) {
 				case ResolutionMode.Highest:
 					result = namedBuilds
-						.Where(nb => (nb.Side == packageSide || nb.Side == PackageSide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
+						.Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
 						.OrderByDescending(nb => nb.Version)
 						.ThenByDescending(nb => nb.Side == packageSide)
 						.ToArray();
 					break;
 				case ResolutionMode.HighestStable:
 					result = namedBuilds
-						.Where(nb => (nb.Side == packageSide || nb.Side == PackageSide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
+						.Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
 						.OrderByDescending(nb => nb.Stable)
 						.ThenByDescending(nb => nb.Version)
 						.ThenByDescending(nb => nb.Side == packageSide)
@@ -77,19 +75,19 @@ namespace MPM.Core.Dependency {
 			return result;
 		}
 
-		public async Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+		public async Task<IReadOnlyCollection<Build>> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var possibleBuilds = await ResolveDependency(packageSpec, repository, packageSide, constraints, resolutionMode);
 			Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");
 			foreach (var possibleBuild in possibleBuilds) {
-				var output = new List<NamedBuild>();
+				var output = new List<Build>();
 				Debug.Assert(possibleBuild != null, "ResolveDependency must not return null elements");
 				output.Add(possibleBuild);
-				foreach (var dependency in possibleBuild.Dependencies.Packages) {
+				foreach (var dependency in possibleBuild.PackageDependencies) {
 					var depSpec = dependency.ToSpec(packageSpec.Arch, packageSpec.Platform);
-					if (packageSide != PackageSide.Universal && dependency.Side != PackageSide.Universal && dependency.Side != packageSide) {
+					if (packageSide != CompatibilitySide.Universal && dependency.Side != CompatibilitySide.Universal && dependency.Side != packageSide) {
 						continue;
 					}
-					NamedBuild[] resolvedDeps;
+					IReadOnlyCollection<Build> resolvedDeps;
 					try {
 						resolvedDeps = await ResolveRecursive(depSpec, repository, packageSide, constraints, resolutionMode);
 						Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
@@ -109,8 +107,8 @@ namespace MPM.Core.Dependency {
 		/// </summary>
 		/// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
 		/// <returns>A sorted array of builds, with the least-dependent first</returns>
-		public IEnumerable<NamedBuild> SortBuilds(IEnumerable<NamedBuild> builds) {
-			var buildMap = builds.Distinct(b => b.Name).ToArray();
+		public IEnumerable<Build> SortBuilds(IEnumerable<Build> builds) {
+			var buildMap = builds.Distinct(b => b.PackageName).ToArray();
 
 			var adjGraph = new AdjacencyGraph<int, Edge<int>>(false);
 			adjGraph.AddVertexRange(Enumerable.Range(0, buildMap.Length));
@@ -118,9 +116,8 @@ namespace MPM.Core.Dependency {
 				adjGraph.AddEdgeRange(
 					buildMap
 						.ElementAt(buildIndex)
-						.Dependencies
-						.Packages
-						.Select(dep => Array.FindIndex<NamedBuild>(buildMap, nb => nb.Name == dep.Name))
+						.PackageDependencies
+						.Select(dep => Array.FindIndex<Build>(buildMap, nb => nb.PackageName == dep.PackageName))
 						.Where(depIndex => depIndex != -1)
 						.Select(destination => new Edge<int>(buildIndex, destination))
 				);

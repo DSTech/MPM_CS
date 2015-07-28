@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
-using MPM.Net.DTO;
+using MPM.Types;
 
 namespace MPM.Core.Dependency {
 
@@ -41,7 +41,7 @@ namespace MPM.Core.Dependency {
 		/// <param name="resolutionMode">Specifier declaring which behavior the resolver should follow when attempting to find qualifying builds</param>
 		/// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
 		/// <returns>A set of builds satisfying the spec, qualifying with all constraints, resolved with the specified behavior, ordered from most to least prefered</returns>
-		Task<NamedBuild[]> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide side = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		Task<IReadOnlyCollection<Build>> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide side = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 
 		/// <summary>
 		/// A variant of ResolveDependency which should implement additional constraints on each cycle until a dependency tree can be resolved as non-null.
@@ -62,6 +62,6 @@ namespace MPM.Core.Dependency {
 		/// A topologically-ordered array of dependencies on successful resolution back to root.
 		/// Null if resolution fails.
 		/// </returns>
-		Task<NamedBuild[]> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, PackageSide packageSide = PackageSide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+		Task<IReadOnlyCollection<Build>> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
 	}
 }
