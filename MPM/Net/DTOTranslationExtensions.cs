@@ -103,7 +103,7 @@ namespace MPM.Net {
 				Packages = build.PackageDependencies.Select(packageDependency => packageDependency.ToDTO()).ToArray(),
 			},
 			GivenVersion = build.GivenVersion,
-			Hashes = build.Hashes.Select(hash => hash.ToString()).ToArray(),
+			Hashes = build.Hashes.Denull().Select(hash => hash.ToString()).ToArray(),
 			Platform = build.Platform.ToDTO(),
 			Recommended = build.Recommended,
 			Side = build.Side.ToDTO(),
@@ -120,8 +120,8 @@ namespace MPM.Net {
 		public static Types.ConflictCondition FromDTO(this DTO.ConflictCondition conflictCondition) => new Types.ConflictCondition(
 			conflictCondition.Package,
 			conflictCondition.Interface,
-			conflictCondition.And.Select(cond => cond.FromDTO()),
-			conflictCondition.Or.Select(cond => cond.FromDTO())
+			conflictCondition.And.Denull().Select(cond => cond.FromDTO()),
+			conflictCondition.Or.Denull().Select(cond => cond.FromDTO())
 		);
 
 		public static DTO.ConflictCondition ToDTO(this Types.ConflictCondition conflictCondition) => new DTO.ConflictCondition {
@@ -142,17 +142,17 @@ namespace MPM.Net {
 		public static DTO.DependencyConflictResolution ToDTO(this Types.DependencyConflictResolution res) => new DTO.DependencyConflictResolution { Decline = res.Decline.ToDTO(), Force = res.Force.ToDTO() };
 
 		//InstallationConflictResolution
-		public static Types.InstallationConflictResolution FromDTO(this DTO.InstallationConflictResolution res) => new Types.InstallationConflictResolution(res.Packages);
+		public static Types.InstallationConflictResolution FromDTO(this DTO.InstallationConflictResolution res) => new Types.InstallationConflictResolution(res.Packages.Denull());
 
 		public static DTO.InstallationConflictResolution ToDTO(this Types.InstallationConflictResolution res) => new DTO.InstallationConflictResolution { Packages = res.PackageNames.ToArray() };
 
 		//DeclinedDependencySet
-		public static Types.DeclinedDependencySet FromDTO(this DTO.DeclinedDependency res) => new Types.DeclinedDependencySet(res.Packages, res.Interfaces);
+		public static Types.DeclinedDependencySet FromDTO(this DTO.DeclinedDependency res) => new Types.DeclinedDependencySet(res.Packages.Denull(), res.Interfaces.Denull());
 
 		public static DTO.DeclinedDependency ToDTO(this Types.DeclinedDependencySet res) => new DTO.DeclinedDependency { Interfaces = res.InterfaceNames.ToArray(), Packages = res.PackageNames.ToArray() };
 
 		//ForcedDependencySet
-		public static Types.ForcedDependencySet FromDTO(this DTO.ForcedDependency res) => new Types.ForcedDependencySet(res.Packages, res.Interfaces);
+		public static Types.ForcedDependencySet FromDTO(this DTO.ForcedDependency res) => new Types.ForcedDependencySet(res.Packages.Denull(), res.Interfaces.Denull());
 
 		public static DTO.ForcedDependency ToDTO(this Types.ForcedDependencySet res) => new DTO.ForcedDependency { Interfaces = res.InterfaceNames.ToArray(), Packages = res.PackageNames.ToArray() };
 
