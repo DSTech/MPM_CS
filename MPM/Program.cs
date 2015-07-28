@@ -9,15 +9,6 @@ namespace MPM {
 	public class Program {
 
 		public static void Main(string[] args) {
-			MPM.Types.Mapping.Mappings.CreateStaticMappings();
-			AutoMapper.Mapper.AssertConfigurationIsValid();
-			/*JsonConvert.DefaultSettings = () => new JsonSerializerSettings {
-				TypeNameHandling = TypeNameHandling.Auto,
-				Converters = new List<JsonConverter> {
-					new SemanticVersionConverter(),
-					new VersionSpecConverter(),
-				},
-			};*/
 			ArgAction<LaunchArgs> parsed;
 			try {
 				parsed = Args.ParseAction<LaunchArgs>(args);

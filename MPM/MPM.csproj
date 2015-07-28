@@ -308,6 +308,7 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Net\DTO\Author.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
+    <Compile Include="Net\DTO\DTOTranslationExtensions.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
     <Compile Include="Types\Arch.cs" />
@@ -322,8 +323,6 @@
     <Compile Include="Types\InstallationConflictResolution.cs" />
     <Compile Include="Types\InterfaceDependency.cs" />
     <Compile Include="Types\InterfaceProvision.cs" />
-    <Compile Include="Types\Mapping\DTOMappings.cs" />
-    <Compile Include="Types\Mapping\Mappings.cs" />
     <Compile Include="Types\Package.cs" />
     <Compile Include="Types\CompatibilitySide.cs" />
     <Compile Include="Types\Conflict.cs" />
