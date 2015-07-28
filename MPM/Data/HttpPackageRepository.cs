@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
+using MPM.Net;
 using MPM.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,7 +30,7 @@ namespace MPM.Data {
 			}
 			var build = JsonConvert.DeserializeObject<MPM.Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
 			build.Package = build.Package ?? packageName;
-			return Mapper.Map<Build>(build);
+			return build.FromDTO();
 		}
 
 		public async Task<IEnumerable<Build>> FetchBuilds(string packageName, VersionSpec versionSpec) {
@@ -50,7 +50,7 @@ namespace MPM.Data {
 				responseData = await responseStream.ReadToEndAsync();
 			}
 			var package = JsonConvert.DeserializeObject<MPM.Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
-			return Mapper.Map<Package>(package);
+			return package.FromDTO();
 		}
 
 		public async Task<IEnumerable<Package>> FetchPackageList() {
@@ -61,7 +61,7 @@ namespace MPM.Data {
 				responseData = await responseStream.ReadToEndAsync();
 			}
 			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-			return Mapper.Map<IEnumerable<Package>>(packageList);
+			return packageList.Select(package => package.FromDTO()).ToArray();
 		}
 
 		public async Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter) {
@@ -73,7 +73,7 @@ namespace MPM.Data {
 				responseData = await responseStream.ReadToEndAsync();
 			}
 			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-			return Mapper.Map<IEnumerable<Package>>(packageList);
+			return packageList.Select(package => package.FromDTO()).ToArray();
 		}
 	}
 }

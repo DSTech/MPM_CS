@@ -308,7 +308,7 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Net\DTO\Author.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
-    <Compile Include="Net\DTO\DTOTranslationExtensions.cs" />
+    <Compile Include="Net\DTOTranslationExtensions.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
     <Compile Include="Types\Arch.cs" />
