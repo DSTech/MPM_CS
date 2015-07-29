@@ -233,7 +233,7 @@
     <Compile Include="Core\Dependency\Reconfiguration.cs" />
     <Compile Include="Core\Dependency\ResolutionMode.cs" />
     <Compile Include="Core\Dependency\Resolver.cs" />
-    <Compile Include="Core\EnumeratorExtensions.cs" />
+    <Compile Include="Extensions\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\Instances\Info\ScriptFileDeclarationExtensions.cs" />
@@ -261,8 +261,8 @@
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessType.cs" />
-    <Compile Include="Core\Instances\Installation\StreamingZipFetcher.cs" />
-    <Compile Include="Core\Instances\Installation\SeekingZipFetcher.cs" />
+    <Compile Include="Archival\StreamingZipFetcher.cs" />
+    <Compile Include="Archival\SeekingZipFetcher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Instances\Info\PackageInfoParser.cs" />
     <Compile Include="Core\Instances\Info\PackageJsonParser.cs" />
@@ -299,6 +299,7 @@
     <Compile Include="Net\DTOTranslationExtensions.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTOTranslationExtensions.cs" />
     <Compile Include="Types\Arch.cs" />
     <Compile Include="Types\Author.cs" />
     <Compile Include="Types\Build.cs" />
@@ -321,8 +322,8 @@
     <Compile Include="SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgExtensions.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
-    <Compile Include="Core\Archival\ArchiveChunk.cs" />
-    <Compile Include="Core\Archival\Archive.cs" />
+    <Compile Include="Archival\ArchiveChunk.cs" />
+    <Compile Include="Archival\Archive.cs" />
     <Compile Include="Net\DTO\ConflictResolution.cs" />
     <Compile Include="Net\DTO\ConflictCondition.cs" />
     <Compile Include="Net\DTO\DeclinedDependency.cs" />

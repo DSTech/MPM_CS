@@ -6,6 +6,8 @@ namespace MPM.Extensions {
 
 	public static class IEnumerableExtensions {
 
+		public static IEnumerable<T> Denull<T>(this IEnumerable<T> enumerable) => (enumerable != null ? enumerable : Enumerable.Empty<T>());
+
 		public static IEnumerable<T> SubEnumerable<T>(this IEnumerable<T> enumerable, int startIndex) {
 			if (enumerable == null) {
 				return null;

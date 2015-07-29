@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
+using MPM.Archival;
 using MPM.Core.Instances.Cache;
 using Platform.VirtualFileSystem;
 using semver.tools;

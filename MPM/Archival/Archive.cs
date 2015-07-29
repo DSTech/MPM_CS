@@ -6,16 +6,38 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core;
+using MPM.Extensions;
 
-namespace MPM.Core.Archival {
+namespace MPM.Archival {
 
 	public class Archive : IList<EncryptedChunk> {
+		private IList<EncryptedChunk> chunks;
 
 		public Archive(IEnumerable<EncryptedChunk> chunks) {
 			this.chunks = new List<EncryptedChunk>(chunks);
 		}
 
-		private IList<EncryptedChunk> chunks;
+		public int Count {
+			get {
+				return chunks.Count;
+			}
+		}
+
+		public bool IsReadOnly {
+			get {
+				return chunks.IsReadOnly;
+			}
+		}
+
+		public EncryptedChunk this[int index] {
+			get {
+				return chunks[index];
+			}
+
+			set {
+				chunks[index] = value;
+			}
+		}
 
 		public static byte[] ApplyLeadingHash(byte[] contents) {
 			byte[] leadingHash;
@@ -26,19 +48,6 @@ namespace MPM.Core.Archival {
 				BitConverter.GetBytes(Convert.ToInt16(leadingHash.Length)),
 				leadingHash);
 			return Enumerable.Concat(header, contents).ToArray();
-		}
-
-		public static byte[] VerifyLeadingHash(byte[] contents) {
-			var contentsEnumr = contents.AsEnumerable().GetEnumerator();
-			var leadingHashLength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
-			var leadingHash = contentsEnumr.Take(leadingHashLength).ToArray();
-			var body = contentsEnumr.AsEnumerable().ToArray();
-			using (var sha256 = new SHA256Managed()) {
-				if (!sha256.ComputeHash(body).SequenceEqual(leadingHash)) {
-					return null;
-				}
-			}
-			return body;
 		}
 
 		public static async Task<Archive> CreateArchive(string packageName, byte[] contents, uint? maxChunkSize = null) {
@@ -60,47 +69,17 @@ namespace MPM.Core.Archival {
 			return await Task.Run(() => new Archive(encryptedChunks)).ConfigureAwait(false);
 		}
 
-		//Returns null if leading-hash verification fails
-		public async Task<byte[]> Unpack(string packageName) {
-			return await Task.Run(() => {
-				var unpacked = EnumerableEx.Concat(UnpackInternal(packageName)).ToArray();
-				var verifiedBody = VerifyLeadingHash(unpacked);
-				if (verifiedBody == null) {
+		public static byte[] VerifyLeadingHash(byte[] contents) {
+			var contentsEnumr = contents.AsEnumerable().GetEnumerator();
+			var leadingHashLength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
+			var leadingHash = contentsEnumr.Take(leadingHashLength).ToArray();
+			var body = contentsEnumr.AsEnumerable().ToArray();
+			using (var sha256 = new SHA256Managed()) {
+				if (!sha256.ComputeHash(body).SequenceEqual(leadingHash)) {
 					return null;
 				}
-				return verifiedBody;
-			});
-		}
-
-		private IEnumerable<IEnumerable<byte>> UnpackInternal(string packageName) {
-			var key = System.Text.Encoding.UTF8.GetBytes(packageName);
-			foreach (var chunk in chunks) {
-				var rawChunk = chunk.Decrypt(key);
-				yield return rawChunk;
-				key = rawChunk.Hash();
 			}
-		}
-
-		public EncryptedChunk this[int index] {
-			get {
-				return chunks[index];
-			}
-
-			set {
-				chunks[index] = value;
-			}
-		}
-
-		public int Count {
-			get {
-				return chunks.Count;
-			}
-		}
-
-		public bool IsReadOnly {
-			get {
-				return chunks.IsReadOnly;
-			}
+			return body;
 		}
 
 		public void Add(EncryptedChunk item) {
@@ -123,6 +102,10 @@ namespace MPM.Core.Archival {
 			return chunks.GetEnumerator();
 		}
 
+		IEnumerator IEnumerable.GetEnumerator() {
+			return chunks.GetEnumerator();
+		}
+
 		public int IndexOf(EncryptedChunk item) {
 			return chunks.IndexOf(item);
 		}
@@ -139,8 +122,25 @@ namespace MPM.Core.Archival {
 			chunks.RemoveAt(index);
 		}
 
-		IEnumerator IEnumerable.GetEnumerator() {
-			return chunks.GetEnumerator();
+		//Returns null if leading-hash verification fails
+		public async Task<byte[]> Unpack(string packageName) {
+			return await Task.Run(() => {
+				var unpacked = EnumerableEx.Concat(UnpackInternal(packageName)).ToArray();
+				var verifiedBody = VerifyLeadingHash(unpacked);
+				if (verifiedBody == null) {
+					return null;
+				}
+				return verifiedBody;
+			});
+		}
+
+		private IEnumerable<IEnumerable<byte>> UnpackInternal(string packageName) {
+			var key = System.Text.Encoding.UTF8.GetBytes(packageName);
+			foreach (var chunk in chunks) {
+				var rawChunk = chunk.Decrypt(key);
+				yield return rawChunk;
+				key = rawChunk.Hash();
+			}
 		}
 	}
 }

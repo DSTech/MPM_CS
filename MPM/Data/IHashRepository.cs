@@ -52,7 +52,7 @@ namespace MPM.Data {
 			//TODO: Switch to TPL Dataflow as described in https://msdn.microsoft.com/en-us/library/hh228603.aspx for parallelism control to prevent flooding
 			//WhenAll preserves order of provided tasks, so each value will be associated with its parent hash
 			var retrievedHashes = (await Task.WhenAll(retrievers.Select(async retriever => await retriever.Item2.Retrieve())));
-			var archive = new Core.Archival.Archive(retrievedHashes.Select(retrievedHash => new Core.Archival.EncryptedChunk(retrievedHash)));
+			var archive = new Archival.Archive(retrievedHashes.Select(retrievedHash => new Archival.EncryptedChunk(retrievedHash)));
 			return await archive.Unpack(packageName);
 		}
 	}

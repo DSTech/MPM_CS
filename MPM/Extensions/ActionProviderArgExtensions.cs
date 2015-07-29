@@ -1,3 +1,4 @@
+using MPM.ActionProviders;
 using MPM.CLI;
 
 namespace MPM.Extensions {

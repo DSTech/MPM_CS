@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Extensions;
 
 namespace MPM.Net {
 
 	public static class DTOTranslationExtensions {
-
-		private static IEnumerable<T> Denull<T>(this IEnumerable<T> enumerable) => (enumerable != null ? enumerable : Enumerable.Empty<T>());
 
 		//CompatibilityPlatform
 		public static Types.CompatibilityPlatform FromCompatibilityPlatformDTO(string platformDto) => (Types.CompatibilityPlatform)System.Enum.Parse(typeof(Types.CompatibilityPlatform), platformDto, true);

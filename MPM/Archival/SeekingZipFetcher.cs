@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
+using MPM.Extensions;
 
-namespace MPM.Core.Instances.Installation {
+namespace MPM.Archival {
 
 	public sealed class SeekingZipFetcher : IDisposable {
 		private readonly ZipFile zipFile;
@@ -16,6 +17,10 @@ namespace MPM.Core.Instances.Installation {
 				throw new ArgumentException("is not seekable", nameof(seekableStream));
 			}
 			this.zipFile = new ZipFile(seekableStream) { IsStreamOwner = true };
+		}
+
+		public void Dispose() {
+			using (zipFile) { }
 		}
 
 		public byte[] FetchFile(String path) {
@@ -34,10 +39,6 @@ namespace MPM.Core.Instances.Installation {
 				return null;
 			}
 			return zipFile.GetInputStream(entry);
-		}
-
-		public void Dispose() {
-			using (zipFile) { }
 		}
 	}
 }

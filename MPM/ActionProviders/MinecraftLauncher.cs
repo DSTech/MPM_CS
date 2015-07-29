@@ -6,7 +6,7 @@ using MPM.Core;
 using MPM.Core.Instances;
 using MPM.Core.Profiles;
 
-namespace MPM {
+namespace MPM.ActionProviders {
 
 	public class MinecraftLauncher : ILauncher, IDisposable {
 		public string UserName { get; set; }

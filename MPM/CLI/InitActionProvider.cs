@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
+using MPM.ActionProviders;
 using MPM.Core.Dependency;
 using MPM.Core.Instances;
 using MPM.Core.Instances.Cache;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MPM.CLI;
 using NServiceKit.Text;
 
-namespace MPM {
+namespace MPM.Extensions {
 
 	public static class StreamExtensions {
 

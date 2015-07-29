@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MPM.Core {
+namespace MPM.Extensions {
 
 	public static class EnumeratorExtensions {
 
