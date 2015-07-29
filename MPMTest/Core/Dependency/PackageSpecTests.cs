@@ -11,17 +11,17 @@ namespace MPMTest.Core.Dependency {
 		public void Equality() {
 			var first = new PackageSpec {
 				Name = "testPackage",
-				Version = new VersionSpec(SemanticVersion.Parse("0.0.1")),
+				VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.1")),
 				Manual = true,
 			};
 			var second = new PackageSpec {
 				Name = "testPackage",
-				Version = new VersionSpec(SemanticVersion.Parse("0.0.1")),
+				VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.1")),
 				Manual = true,
 			};
 			var third = new PackageSpec {
 				Name = "testPackage",
-				Version = new VersionSpec(SemanticVersion.Parse("0.0.2")),
+				VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.2")),
 				Manual = false,
 			};
 			Assert.Equal(first, second);

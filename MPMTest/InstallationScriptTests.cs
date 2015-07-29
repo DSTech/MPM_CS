@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
+using MPM.Archival;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Info;
 using MPM.Core.Instances.Installation;
 using MPM.Core.Instances.Installation.Scripts;
+using MPM.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Platform.VirtualFileSystem;
@@ -150,9 +152,9 @@ namespace MPMTest {
 						packageInfo = JsonConvert.DeserializeObject<RawBuildInfo>(packageJsonString);
 					}
 
-					var installationScript = packageInfo.Installation.Select(decl => decl.Parse(packageInfo.Name, packageInfo.Version)).ToArray();
+					var installationScript = packageInfo.Installation.Select(decl => decl.Parse(packageInfo.Package, packageInfo.Version.FromDTO())).ToArray();
 
-					Console.WriteLine(packageInfo.Name);
+					Console.WriteLine(packageInfo.Package);
 					Console.WriteLine(packageInfo.Version);
 					Console.WriteLine(packageInfo.GivenVersion);
 

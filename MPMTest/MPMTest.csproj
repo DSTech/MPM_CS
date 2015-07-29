@@ -179,11 +179,11 @@
   <ItemGroup>
     <Compile Include="InstallationScriptTests.cs" />
     <Compile Include="ProfileTests.cs" />
-    <Compile Include="ArchiveTests.cs" />
+    <None Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />
-    <Compile Include="Core\Dependency\ResolverTests.cs" />
+    <None Include="Core\Dependency\ResolverTests.cs" />
     <Compile Include="Core\Dependency\PackageSpecTests.cs" />
-    <Compile Include="Core\Dependency\TestPackageRepository.cs" />
+    <None Include="Core\Dependency\TestPackageRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
