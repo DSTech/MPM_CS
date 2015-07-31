@@ -233,10 +233,13 @@
     <Compile Include="Core\Dependency\Reconfiguration.cs" />
     <Compile Include="Core\Dependency\ResolutionMode.cs" />
     <Compile Include="Core\Dependency\Resolver.cs" />
-    <Compile Include="Core\Instances\Installation\ArchInstaller.cs" />
+    <Compile Include="Core\Instances\Installation\ArchInstallationProcedure.cs" />
+    <Compile Include="Core\Instances\Installation\ArchInstallationOperation.cs" />
     <Compile Include="Core\Instances\Installation\CopyFileOperation.cs" />
+    <Compile Include="Core\Instances\Installation\IArchInstallationProcedure.cs" />
+    <Compile Include="Core\Instances\Installation\SingleEntryFileMap.cs" />
+    <Compile Include="Core\Instances\Installation\DictionaryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
-    <Compile Include="Core\Instances\Installation\IArchInstaller.cs" />
     <Compile Include="Extensions\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />

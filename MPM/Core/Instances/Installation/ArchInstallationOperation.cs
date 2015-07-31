@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Archival;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Installation.Scripts;
 using MPM.Extensions;
@@ -10,14 +12,6 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
-
-	public class ArchInstaller {
-
-		private IFileMap ToFileMap(IEnumerable<ArchInstallationOperation> operations) {
-			var fileMaps = operations.Select(op => op.GenerateOperations());
-			return FileMap.MergeOrdered(fileMaps);
-		}
-	}
 
 	public abstract class ArchInstallationOperation {
 		public string PackageName { get; set; }
@@ -38,7 +32,7 @@ namespace MPM.Core.Instances.Installation {
 	internal class ExtractArchInstallationOperation : ArchInstallationOperation {
 
 		//The targetted file or the entire targetted directory will be extracted where not starting with an ignored path.
-		//Use "." to copy the entire archive.
+		//Use "" to copy the entire archive.
 		public string SourcePath { get; set; }
 
 		//Directories will be merged, files will be overwritten.
@@ -64,9 +58,23 @@ namespace MPM.Core.Instances.Installation {
 		}
 
 		public override IFileMap GenerateOperations() {
-			//Iterate each path in the archive, building a filemap of extract operations to use.
-			//TODO: Implement
-			throw new NotImplementedException();
+			//Iterate each path in the archive, building a filemap of extract operations to perform.
+			var fileMap = new DictionaryFileMap();
+			using (var zip = new SeekingZipFetcher(Cache.Fetch(CacheEntryName).FetchStream())) {
+				foreach (var entry in zip.FetchEntryInfo()) {
+					if (entry.IsDirectory) {
+						continue;
+					}
+					var entryName = entry.Name;
+					if (!entryName.StartsWith(SourcePath) || IgnorePaths.Any(ignorePath => entryName.StartsWith(ignorePath))) {
+						continue;
+					}
+					var targetPath = TargetPath + entry.Name.Substring(SourcePath.Length);
+					var exOp = new ExtractFileOperation(PackageName, PackageVersion, CacheEntryName, entryName);
+					fileMap.Register(targetPath, exOp);
+				}
+			}
+			return fileMap;
 		}
 	}
 
@@ -93,10 +101,8 @@ namespace MPM.Core.Instances.Installation {
 
 		public override IFileMap GenerateOperations() {
 			//Build an extract operation for the given archive that extracts the source.
-			var fileMap = new FileMap();
 			var exOp = new ExtractFileOperation(PackageName, PackageVersion, CachedName, SourcePath);
-			fileMap.Register(TargetPath, exOp);
-			return fileMap;
+			return new SingleEntryFileMap(TargetPath, exOp);
 		}
 	}
 
@@ -116,11 +122,9 @@ namespace MPM.Core.Instances.Installation {
 		}
 
 		public override IFileMap GenerateOperations() {
-			//Build an copy operation for the given file that copies the source to the destination.
-			var fileMap = new FileMap();
+			//Build a copy operation for the given file that copies the source to the destination.
 			var copyOp = new CopyFileOperation(PackageName, PackageVersion, CachedName);
-			fileMap.Register(TargetPath, copyOp);
-			return fileMap;
+			return new SingleEntryFileMap(TargetPath, copyOp);
 		}
 	}
 }

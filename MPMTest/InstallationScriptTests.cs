@@ -165,7 +165,7 @@ namespace MPMTest {
 							return decl.GenerateOperations();
 						}).ToArray();
 
-					var fileMap = FileMap.FromFileOperations(operationSets);
+					var fileMap = FileMap.AsMergedFileMap(operationSets);
 
 					foreach (var file in fileMap) {
 						var fileName = file.Key;

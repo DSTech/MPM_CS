@@ -23,6 +23,12 @@ namespace MPM.Archival {
 			using (zipFile) { }
 		}
 
+		public IEnumerable<ZipEntry> FetchEntryInfo() {
+			foreach (ZipEntry z in zipFile) {
+				yield return z;
+			}
+		}
+
 		public byte[] FetchFile(String path) {
 			var entry = zipFile.GetEntry(path);
 			if (entry == null) {

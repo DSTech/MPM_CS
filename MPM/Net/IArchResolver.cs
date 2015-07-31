@@ -11,8 +11,7 @@ using MPM.Core.Protocols;
 namespace MPM.Net {
 
 	public interface IArchResolver {
-		IArchInstaller Installer { get; }
 
-		IEnumerable<ArchInstallationOperation> EnsureCached(string packageName, ICacheManager cacheManager, IProtocolResolver protocolResolver);
+		IArchInstallationProcedure EnsureCached(string packageName, ICacheManager cacheManager, IProtocolResolver protocolResolver);
 	}
 }

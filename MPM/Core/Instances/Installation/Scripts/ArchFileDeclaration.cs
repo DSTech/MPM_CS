@@ -22,21 +22,19 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
 		public IReadOnlyCollection<string> Targets => new string[0];
 
-		private IArchInstaller archInstaller { get; set; }
-		private IEnumerable<ArchInstallationOperation> cacheEntries { get; set; }
+		private IArchInstallationProcedure installationProcedure { get; set; }
 
 		public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
 			IArchResolver archResolver = protocolResolver.GetArchResolver();
-			this.cacheEntries = archResolver.EnsureCached(PackageName, cacheManager, protocolResolver);
-			this.archInstaller = archResolver.Installer;
+			this.installationProcedure = archResolver.EnsureCached(PackageName, cacheManager, protocolResolver);
 		}
 
 		public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() {
-			return archInstaller.GenerateOperations(cacheEntries);
+			return installationProcedure.GenerateOperations();
 		}
 
 		public override string ToString() {
-			return $"{nameof(SourcedFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  {Source} => [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n  ]";
+			return $"{nameof(ArchFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  {Source} => [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n  ]";
 		}
 	}
 }
