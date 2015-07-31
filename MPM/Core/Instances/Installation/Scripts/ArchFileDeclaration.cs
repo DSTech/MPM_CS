@@ -5,6 +5,7 @@ using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Extensions;
 using MPM.Net;
+using MPM.Types;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
@@ -16,7 +17,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
 		public string Description { get; set; }
 
-		public byte[] Hash => null;
+		public Hash @Hash => null;
 
 		public string Source { get; set; }
 

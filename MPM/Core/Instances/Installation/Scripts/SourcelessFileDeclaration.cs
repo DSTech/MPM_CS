@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
+using MPM.Types;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
@@ -14,7 +15,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
 		public string Description { get; set; }
 
-		public byte[] Hash => null;
+		public Hash @Hash { get; set; }
 
 		public string Source => null;
 

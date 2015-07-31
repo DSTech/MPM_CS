@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
+using MPM.Types;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
@@ -28,7 +29,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 		/// <summary>
 		/// Must be specified if <see cref="Source"/> is a protocol source. May be null otherwise.
 		/// </summary>
-		Byte[] Hash { get; }
+		Hash @Hash { get; }
 
 		/// <summary>
 		/// A description for the operation; May be null.

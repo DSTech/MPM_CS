@@ -1,5 +1,6 @@
 using System;
 using MPM.Core.Instances.Installation.Scripts;
+using MPM.Types;
 using Newtonsoft.Json;
 using semver.tools;
 
@@ -9,7 +10,7 @@ namespace MPM.Core.Instances.Info {
 
 		public static IFileDeclaration Parse(this ScriptFileDeclaration declaration, String packageName, SemanticVersion packageVersion) {
 			var targets = (declaration.Target != null ? new[] { declaration.Target } : declaration.Targets ?? new String[0]);
-			var hash = (declaration.Hash != null) ? Convert.FromBase64String(declaration.Hash) : null;
+			var hash = (declaration.Hash != null) ? Hash.Parse(declaration.Hash) : null;
 
 			//Determine what type of file declaration to create depending upon class members
 			if (declaration.Source == null) {
