@@ -7,13 +7,17 @@ using semver.tools;
 namespace MPM.Core.Instances.Info {
 
 	public static class ScriptFileDeclarationExtensions {
+		public const string ProtocolSeparator = "://";
+		public const string ArchSourcePrefix = "arch";
+		public const string ArchProtocolPrefix = ArchSourcePrefix + ProtocolSeparator;
 
 		public static IFileDeclaration Parse(this ScriptFileDeclaration declaration, String packageName, SemanticVersion packageVersion) {
 			var targets = (declaration.Target != null ? new[] { declaration.Target } : declaration.Targets ?? new String[0]);
 			var hash = (declaration.Hash != null) ? Hash.Parse(declaration.Hash) : null;
 
 			//Determine what type of file declaration to create depending upon class members
-			if (declaration.Source == null) {
+			var source = declaration.Source;
+			if (source == null) {
 				if (declaration.Type != null) {
 					var sourcelessDecl = new SourcelessFileDeclaration() {
 						Description = declaration.Description,
@@ -33,16 +37,27 @@ namespace MPM.Core.Instances.Info {
 					}
 				}
 			} else {
-				if (targets.Length > 0) {
-					var sourcedDecl = new SourcedFileDeclaration() {
+				if (source.StartsWith(ArchProtocolPrefix)) {
+					var sourceArchName = source.Substring(ArchProtocolPrefix.Length);
+					var archDecl = new ArchFileDeclaration() {
 						Description = declaration.Description,
 						PackageName = packageName,
 						PackageVersion = packageVersion,
-						Targets = targets,
-						Hash = hash,
-						Source = declaration.Source,
+						Source = sourceArchName,
 					};
-					return sourcedDecl;
+					return archDecl;
+				} else {
+					if (targets.Length > 0) {
+						var sourcedDecl = new SourcedFileDeclaration() {
+							Description = declaration.Description,
+							PackageName = packageName,
+							PackageVersion = packageVersion,
+							Targets = targets,
+							Hash = hash,
+							Source = declaration.Source,
+						};
+						return sourcedDecl;
+					}
 				}
 			}
 			//TODO: Add support for other declaration types

@@ -27,12 +27,10 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
 		public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
 			IArchResolver archResolver = protocolResolver.GetArchResolver();
-			this.installationProcedure = archResolver.EnsureCached(PackageName, cacheManager, protocolResolver);
+			this.installationProcedure = archResolver.EnsureCached(Source, cacheManager, protocolResolver);
 		}
 
-		public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() {
-			return installationProcedure.GenerateOperations();
-		}
+		public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() => installationProcedure.GenerateOperations();
 
 		public override string ToString() {
 			return $"{nameof(ArchFileDeclaration)} <{PackageName}:{PackageVersion}> =>\n  {Source} => [\n{String.Join(",\n", Targets.Select(t => $"    {t}"))}\n  ]";

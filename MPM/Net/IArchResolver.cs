@@ -12,6 +12,6 @@ namespace MPM.Net {
 
 	public interface IArchResolver {
 
-		IArchInstallationProcedure EnsureCached(string packageName, ICacheManager cacheManager, IProtocolResolver protocolResolver);
+		IArchInstallationProcedure EnsureCached(string archName, ICacheManager cacheManager, IProtocolResolver protocolResolver);
 	}
 }
