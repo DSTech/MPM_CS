@@ -30,8 +30,6 @@ namespace MPM.CLI {
 
 			var packageList = await repository.FetchPackageList();
 
-			//var packageDetails = new List<Package>();
-
 			foreach (var _package in packageList) {
 				var package = repository.FetchPackage(_package.Name).WaitAndUnwrapException();
 				Console.WriteLine($"{package.Name} <{String.Join(", ", package.Authors)}>");

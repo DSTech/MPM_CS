@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Net.Protocols.Minecraft.DTO;
+using Newtonsoft.Json;
 using NServiceKit.Service;
 using NServiceKit.ServiceClient;
 using NServiceKit.ServiceClient.Web;
+using RestSharp;
+using semver.tools;
 
 namespace MPM.Net.Protocols.Minecraft {
 
@@ -22,18 +25,26 @@ namespace MPM.Net.Protocols.Minecraft {
 	}
 
 	public class MinecraftDownloadClient {
-		public readonly IServiceClient serviceClient;
+		private readonly RestClient client;
 
 		public MinecraftDownloadClient() {
-			serviceClient = new JsonServiceClient();
+			this.client = new RestClient("https://s3.amazonaws.com/Minecraft.Download/");
 		}
 
 		public async Task<MinecraftVersionCollection> FetchVersions() {
-			return await serviceClient.GetAsync<MinecraftVersionCollection>("https://s3.amazonaws.com/Minecraft.Download/versions/versions.json");
+			var req = new RestRequest("/versions/versions.json") {
+			};
+			var res = await client.ExecuteGetTaskAsync(req);
+			var data = JsonConvert.DeserializeObject<MinecraftVersionCollection>(res.Content);
+			return data;
 		}
 
 		public async Task<MinecraftVersion> FetchVersion(string versionId) {
-			return await serviceClient.GetAsync<MinecraftVersion>(String.Format("https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{0}.json", versionId));
+			var req = new RestRequest(String.Format("/versions/{0}/{0}.json", versionId)) {
+				OnBeforeDeserialization = resp => resp.ContentType = "application/json",
+			};
+			var res = await client.ExecuteGetTaskAsync<MinecraftVersion>(req);
+			return res.StatusCode == System.Net.HttpStatusCode.OK ? res.Data : null;
 		}
 
 		public async Task<MinecraftVersion> FetchLatest(bool snapshot = false) {

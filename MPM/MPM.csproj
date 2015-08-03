@@ -179,6 +179,10 @@
       <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
       <Private>True</Private>
@@ -301,12 +305,15 @@
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="JsonSerializer.cs" />
     <Compile Include="Net\DTO\Author.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
     <Compile Include="Net\DTOTranslationExtensions.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
     <Compile Include="Net\IArchResolver.cs" />
+    <Compile Include="Net\Protocols\MetaArchResolver.cs" />
+    <Compile Include="Net\Protocols\Minecraft\MinecraftArchResolver.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTOTranslationExtensions.cs" />
     <Compile Include="Types\Arch.cs" />
     <Compile Include="Types\Author.cs" />

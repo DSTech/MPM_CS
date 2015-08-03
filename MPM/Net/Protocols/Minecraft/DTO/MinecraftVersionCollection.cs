@@ -12,6 +12,7 @@ namespace MPM.Net.Protocols.Minecraft.DTO {
 		public string Release { get; set; }
 	}
 
+	[Newtonsoft.Json.JsonObject]
 	public class MinecraftVersionCollection : ICollection<MinecraftVersion> {
 
 		public MinecraftVersionLatestSpec Latest { get; set; } = new MinecraftVersionLatestSpec {

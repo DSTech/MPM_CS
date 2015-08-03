@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using MPM.CLI;
+using MPM.Net.Protocols.Minecraft;
 using Newtonsoft.Json;
+using Nito.AsyncEx.Synchronous;
 using PowerArgs;
 
 namespace MPM {
@@ -9,6 +11,9 @@ namespace MPM {
 	public class Program {
 
 		public static void Main(string[] args) {
+			var mdc = new MinecraftDownloadClient();
+			var latestSnapshot = mdc.FetchLatestSnapshot().WaitAndUnwrapException();
+			Console.WriteLine(latestSnapshot);
 			ArgAction<LaunchArgs> parsed;
 			try {
 				parsed = Args.ParseAction<LaunchArgs>(args);
