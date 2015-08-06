@@ -13,53 +13,53 @@ namespace MPM.Net.Protocols.Minecraft.DTO {
 	}
 
 	[Newtonsoft.Json.JsonObject]
-	public class MinecraftVersionCollection : ICollection<MinecraftVersion> {
+	public class MinecraftVersionCollection : ICollection<MinecraftVersionListing> {
 
 		public MinecraftVersionLatestSpec Latest { get; set; } = new MinecraftVersionLatestSpec {
 			Release = null,
 			Snapshot = null,
 		};
 
-		public MinecraftVersion[] Versions { get; set; } = new MinecraftVersion[0];
+		public MinecraftVersionListing[] Versions { get; set; } = new MinecraftVersionListing[0];
 
 		public int Count {
 			get {
-				return ((ICollection<MinecraftVersion>)Versions).Count;
+				return ((ICollection<MinecraftVersionListing>)Versions).Count;
 			}
 		}
 
 		public bool IsReadOnly {
 			get {
-				return ((ICollection<MinecraftVersion>)Versions).IsReadOnly;
+				return ((ICollection<MinecraftVersionListing>)Versions).IsReadOnly;
 			}
 		}
 
-		public void Add(MinecraftVersion item) {
-			((ICollection<MinecraftVersion>)Versions).Add(item);
+		public void Add(MinecraftVersionListing item) {
+			((ICollection<MinecraftVersionListing>)Versions).Add(item);
 		}
 
 		public void Clear() {
-			((ICollection<MinecraftVersion>)Versions).Clear();
+			((ICollection<MinecraftVersionListing>)Versions).Clear();
 		}
 
-		public bool Contains(MinecraftVersion item) {
-			return ((ICollection<MinecraftVersion>)Versions).Contains(item);
+		public bool Contains(MinecraftVersionListing item) {
+			return ((ICollection<MinecraftVersionListing>)Versions).Contains(item);
 		}
 
-		public void CopyTo(MinecraftVersion[] array, int arrayIndex) {
-			((ICollection<MinecraftVersion>)Versions).CopyTo(array, arrayIndex);
+		public void CopyTo(MinecraftVersionListing[] array, int arrayIndex) {
+			((ICollection<MinecraftVersionListing>)Versions).CopyTo(array, arrayIndex);
 		}
 
-		public IEnumerator<MinecraftVersion> GetEnumerator() {
-			return ((ICollection<MinecraftVersion>)Versions).GetEnumerator();
+		public IEnumerator<MinecraftVersionListing> GetEnumerator() {
+			return ((ICollection<MinecraftVersionListing>)Versions).GetEnumerator();
 		}
 
-		public bool Remove(MinecraftVersion item) {
-			return ((ICollection<MinecraftVersion>)Versions).Remove(item);
+		public bool Remove(MinecraftVersionListing item) {
+			return ((ICollection<MinecraftVersionListing>)Versions).Remove(item);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
-			return ((ICollection<MinecraftVersion>)Versions).GetEnumerator();
+			return ((ICollection<MinecraftVersionListing>)Versions).GetEnumerator();
 		}
 	}
 }

@@ -36,7 +36,8 @@ namespace RestSharp.Serializers {
 			_serializer = new Newtonsoft.Json.JsonSerializer {
 				MissingMemberHandling = MissingMemberHandling.Ignore,
 				NullValueHandling = NullValueHandling.Include,
-				DefaultValueHandling = DefaultValueHandling.Include
+				DefaultValueHandling = DefaultValueHandling.Include,
+				TypeNameHandling = TypeNameHandling.Auto,
 			};
 		}
 
