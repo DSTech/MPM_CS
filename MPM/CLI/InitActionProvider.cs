@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using MPM.ActionProviders;
+using MPM.Core;
 using MPM.Core.Dependency;
 using MPM.Core.Instances;
 using MPM.Core.Instances.Cache;
+using MPM.Core.Instances.Installation;
 using MPM.Core.Protocols;
 using MPM.Data;
 using MPM.Types;
@@ -46,7 +48,7 @@ namespace MPM.CLI {
 			Console.WriteLine("Creating instance...");
 			SemanticVersion instanceArch;
 			if (args.Arch == "latest") {
-				instanceArch = SemanticVersion.Parse("1.8.4");
+				instanceArch = SemanticVersion.Parse("1.8.8");
 			} else {
 				instanceArch = SemanticVersion.Parse(args.Arch);
 			}
@@ -143,6 +145,32 @@ namespace MPM.CLI {
 			Console.WriteLine("Attempting to resolve packages...");
 			var resolvedArchConfiguration = await resolver.Resolve(archConfiguration, repository);
 			Console.WriteLine("Configuration resolved.");
+
+			var cacheManager = factory.Resolve<ICacheManager>();
+			var hashRepository = factory.Resolve<IHashRepository>();
+
+			instance.Configuration = resolvedArchConfiguration;
+
+			foreach (var package in resolvedArchConfiguration.Packages) {
+				var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}_{package.Platform}";
+				if (cacheManager.Contains(cacheEntryName)) {
+					Console.WriteLine("Package {0} already cached.", package.PackageName);
+					continue;
+				}
+				Console.WriteLine("Downloading package {0} to cache...", package.PackageName);
+				var packageArchive = await hashRepository.RetrieveArchive(package.PackageName, package.Hashes);
+				cacheManager.Store(cacheEntryName, packageArchive);
+			}
+
+			var installer = new Installer(
+				instance,
+				repository,
+				factory.Resolve<IHashRepository>(),
+				cacheManager,
+				factory.Resolve<IProtocolResolver>()
+			);
+
+			await installer.Install(resolvedArchConfiguration);
 
 			//var cacheManager = factory.Resolve<ICacheManager>();
 			//var protocolResolver = factory.Resolve<IProtocolResolver>();

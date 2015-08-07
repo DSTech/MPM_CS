@@ -26,7 +26,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 		private IArchInstallationProcedure installationProcedure { get; set; }
 
 		public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
-			IArchResolver archResolver = protocolResolver.GetArchResolver();
+			var archResolver = protocolResolver.GetArchResolver();
 			this.installationProcedure = archResolver.EnsureCached(Source, PackageVersion, cacheManager, protocolResolver);
 		}
 

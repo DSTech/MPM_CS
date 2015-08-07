@@ -21,7 +21,7 @@ namespace MPM.Net.Protocols.Minecraft {
 			var operations = new List<ArchInstallationOperation>();
 			foreach (var lib in libsToInstall) {
 				var appliedNatives = lib.ApplyNatives(MPM.Types.CompatibilityPlatform.Win64);
-                var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{"_" + appliedNatives ?? "_u"}";
+				var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{"_" + appliedNatives ?? "_u"}";
 				var cacheOp = GenerateOp(archVersion, lib, appliedNatives, cacheEntryName, cacheManager);
 				operations.Add(cacheOp);
 				if (cacheManager.Contains(cacheEntryName)) {

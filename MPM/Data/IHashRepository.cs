@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MPM.Types;
 
 namespace MPM.Data {
 
@@ -27,8 +28,12 @@ namespace MPM.Data {
 		/// <returns>A byte array of the unpacked archive.</returns>
 		/// <exception cref="KeyNotFoundException">Thrown when a package could not be resolved to an archive or retrieved.</exception>
 		/// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
-		public static async Task<byte[]> RetrieveArchive(this IHashRepository hashRepository, string packageName, string[] hashes) {
-			var hashRetrievers = await hashRepository.Resolve(hashes);
+		public static async Task<byte[]> RetrieveArchive(this IHashRepository hashRepository, string packageName, IEnumerable<Hash> hashes) {
+			var hashStrings = hashes.Select(hash => hash.Checksum).ToArray();
+			if (hashStrings.Length == 0) {
+				throw new ArgumentOutOfRangeException(nameof(hashes), "hash array contained no elements");
+			}
+			var hashRetrievers = await hashRepository.Resolve(hashStrings);
 			var retrievers = hashes.Zip(hashRetrievers, (hash, retriever) => Tuple.Create(hash, retriever));
 			{
 				var failedResolutions = retrievers.Where(retr => retr.Item2 == null).ToArray();
@@ -44,7 +49,7 @@ namespace MPM.Data {
 							)
 						),
 						new AggregateException(
-							failedResolutions.Select(failedResolution => new KeyNotFoundException(failedResolution.Item1))//An exception is created with each hash that could not be located.
+							failedResolutions.Select(failedResolution => new KeyNotFoundException(failedResolution.Item1.ToString()))//An exception is created with each hash that could not be located.
 						)
 					);//Outputs a json-esque array to allow easy export by a user alongside an aggregate containing a more easily computer-understandable output
 				}

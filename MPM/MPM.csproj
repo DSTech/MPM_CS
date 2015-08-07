@@ -329,6 +329,7 @@
     <Compile Include="Net\Protocols\Minecraft\Types\MinecraftVersionListing.cs" />
     <Compile Include="Net\Protocols\Minecraft\Types\ReleaseType.cs" />
     <Compile Include="Net\Protocols\Minecraft\Types\MinecraftVersion.cs" />
+    <Compile Include="VersionConverter.cs" />
     <Compile Include="Types\Arch.cs" />
     <Compile Include="Types\Author.cs" />
     <Compile Include="Types\Build.cs" />

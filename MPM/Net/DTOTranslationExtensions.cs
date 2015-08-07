@@ -66,7 +66,12 @@ namespace MPM.Net {
 		public static Types.Package FromDTO(this DTO.Package package) => new Types.Package(
 			package.Name,
 			package.Authors.Denull().Select(author => author.FromDTO()),
-			package.Builds.Denull().Select(build => build.FromDTO())
+			package.Builds.Denull().Select(b => {
+				if (b.Package == null) {
+					b.Package = package.Name;
+				}
+				return b;
+			}).Select(build => build.FromDTO())
 		);
 
 		public static DTO.Package ToDTO(this Types.Package package) => new DTO.Package {
@@ -81,7 +86,7 @@ namespace MPM.Net {
 			build.Version.FromDTO(),
 			build.GivenVersion,
 			FromArchDTO(build.Arch),
-			FromCompatibilityPlatformDTO(build.Platform),
+			build.Platform != null ? FromCompatibilityPlatformDTO(build.Platform) : Types.CompatibilityPlatform.Universal,
 			FromDTO(build.Side),
 			build.Interfaces.Denull().Select(interfaceProvision => interfaceProvision.FromDTO()),
 			build.Dependencies?.Interfaces.Denull().Select(interfaceDependency => interfaceDependency.FromDTO()),

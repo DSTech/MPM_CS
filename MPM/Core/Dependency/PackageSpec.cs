@@ -20,6 +20,26 @@ namespace MPM.Core.Dependency {
 			}.PopulateWithNonDefaultValues(dependency);
 		}
 
+		public static bool IsPlatformCompatible(CompatibilityPlatform package, CompatibilityPlatform environment) {
+			if (package == environment) {
+				return true;
+			}
+			switch (package) {
+				case CompatibilityPlatform.Universal:
+					return true;
+				case CompatibilityPlatform.Universal32:
+					return environment == CompatibilityPlatform.Universal32 || environment == CompatibilityPlatform.Win32 || environment == CompatibilityPlatform.Lin32;
+				case CompatibilityPlatform.Universal64:
+					return environment == CompatibilityPlatform.Universal64 || environment == CompatibilityPlatform.Win64 || environment == CompatibilityPlatform.Lin64;
+				case CompatibilityPlatform.Lin:
+					return environment == CompatibilityPlatform.Lin || environment == CompatibilityPlatform.Lin32 || environment == CompatibilityPlatform.Lin64;
+				case CompatibilityPlatform.Win:
+					return environment == CompatibilityPlatform.Win || environment == CompatibilityPlatform.Win32 || environment == CompatibilityPlatform.Win64;
+				default:
+					return false;
+			}
+		}
+
 		/// <summary>
 		/// Checks if a build satisfies the given specification.
 		/// </summary>
@@ -28,8 +48,8 @@ namespace MPM.Core.Dependency {
 		/// <returns></returns>
 		public static bool Satisfies(this PackageSpec spec, Build build) {
 			return spec.Name == build.PackageName
-				&& spec.Arch == build.Arch
-				&& spec.Platform == build.Platform
+				//&& spec.Arch == build.Arch//TODO: Add ARCH to the API
+				&& IsPlatformCompatible(build.Platform, spec.Platform)
 				&& (
 					spec.Side == build.Side || build.Side == CompatibilitySide.Universal
 				)
@@ -44,9 +64,11 @@ namespace MPM.Core.Dependency {
 		/// <returns>Builds in descending order of version</returns>
 		/// <remarks>Should be converted to return IQueryable to allow optimized behavior with constraint lookup</remarks>
 		public static async Task<IEnumerable<Build>> LookupSpec(this IPackageRepository repository, PackageSpec packageSpec) {
-			var package = await repository.FetchBuilds(packageSpec.Name, packageSpec.VersionSpec);
-			return package
-				.Where(b => packageSpec.Satisfies(b));
+			var builds = (await repository.FetchBuilds(packageSpec.Name, packageSpec.VersionSpec))
+				.ToArray();
+			return builds
+				.Where(b => packageSpec.Satisfies(b))
+				.ToArray();
 		}
 	}
 

@@ -9,7 +9,11 @@ using MPM.Core;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Profiles;
+using MPM.Core.Protocols;
 using MPM.Data;
+using MPM.Net;
+using MPM.Net.Protocols.Minecraft;
+using MPM.Types;
 
 namespace MPM.CLI {
 
@@ -25,6 +29,7 @@ namespace MPM.CLI {
 			RegisterPackageRepository(ref cb);
 			RegisterHashStore(ref cb);
 			RegisterDependencyResolver(ref cb);//Consider auto-registering hashstores and packagerepo in an "IConfiguredResolver" interface?
+			RegisterProtocolResolver(ref cb);
 
 			var container = cb.Build();
 			Debug.Assert(container.IsRegistered<GlobalStorage>());
@@ -32,9 +37,12 @@ namespace MPM.CLI {
 			Debug.Assert(container.IsRegistered<IMetaDataManager>());
 			Debug.Assert(container.IsRegistered<IProfileManager>());
 			Debug.Assert(container.IsRegistered<ICacheManager>());
+			Debug.Assert(container.IsRegistered<ICacheReader>());
+			Debug.Assert(container.IsRegistered<ICacheWriter>());
 			Debug.Assert(container.IsRegistered<IResolver>());
 			Debug.Assert(container.IsRegistered<IPackageRepository>());
 			Debug.Assert(container.IsRegistered<IHashRepository>());
+			Debug.Assert(container.IsRegistered<IProtocolResolver>());
 			return container;
 		}
 
@@ -56,11 +64,37 @@ namespace MPM.CLI {
 		}
 
 		private void RegisterCache(ref ContainerBuilder cb) {
-			cb.Register<ICacheManager>(ctxt => ctxt.Resolve<GlobalStorage>().FetchGlobalCache()).SingleInstance();
+			cb
+				.Register(ctxt => ctxt.Resolve<GlobalStorage>().FetchGlobalCache())
+				.As<ICacheManager>()
+				.As<ICacheReader>()
+				.As<ICacheWriter>()
+				.SingleInstance();
 		}
 
 		private void RegisterDependencyResolver(ref ContainerBuilder cb) {
 			cb.Register<IResolver>(ctxt => new Resolver()).SingleInstance();
+		}
+
+		private class CLIProtocolResolver : IProtocolResolver {
+			public CLIProtocolResolver(IHashRepository hashRepository) {
+
+			}
+
+			private IHashRepository HashRepository { get; }
+
+			public IArchResolver GetArchResolver() => new MetaArchInstaller();
+
+			public byte[] Resolve(string protocol, string path, Hash hash) {
+				switch (protocol) {
+					default:
+						throw new NotSupportedException($"Protocol {protocol} is not supported by {nameof(CLIProtocolResolver)}");
+				}
+			}
+		}
+
+		private void RegisterProtocolResolver(ref ContainerBuilder cb) {
+			cb.Register<IProtocolResolver>(ctxt => new CLIProtocolResolver(ctxt.Resolve<IHashRepository>())).SingleInstance();
 		}
 
 		private void RegisterPackageRepository(ref ContainerBuilder cb) {

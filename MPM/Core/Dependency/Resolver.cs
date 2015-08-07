@@ -48,7 +48,7 @@ namespace MPM.Core.Dependency {
 
 		public async Task<IReadOnlyCollection<Build>> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
 			var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
-			var namedBuilds = await repository.LookupSpec(packageSpec);
+			var namedBuilds = (await repository.LookupSpec(packageSpec)).ToArray();
 			Build[] result;
 			switch (resolutionMode) {
 				case ResolutionMode.Highest:
