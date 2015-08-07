@@ -245,7 +245,7 @@ add_route( function( conn, package_name ) {
                 if( err )
                     return conn.mysql_error( err );
 
-                pkg.authors = rows.map( function(x) { return x.author } );
+                pkg.authors = rows.map( function(x) { return { email: x.author } } );
                 finish();
             }
         );
