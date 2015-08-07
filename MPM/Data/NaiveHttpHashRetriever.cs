@@ -29,7 +29,8 @@ namespace MPM.Data {
 
 		public async Task<Stream> RetrieveStream() {
 			var req = WebRequest.CreateHttp(this.@Uri);
-			return await req.GetRequestStreamAsync();
+			var res = await req.GetResponseAsync();
+			return new DisposerStreamWrapper(res.GetResponseStream(), res);
 		}
 	}
 }

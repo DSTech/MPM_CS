@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Net.Protocols.Minecraft.Types;
@@ -60,13 +62,16 @@ namespace MPM.Net.Protocols.Minecraft {
 		/// <param name="nativeVariant">'${arch}' tag should already be replaced within this string with '32' or '64'</param>
 		/// <returns></returns>
 		public async Task<Stream> FetchLibrary(string package, string name, string version, string nativeVariant = null) {
+			const string baseUrl = "https://libraries.minecraft.net";
+			string url;
 			if (!String.IsNullOrWhiteSpace(nativeVariant)) {
-				//https://libraries.minecraft.net/<package>/<name>/<version>/<name>-<version>-<native>.jar
+				url = $"{baseUrl}/{package}/{name}/{version}/{name}-{version}-{nativeVariant}.jar";
 			} else {
-				//https://libraries.minecraft.net/<package>/<name>/<version>/<name>-<version>.jar
+				url = $"{baseUrl}/{package}/{name}/{version}/{name}-{version}.jar";
 			}
-			await Task.Yield();
-			throw new NotImplementedException();
+			var req = WebRequest.Create(url);
+			var res = await req.GetResponseAsync();
+			return new DisposerStreamWrapper(res.GetResponseStream(), res);
 		}
 	}
 }

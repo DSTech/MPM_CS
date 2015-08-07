@@ -36,6 +36,8 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 		/// </summary>
 		public LibraryNativesSpec Natives { get; }
 
+		public string ApplyNatives(CompatibilityPlatform platform) => Natives?.AppliedTo(platform);
+
 		/// <summary>
 		/// A description of how a package should be extracted, with optional exclusions
 		/// </summary>

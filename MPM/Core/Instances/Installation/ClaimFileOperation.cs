@@ -28,5 +28,7 @@ namespace MPM.Core.Instances.Installation {
 		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
 			//A no-op
 		}
+
+		public override string ToString() => $"<Claim>";
 	}
 }

@@ -38,10 +38,11 @@ namespace MPM.Core {
 			{
 				var curVersion = Convert.ToInt32(Version);
 				var req = WebRequest.Create("http://files.minecraftforge.net/");
-				var res = req.GetResponse();
 				string text;
-				using (var textReader = new StreamReader(res.GetResponseStream())) {
-					text = textReader.ReadToEnd();
+				using (var res = req.GetResponse()) {
+					using (var textReader = new StreamReader(res.GetResponseStream())) {
+						text = textReader.ReadToEnd();
+					}
 				}
 				var regex = new Regex(@"(\d+)\.(\d+)\.(\d+)\.(\d+)");
 				var matches = regex.Matches(text);

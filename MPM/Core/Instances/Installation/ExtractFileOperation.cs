@@ -69,5 +69,7 @@ namespace MPM.Core.Instances.Installation {
 				}
 			}
 		}
+
+		public override string ToString() => $"<Extract {ArchiveCacheEntry}>";
 	}
 }

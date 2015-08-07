@@ -28,6 +28,9 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 				case CompatibilityPlatform.Win:
 				case CompatibilityPlatform.Win32:
 				case CompatibilityPlatform.Win64:
+					if (String.IsNullOrWhiteSpace(Windows)) {
+						return null;
+					}
 					if (Windows.Contains("${arch}")) {
 						if (platform == CompatibilityPlatform.Win) {
 							throw new ArgumentOutOfRangeException(nameof(platform), $"Bitness-inspecific natives are not available for spec {Windows}");
@@ -39,7 +42,10 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 				case CompatibilityPlatform.Lin:
 				case CompatibilityPlatform.Lin32:
 				case CompatibilityPlatform.Lin64:
-					if (Windows.Contains("${arch}")) {
+					if (String.IsNullOrWhiteSpace(Linux)) {
+						return null;
+					}
+					if (Linux.Contains("${arch}")) {
 						if (platform == CompatibilityPlatform.Lin) {
 							throw new ArgumentOutOfRangeException(nameof(platform), $"Bitness-inspecific natives are not available for spec {Linux}");
 						}

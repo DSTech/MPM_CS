@@ -4,8 +4,12 @@ using System.Linq;
 namespace MPM.Core.Instances.Installation {
 
 	public class ArchInstallationProcedure : IArchInstallationProcedure {
-		public IEnumerable<ArchInstallationOperation> operations { get; set; }
+		public IEnumerable<ArchInstallationOperation> Operations { get; }
 
-		public IFileMap GenerateOperations() => FileMap.MergeOrdered(operations.Select(op => op.GenerateOperations()));
+		public ArchInstallationProcedure(IEnumerable<ArchInstallationOperation> operations) {
+			this.Operations = operations;
+		}
+
+		public IFileMap GenerateOperations() => FileMap.MergeOrdered(Operations.Select(op => op.GenerateOperations()));
 	}
 }

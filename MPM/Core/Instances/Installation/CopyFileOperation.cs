@@ -53,5 +53,7 @@ namespace MPM.Core.Instances.Installation {
 				entryStream.CopyTo(fileWriter);
 			}
 		}
+
+		public override string ToString() => $"<Copy {CacheEntryName}>";
 	}
 }

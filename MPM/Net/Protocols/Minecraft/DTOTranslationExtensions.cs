@@ -15,7 +15,7 @@ namespace MPM.Net.Protocols.Minecraft {
 			return new MinecraftVersion(
 				dto.Id,
 				DateTime.ParseExact(dto.ReleaseTime ?? dto.Time, "yyyy'-'MM'-'dd'T'HH':'mm':'sszzz", System.Globalization.CultureInfo.InvariantCulture).ToUniversalTime(),
-				dto.Type == "release" ? ReleaseType.Release : ReleaseType.Snapshot,
+				ReleaseTypeEx.FromString(dto.Type),
 				dto.MinecraftArguments,
 				dto.MinimumLauncherVersion,
 				dto.Assets,
@@ -29,7 +29,7 @@ namespace MPM.Net.Protocols.Minecraft {
 				Id = obj.Id,
 				Time = releaseTime,
 				ReleaseTime = releaseTime,
-				Type = (obj.Type == ReleaseType.Release ? "release" : "snapshot"),
+				Type = obj.Type.ToDTO(),
 				MinecraftArguments = obj.MinecraftArguments,
 				MinimumLauncherVersion = obj.MinimumLauncherVersion,
 				Assets = obj.AssetsIdentifier,
@@ -42,7 +42,7 @@ namespace MPM.Net.Protocols.Minecraft {
 			return new MinecraftVersionListing(
 				dto.Id,
 				DateTime.ParseExact(dto.ReleaseTime ?? dto.Time, "yyyy'-'MM'-'dd'T'HH':'mm':'sszzz", System.Globalization.CultureInfo.InvariantCulture).ToUniversalTime(),
-				dto.Type == "snapshot" ? ReleaseType.Snapshot : ReleaseType.Release
+				ReleaseTypeEx.FromString(dto.Type)
 			);
 		}
 
@@ -52,7 +52,7 @@ namespace MPM.Net.Protocols.Minecraft {
 				Id = obj.Id,
 				Time = releaseTime,
 				ReleaseTime = releaseTime,
-				Type = (obj.Type == ReleaseType.Snapshot ? "snapshot" : "release"),
+				Type = obj.Type.ToDTO(),
 			};
 		}
 
@@ -84,7 +84,7 @@ namespace MPM.Net.Protocols.Minecraft {
 		public static LibrarySpec FromDTO(this DTO.LibrarySpec dto) {
 			var splitName = dto.Name.Split(new[] { ':' }, 3);
 			return new LibrarySpec(
-				package: splitName[0],
+				package: splitName[0].Replace('.', '/'),
 				name: splitName[1],
 				version: splitName[2],
 				extractSpec: dto.Extract.FromDTO(),
@@ -190,14 +190,14 @@ namespace MPM.Net.Protocols.Minecraft {
 			}
 			string name = null;
 			{
-				var osFilter = (LibraryRuleFilterOS)obj.FirstOrDefault(rule => rule is LibraryRuleFilterOS);
+				var osFilter = (LibraryRuleFilterOS)obj.OfType<LibraryRuleFilterOS>().FirstOrDefault();
 				if (osFilter != null) {
 					name = osFilter.OS;
 				}
 			}
 			string version = null;
 			{
-				var osVersionFilter = (LibraryRuleFilterOSVersion)obj.FirstOrDefault(rule => rule is LibraryRuleFilterOSVersion);
+				var osVersionFilter = (LibraryRuleFilterOSVersion)obj.OfType<LibraryRuleFilterOSVersion>().FirstOrDefault();
 				if (osVersionFilter != null) {
 					version = osVersionFilter.Version;
 				}

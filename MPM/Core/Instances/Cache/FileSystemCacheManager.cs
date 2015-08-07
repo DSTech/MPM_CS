@@ -11,14 +11,15 @@ namespace MPM.Core.Instances.Cache {
 
 		private IEnumerable<string> cacheEntryPaths => Directory.GetFiles(cachePath);
 
+		public FileSystemCacheManager(string cachePath) {
+			this.cachePath = cachePath;
+			Directory.CreateDirectory(cachePath);
+		}
+
 		private void ValidateEntryPath(string cacheEntryName) {
 			if (cacheEntryName.Contains("..") || cacheEntryName.Contains(":/") || cacheEntryName.StartsWith("/")) {
 				throw new InvalidOperationException("No parent directory access allowed.");
 			}
-		}
-
-		public FileSystemCacheManager(string cachePath) {
-			this.cachePath = cachePath;
 		}
 
 		public IEnumerable<ICacheEntry> Entries {
@@ -52,7 +53,9 @@ namespace MPM.Core.Instances.Cache {
 
 		public void Store(string cacheEntryName, byte[] entryData) {
 			ValidateEntryPath(cacheEntryName);
-			File.WriteAllBytes(Path.Combine(cachePath, cacheEntryName), entryData);
+			var itemPath = Path.Combine(cachePath, cacheEntryName);
+			Directory.CreateDirectory(Path.GetDirectoryName(itemPath));
+			File.WriteAllBytes(itemPath, entryData);
 		}
 	}
 }
