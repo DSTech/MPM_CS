@@ -17,28 +17,6 @@ namespace MPM.Archival {
 			this.chunks = new List<EncryptedChunk>(chunks);
 		}
 
-		public int Count {
-			get {
-				return chunks.Count;
-			}
-		}
-
-		public bool IsReadOnly {
-			get {
-				return chunks.IsReadOnly;
-			}
-		}
-
-		public EncryptedChunk this[int index] {
-			get {
-				return chunks[index];
-			}
-
-			set {
-				chunks[index] = value;
-			}
-		}
-
 		public static byte[] ApplyLeadingHash(byte[] contents) {
 			byte[] leadingHash;
 			using (var sha256 = new SHA256Managed()) {
@@ -69,7 +47,11 @@ namespace MPM.Archival {
 			return await Task.Run(() => new Archive(encryptedChunks)).ConfigureAwait(false);
 		}
 
+		//Returns null if leading-hash doesn't match the body
 		public static byte[] VerifyLeadingHash(byte[] contents) {
+			if (contents.Length < sizeof(Int16)) {
+				throw new ArgumentOutOfRangeException(nameof(contents), "provided contents were too short");
+			}
 			var contentsEnumr = contents.AsEnumerable().GetEnumerator();
 			var leadingHashLength = BitConverter.ToInt16(contentsEnumr.Take(2).ToArray(), 0);
 			var leadingHash = contentsEnumr.Take(leadingHashLength).ToArray();
@@ -82,54 +64,13 @@ namespace MPM.Archival {
 			return body;
 		}
 
-		public void Add(EncryptedChunk item) {
-			chunks.Add(item);
-		}
-
-		public void Clear() {
-			chunks.Clear();
-		}
-
-		public bool Contains(EncryptedChunk item) {
-			return chunks.Contains(item);
-		}
-
-		public void CopyTo(EncryptedChunk[] array, int arrayIndex) {
-			chunks.CopyTo(array, arrayIndex);
-		}
-
-		public IEnumerator<EncryptedChunk> GetEnumerator() {
-			return chunks.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() {
-			return chunks.GetEnumerator();
-		}
-
-		public int IndexOf(EncryptedChunk item) {
-			return chunks.IndexOf(item);
-		}
-
-		public void Insert(int index, EncryptedChunk item) {
-			chunks.Insert(index, item);
-		}
-
-		public bool Remove(EncryptedChunk item) {
-			return chunks.Remove(item);
-		}
-
-		public void RemoveAt(int index) {
-			chunks.RemoveAt(index);
-		}
-
-		//Returns null if leading-hash verification fails
 		public async Task<byte[]> Unpack(string packageName) {
+			if (chunks.Count == 0) {
+				throw new InvalidOperationException("No chunks to decrypt in archive");
+			}
 			return await Task.Run(() => {
 				var unpacked = EnumerableEx.Concat(UnpackInternal(packageName)).ToArray();
 				var verifiedBody = VerifyLeadingHash(unpacked);
-				if (verifiedBody == null) {
-					return null;
-				}
 				return verifiedBody;
 			});
 		}
@@ -142,5 +83,42 @@ namespace MPM.Archival {
 				key = rawChunk.Hash();
 			}
 		}
+
+		#region IList
+
+		public int Count => chunks.Count;
+
+		public bool IsReadOnly => chunks.IsReadOnly;
+
+		public EncryptedChunk this[int index] {
+			get {
+				return chunks[index];
+			}
+			set {
+				chunks[index] = value;
+			}
+		}
+
+		public void Add(EncryptedChunk item) => chunks.Add(item);
+
+		public void Clear() => chunks.Clear();
+
+		public bool Contains(EncryptedChunk item) => chunks.Contains(item);
+
+		public void CopyTo(EncryptedChunk[] array, int arrayIndex) => chunks.CopyTo(array, arrayIndex);
+
+		public IEnumerator<EncryptedChunk> GetEnumerator() => chunks.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => chunks.GetEnumerator();
+
+		public int IndexOf(EncryptedChunk item) => chunks.IndexOf(item);
+
+		public void Insert(int index, EncryptedChunk item) => chunks.Insert(index, item);
+
+		public bool Remove(EncryptedChunk item) => chunks.Remove(item);
+
+		public void RemoveAt(int index) => chunks.RemoveAt(index);
+
+		#endregion
 	}
 }

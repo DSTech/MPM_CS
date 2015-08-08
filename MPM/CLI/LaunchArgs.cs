@@ -48,28 +48,22 @@ namespace MPM.CLI {
 		[ArgActionMethod]
 		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("i"), ArgShortcut("--init")]
 		public void Init(InitArgs args) {
-			using (var factory = new CLIFactory().GenerateResolver()) {
-				var initActionProvider = new InitActionProvider();
-				initActionProvider.Provide(factory, args);
-			}
+			var initActionProvider = new InitActionProvider();
+			initActionProvider.Provide(Resolver, args);
 		}
 
 		[ArgActionMethod]
 		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("list"), ArgShortcut("--list")]
 		public void ListPackages(ListArgs args) {
-			using (var factory = new CLIFactory().GenerateResolver()) {
-				var listActionProvider = new ListActionProvider();
-				listActionProvider.Provide(factory, args);
-			}
+			var listActionProvider = new ListActionProvider();
+			listActionProvider.Provide(Resolver, args);
 		}
 
 		/*[ArgActionMethod]
 		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("s"), ArgShortcut("--sync")]
 		public void Sync(InitArgs args) {
-			using (var factory = new CLIFactory().GenerateResolver()) {
-				var syncActionProvider = new SyncActionProvider();
-				syncActionProvider.Provide(factory, args);
-			}
+			var syncActionProvider = new SyncActionProvider();
+			syncActionProvider.Provide(Resolver, args);
 		}*/
 
 		[ArgActionMethod]
