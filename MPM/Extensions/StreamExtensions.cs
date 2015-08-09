@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MPM.CLI;
-using NServiceKit.Text;
 
 namespace MPM.Extensions {
 

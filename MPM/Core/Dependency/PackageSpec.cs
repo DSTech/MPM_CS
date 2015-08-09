@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Types;
-using NServiceKit.Common;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
@@ -13,11 +12,13 @@ namespace MPM.Core.Dependency {
 	public static class PackageSpecExtensions {
 
 		public static PackageSpec ToSpec(this PackageDependency dependency, Arch arch, CompatibilityPlatform platform, bool manual = false) {
-			return new PackageSpec {
+			var spec = new PackageSpec {
 				Manual = manual,
 				Arch = arch,
 				Platform = platform,
-			}.PopulateWithNonDefaultValues(dependency);
+			};
+			AutoMapper.Mapper.DynamicMap(dependency, spec);
+			return spec;
 		}
 
 		public static bool IsPlatformCompatible(CompatibilityPlatform package, CompatibilityPlatform environment) {

@@ -8,9 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Net.Protocols.Minecraft.Types;
 using Newtonsoft.Json;
-using NServiceKit.Service;
-using NServiceKit.ServiceClient;
-using NServiceKit.ServiceClient.Web;
 using RestSharp;
 using semver.tools;
 
