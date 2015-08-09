@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Types;
+using Omu.ValueInjecter;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
@@ -17,7 +18,7 @@ namespace MPM.Core.Dependency {
 				Arch = arch,
 				Platform = platform,
 			};
-			AutoMapper.Mapper.DynamicMap(dependency, spec);
+			spec.InjectFrom(dependency);
 			return spec;
 		}
 
