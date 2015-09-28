@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Types;
-using Omu.ValueInjecter;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
@@ -17,8 +16,10 @@ namespace MPM.Core.Dependency {
 				Manual = manual,
 				Arch = arch,
 				Platform = platform,
+				Name = dependency.PackageName,
+				Side = dependency.Side,
+				VersionSpec = dependency.VersionSpec,
 			};
-			spec.InjectFrom(dependency);
 			return spec;
 		}
 
