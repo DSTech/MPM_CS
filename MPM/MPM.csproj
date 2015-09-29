@@ -221,7 +221,7 @@
     <Compile Include="Core\Instances\Installation\SingleEntryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\DictionaryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
-    <Compile Include="Data\RapterUntypedKeyValueStore.cs" />
+    <Compile Include="Data\RaptorUntypedKeyValueStore.cs" />
     <Compile Include="DisposerStreamWrapper.cs" />
     <Compile Include="Extensions\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
