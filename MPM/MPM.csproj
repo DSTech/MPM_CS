@@ -115,8 +115,8 @@
       <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform, Version=1.1.0.204, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.1.0.204\lib\net40\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.1.0.205, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.205\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.109, Culture=neutral, processorArchitecture=MSIL">
@@ -127,8 +127,8 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.109\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.204, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.204\lib\net40\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.205, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.205\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerArgs, Version=2.7.0.0, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
