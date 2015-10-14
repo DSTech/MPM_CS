@@ -6,7 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Profiles {
-
+	public static class MutableProfileExtensions {
+		public static MutableProfile ToMutableProfile(this IProfile profile) {
+			return new MutableProfile {
+				Id = profile.Id,
+				Name = profile.Name,
+				Preferences = profile.Preferences.ToDictionary(x => x.Key, x => x.Value),
+			};
+		}
+	}
 	public class MutableProfile : IProfile {
 
 		public MutableProfile() {

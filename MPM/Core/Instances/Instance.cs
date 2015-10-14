@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Installation;
 using MPM.Data;
@@ -12,7 +13,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
 using Platform.VirtualFileSystem.Providers.Local;
-using RaptorDB;
 
 namespace MPM.Core.Instances {
 
@@ -26,12 +26,10 @@ namespace MPM.Core.Instances {
 		private const string PackageCacheName = "packagecache";
 		public String Location { get; set; }
 
-		private KeyStore<T> CreateDbConnection<T>(string dbTableName) where T : IComparable<T> {
-			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(Location, MpmDirectory)).FullName, DbName);
-			var db = new RaptorDB.RaptorDB<T>(Path.Combine(dbPath, $"{dbTableName}.rptr"), false);
-			return db;
+		private LiteDatabase CreateDbConnection() {
+			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(Location, MpmDirectory)).FullName, $"{DbName}.litedb");
+			return new LiteDatabase($"filename={dbPath}; journal=false");
 		}
-		private KeyStore<string> CreateDbConnection(string dbTableName) => CreateDbConnection<string>(dbTableName);
 
 		public String Name {
 			get {
@@ -67,7 +65,7 @@ namespace MPM.Core.Instances {
 		}
 
 		public IMetaDataManager GetDbMeta() {
-			return new DbMetaDataManager(new RaptorUntypedKeyValueStore<string>(CreateDbConnection(MetaName)));
+			return new LiteDbMetaDataManager(CreateDbConnection(), MetaName);
 		}
 
 		public IFileSystem GetFileSystem() {

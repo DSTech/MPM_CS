@@ -89,6 +89,10 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LiteDB, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.1.0.3\lib\net40\LiteDB.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -120,10 +124,6 @@
     </Reference>
     <Reference Include="Platform.Xml.Serialization, Version=1.1.0.205, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.205\lib\net40\Platform.Xml.Serialization.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RaptorDB, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RaptorDB.2.6\lib\net40\RaptorDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -178,6 +178,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Data\DbTests.cs" />
     <Compile Include="InstallationScriptTests.cs" />
     <Compile Include="ProfileTests.cs" />
     <None Include="ArchiveTests.cs" />

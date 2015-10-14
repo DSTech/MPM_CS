@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Profiles;
 using MPM.Data;
 using Newtonsoft.Json;
-using RaptorDB;
 
 namespace MPM.Core {
 
@@ -26,19 +26,19 @@ namespace MPM.Core {
 		private const string metaName = "meta";
 		private const string profilesName = "profiles";
 		private String HomePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-		private KeyStore<T> OpenGlobalDb<T>(string dbTableName) where T : IComparable<T> {
-			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(HomePath, mpmDir)).FullName, dbName);
-			var db = new RaptorDB.RaptorDB<T>(Path.Combine(dbPath, $"{dbTableName}.rptr"), false);
-			return db;
+		private LiteDatabase OpenGlobalDb() {
+			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(HomePath, mpmDir)).FullName, $"{dbName}.litedb");
+			return new LiteDatabase($"filename={dbPath}; journal=false");
 		}
-		private KeyStore<string> OpenGlobalDb(string dbTableName) => OpenGlobalDb<string>(dbTableName);
 
-		public IUntypedKeyValueStore<String> FetchDataStore() => new RaptorUntypedKeyValueStore<String>(OpenGlobalDb(metaName));
+		public LiteDatabase FetchDataStore() => OpenGlobalDb();
 
 		public IProfileManager FetchProfileManager() {
-			return new KeyValueStoreProfileManager(
-				new RaptorUntypedKeyValueStore<Guid>(OpenGlobalDb<Guid>(profilesName)).Typify().As<IProfile>()
-			);
+			return new LiteDbProfileManager(OpenGlobalDb(), profilesName);
+		}
+
+		public IMetaDataManager FetchMetaDataManager() {
+			return new LiteDbMetaDataManager(OpenGlobalDb(), metaName);
 		}
 
 		public IProfile FetchProfile(Guid profileId) {

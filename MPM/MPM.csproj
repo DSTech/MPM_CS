@@ -91,6 +91,10 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LiteDB, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.1.0.3\lib\net40\LiteDB.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8\Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling.dll</HintPath>
       <Private>True</Private>
@@ -149,10 +153,6 @@
     </Reference>
     <Reference Include="QuickGraph.Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RaptorDB, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RaptorDB.2.6\lib\net40\RaptorDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -221,7 +221,10 @@
     <Compile Include="Core\Instances\Installation\SingleEntryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\DictionaryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
-    <Compile Include="Data\RaptorUntypedKeyValueStore.cs" />
+    <Compile Include="Core\Profiles\LiteDbProfileManager.cs" />
+    <Compile Include="Data\LiteCollectionExtensions.cs" />
+    <Compile Include="Data\LiteDbMetaDataManager.cs" />
+    <Compile Include="Data\MetaDataEntry.cs" />
     <Compile Include="DisposerStreamWrapper.cs" />
     <Compile Include="Extensions\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />

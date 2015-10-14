@@ -51,10 +51,10 @@ namespace MPM.CLI {
 		}
 
 		private void RegisterGlobalMeta(ref ContainerBuilder cb) {
-			cb.Register<IUntypedKeyValueStore<String>>(ctxt => ctxt.Resolve<GlobalStorage>().FetchDataStore())
+			cb.Register<LiteDB.LiteDatabase>(ctxt => ctxt.Resolve<GlobalStorage>().FetchDataStore())
 				.InstancePerDependency()
 				.ExternallyOwned();
-			cb.Register<IMetaDataManager>(ctxt => new DbMetaDataManager(ctxt.Resolve<GlobalStorage>().FetchDataStore()))
+			cb.Register<IMetaDataManager>(ctxt => ctxt.Resolve<GlobalStorage>().FetchMetaDataManager())
 				.InstancePerDependency()
 				.ExternallyOwned();
 		}
