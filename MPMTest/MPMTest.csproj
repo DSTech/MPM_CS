@@ -178,6 +178,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Core\Instances\Cache\CacheTests.cs" />
     <Compile Include="Data\DbTests.cs" />
     <Compile Include="InstallationScriptTests.cs" />
     <Compile Include="ProfileTests.cs" />

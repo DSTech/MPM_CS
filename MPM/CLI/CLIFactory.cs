@@ -33,7 +33,7 @@ namespace MPM.CLI {
 
 			var container = cb.Build();
 			Debug.Assert(container.IsRegistered<GlobalStorage>());
-			Debug.Assert(container.IsRegistered<IUntypedKeyValueStore<String>>());
+			Debug.Assert(container.IsRegistered<LiteDB.LiteDatabase>());
 			Debug.Assert(container.IsRegistered<IMetaDataManager>());
 			Debug.Assert(container.IsRegistered<IProfileManager>());
 			Debug.Assert(container.IsRegistered<ICacheManager>());

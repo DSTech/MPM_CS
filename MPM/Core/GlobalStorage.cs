@@ -25,6 +25,7 @@ namespace MPM.Core {
 		private const string dbName = "global";
 		private const string metaName = "meta";
 		private const string profilesName = "profiles";
+		private const string cacheName = "cache";
 		private String HomePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 		private LiteDatabase OpenGlobalDb() {
 			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(HomePath, mpmDir)).FullName, $"{dbName}.litedb");
@@ -48,9 +49,9 @@ namespace MPM.Core {
 		}
 
 		public ICacheManager FetchGlobalCache() {
-			var cachePath = Directory.CreateDirectory(Path.Combine(HomePath, mpmDir, "cache")).FullName;
-			var cacheManager = new FileSystemCacheManager(cachePath);
-			return cacheManager;
+			var dbPath = Path.Combine(Directory.CreateDirectory(Path.Combine(HomePath, mpmDir, cacheName)).FullName, $"{dbName}_{cacheName}.litedb");
+			var dbConnStr = $"filename={dbPath}; journal=false";
+			return new LiteDbCacheManager(dbConnStr);
 		}
 	}
 }

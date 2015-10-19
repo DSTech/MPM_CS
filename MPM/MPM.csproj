@@ -223,6 +223,7 @@
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
     <Compile Include="Core\Profiles\LiteDbProfileManager.cs" />
     <Compile Include="Data\LiteCollectionExtensions.cs" />
+    <Compile Include="Data\LiteDbCacheManager.cs" />
     <Compile Include="Data\LiteDbMetaDataManager.cs" />
     <Compile Include="Data\MetaDataEntry.cs" />
     <Compile Include="DisposerStreamWrapper.cs" />
@@ -286,6 +287,7 @@
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
+    <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Net\DTO\Author.cs" />

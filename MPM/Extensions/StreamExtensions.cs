@@ -25,5 +25,16 @@ namespace MPM.Extensions {
 				return ms.ToArray();
 			}
 		}
+
+		public static DisposerStreamWrapper AndDispose(this Stream stream, params IDisposable[] additionalDisposables) {
+			return new DisposerStreamWrapper(stream, additionalDisposables);
+		}
+
+		public static DisposerStreamWrapper AndDispose(this DisposerStreamWrapper stream, params IDisposable[] additionalDisposables) {
+			foreach (var additionalDisposable in additionalDisposables) {
+				stream.AddDisposable(additionalDisposable);
+			}
+			return stream;
+		}
 	}
 }

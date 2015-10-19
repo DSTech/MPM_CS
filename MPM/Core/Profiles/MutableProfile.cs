@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Extensions;
 
 namespace MPM.Core.Profiles {
 	public static class MutableProfileExtensions {
@@ -26,12 +27,15 @@ namespace MPM.Core.Profiles {
 			this.Preferences = preferences?.ToDictionary(pair => pair.Key, pair => pair.Value);
 		}
 
+		[LiteDB.BsonId]
 		public Guid Id { get; set; }
 
+		[LiteDB.BsonField, LiteDB.BsonIndex]
 		public string Name { get; set; }
 
-		public IDictionary<string, string> Preferences = new Dictionary<string, string>();
+		[LiteDB.BsonField]
+		public IDictionary<string, string> Preferences { get; set; } = new Dictionary<string, string>();
 
-		IReadOnlyDictionary<string, string> IProfile.Preferences => new ReadOnlyDictionary<string, string>(Preferences);
+		IReadOnlyDictionary<string, string> IProfile.Preferences => Preferences.AsReadOnly();
 	}
 }
