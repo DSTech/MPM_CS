@@ -151,7 +151,7 @@ namespace MPMTest.Core {
 				}
 			}
 			if (File.Exists(dbFilePath)) {
-				//File.Delete(dbFilePath);
+				File.Delete(dbFilePath);
 			}
 		}
 	}
