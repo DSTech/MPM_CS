@@ -50,6 +50,11 @@ namespace MPM {
 			if (disposing && !disposed) {
 				disposed = true;
 				InternalStream.Dispose();
+				foreach (IDisposable disposable in Disposables) {
+					if (disposable != null) {
+						disposable.Dispose();
+					}
+				}
 			}
 		}
 

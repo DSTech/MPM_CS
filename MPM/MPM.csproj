@@ -222,6 +222,7 @@
     <Compile Include="Core\Instances\Installation\DictionaryFileMap.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
     <Compile Include="Core\Profiles\LiteDbProfileManager.cs" />
+    <Compile Include="Data\LiteDbPackageRepositoryCache.cs" />
     <Compile Include="Data\LiteCollectionExtensions.cs" />
     <Compile Include="Data\LiteDbCacheManager.cs" />
     <Compile Include="Data\LiteDbMetaDataManager.cs" />

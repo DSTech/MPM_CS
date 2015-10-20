@@ -18,8 +18,12 @@ namespace MPM.Data {
 				this.Id = id;
 			}
 			public Stream FetchStream() {
-				var db = new LiteDatabase(ConnectionString);
-				return db.FileStorage.FindById(id: Id).OpenRead().AndDispose(db);
+				var memstr = new MemoryStream();
+				using (var db = new LiteDatabase(ConnectionString)) {
+					db.FileStorage.FindById(id: Id).OpenRead().CopyTo(memstr);
+					memstr.Seek(0, SeekOrigin.Begin);
+				}
+				return memstr;
 			}
 		}
 
