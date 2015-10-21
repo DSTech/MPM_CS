@@ -6,6 +6,7 @@ using System.Net;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.Types;
 using Newtonsoft.Json;
 using RestSharp;
@@ -68,7 +69,7 @@ namespace MPM.Net.Protocols.Minecraft {
 			}
 			var req = WebRequest.Create(url);
 			var res = await req.GetResponseAsync();
-			return new DisposerStreamWrapper(res.GetResponseStream(), res);
+			return res.GetResponseStream().AndDispose(res);
 		}
 	}
 }

@@ -43,6 +43,11 @@ namespace MPM {
 		/// </summary>
 		/// <param name="disposable">The <see cref="IDisposable"/> to register for disposal.</param>
 		public void AddDisposable(IDisposable disposable) => Disposables.Add(disposable);
+		public void AddDisposables(IEnumerable<IDisposable> disposables) {
+			foreach (var disposable in disposables) {
+				Disposables.Add(disposable);
+			}
+		}
 
 		bool disposed = false;
 		protected override void Dispose(bool disposing) {

@@ -31,9 +31,7 @@ namespace MPM.Extensions {
 		}
 
 		public static DisposerStreamWrapper AndDispose(this DisposerStreamWrapper stream, params IDisposable[] additionalDisposables) {
-			foreach (var additionalDisposable in additionalDisposables) {
-				stream.AddDisposable(additionalDisposable);
-			}
+			stream.AddDisposables(additionalDisposables);
 			return stream;
 		}
 	}
