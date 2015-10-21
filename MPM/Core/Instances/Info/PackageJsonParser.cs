@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,7 +24,7 @@ namespace MPM.Core.Instances.Info {
 						.AsJEnumerable()
 						.Select(tok => tok.ToObject<JObject>())
 						.ToArray();
-				} catch {
+				} catch (Exception) {
 					return null;
 				}
 			}

@@ -13,8 +13,10 @@ namespace MPM.Core.Profiles {
 		public KeyValueStoreProfileManager(ITypedKeyValueStore<Guid, IProfile> store) {
 			this.store = store;
 		}
-
-		public void Dispose() => Dispose(true);
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
 		private bool disposed = false;
 

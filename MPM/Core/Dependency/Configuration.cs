@@ -15,7 +15,7 @@ namespace MPM.Core.Dependency {
 		//LookupBuild should return a package with exactly one build
 		public static IEnumerable<Tuple<PackageSpec, Build, Conflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Package> lookupBuild) {
 			foreach (var package in configuration.Packages) {
-				var packageDetails = lookupBuild(package);
+				var packageDetails = lookupBuild?.Invoke(package);
 				if (packageDetails == null) {
 					throw new Exception("Package details could not be found");
 				}
@@ -41,7 +41,7 @@ namespace MPM.Core.Dependency {
 		public static IEnumerable<Conflict> FindConflicts(this Build build, PackageSpec[] otherPackageSpecs, Func<PackageSpec, Package> lookupBuild) {
 			var packages = otherPackageSpecs
 				.Select(spec => {
-					var packageDetails = lookupBuild(spec);
+					var packageDetails = lookupBuild?.Invoke(spec);
 					Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Count == 1);
 					return packageDetails;
 				})

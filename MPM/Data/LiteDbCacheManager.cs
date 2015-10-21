@@ -28,7 +28,6 @@ namespace MPM.Data {
 		}
 
 		public readonly String ConnectionString;
-		private LiteDatabase FetchDb() => new LiteDatabase(ConnectionString);
 
 		public LiteDbCacheManager(string connectionString) {
 			this.ConnectionString = connectionString;
@@ -36,14 +35,14 @@ namespace MPM.Data {
 
 		public IEnumerable<ICacheEntry> Entries {
 			get {
-				using (var db = FetchDb()) {
+				using (var db = new LiteDatabase(ConnectionString)) {
 					return db.FileStorage.FindAll().Select(fileInfo => new LiteDbCacheEntry(ConnectionString, fileInfo.Id)).ToArray();
 				}
 			}
 		}
 
 		public void Clear() {
-			using (var db = FetchDb()) {
+			using (var db = new LiteDatabase(ConnectionString)) {
 				var fileStorage = db.FileStorage;
 				foreach (var entryId in fileStorage.FindAll().Select(fileInfo => fileInfo.Id).ToArray()) {
 					fileStorage.Delete(entryId);
@@ -52,19 +51,19 @@ namespace MPM.Data {
 		}
 
 		public bool Contains(string cacheEntryName) {
-			using (var db = FetchDb()) {
+			using (var db = new LiteDatabase(ConnectionString)) {
 				return db.FileStorage.FindById(cacheEntryName) != null;
 			}
 		}
 
 		public void Delete(string cacheEntryName) {
-			using (var db = FetchDb()) {
+			using (var db = new LiteDatabase(ConnectionString)) {
 				db.FileStorage.Delete(cacheEntryName);
 			}
 		}
 
 		public ICacheEntry Fetch(string cacheEntryName) {
-			using (var db = FetchDb()) {
+			using (var db = new LiteDatabase(ConnectionString)) {
 				var fileEntry = db.FileStorage.FindById(cacheEntryName);
 				if (fileEntry == null) {
 					return null;
@@ -74,7 +73,7 @@ namespace MPM.Data {
 		}
 
 		public void Store(string cacheEntryName, byte[] entryData) {
-			using (var db = FetchDb()) {
+			using (var db = new LiteDatabase(ConnectionString)) {
 				using (var uploadStream = new MemoryStream(entryData, false)) {
 					db.FileStorage.Upload(new LiteFileInfo(cacheEntryName, cacheEntryName), uploadStream);
 				}

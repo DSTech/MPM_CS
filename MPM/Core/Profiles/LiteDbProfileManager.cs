@@ -19,7 +19,11 @@ namespace MPM.Core.Profiles {
 			}
 		}
 
-		public void Dispose() => Dispose(true);
+		public void Dispose() {
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
 
 		private bool disposed = false;
 		protected virtual void Dispose(bool disposing) {

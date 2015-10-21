@@ -9,13 +9,13 @@ using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
 
-	struct DictionaryFileMapEntry {
-		public IFileOperation Operation { get; set; }
-		public string PackageName { get; set; }
-		public SemanticVersion PackageVersion { get; set; }
-	}
-
 	public class DictionaryFileMap : IFileMap {
+		private struct DictionaryFileMapEntry {
+			public IFileOperation Operation { get; set; }
+			public string PackageName { get; set; }
+			public SemanticVersion PackageVersion { get; set; }
+		}
+
 		private Dictionary<String, Stack<DictionaryFileMapEntry>> operations = new Dictionary<String, Stack<DictionaryFileMapEntry>>();
 
 		public int Count => operations.Count;

@@ -18,7 +18,7 @@ namespace MPM.Core.Instances.Installation {
 		public SemanticVersion PackageVersion { get; set; }
 		public ICacheManager Cache { get; set; }
 
-		public ArchInstallationOperation(string packageName, SemanticVersion packageVersion, ICacheManager cacheManager) {
+		protected ArchInstallationOperation(string packageName, SemanticVersion packageVersion, ICacheManager cacheManager) {
 			this.PackageName = packageName;
 			this.Cache = cacheManager;
 		}
@@ -29,7 +29,7 @@ namespace MPM.Core.Instances.Installation {
 	/// <summary>
 	/// Extracts an entire cached archive, excluding any ignored paths, to a location
 	/// </summary>
-	internal class ExtractArchInstallationOperation : ArchInstallationOperation {
+	public class ExtractArchInstallationOperation : ArchInstallationOperation {
 
 		//The targetted file or the entire targetted directory will be extracted where not starting with an ignored path.
 		//Use "" to copy the entire archive.
@@ -81,7 +81,7 @@ namespace MPM.Core.Instances.Installation {
 	/// <summary>
 	/// Extracts a single file from the specified cached archive to a location
 	/// </summary>
-	internal class ExtractSingleArchInstallationOperation : ArchInstallationOperation {
+	public class ExtractSingleArchInstallationOperation : ArchInstallationOperation {
 		public string CachedName { get; set; }
 		public string SourcePath { get; set; }
 		public string TargetPath { get; set; }
@@ -106,7 +106,7 @@ namespace MPM.Core.Instances.Installation {
 		}
 	}
 
-	internal class CopyArchInstallationOperation : ArchInstallationOperation {
+	public class CopyArchInstallationOperation : ArchInstallationOperation {
 		public string CachedName { get; set; }
 		public string TargetPath { get; set; }
 
