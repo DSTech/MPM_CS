@@ -23,7 +23,7 @@ namespace MPM.CLI {
 	public class InitActionProvider {
 
 		public void Provide(IContainer factory, InitArgs args) {
-			Console.WriteLine("Initializing instance at path:\n\t{0}", Path.GetFullPath(args.InstancePath));
+			Console.WriteLine($"Initializing instance at path:\n\t{Path.GetFullPath(args.InstancePath)}");
 			if (!Directory.Exists(args.InstancePath)) {
 				Console.WriteLine("Directory did not exist. Creating...");
 				Directory.CreateDirectory(args.InstancePath);
@@ -77,8 +77,7 @@ namespace MPM.CLI {
 				case "win64":
 					instancePlatform = InstancePlatform.Win64;
 					break;
-				case "current":
-					{
+				case "current": {
 						var is64Bit = Environment.Is64BitOperatingSystem;
 						var isLinux = Environment.OSVersion.Platform == PlatformID.Unix;
 						if (isLinux) {
@@ -154,10 +153,10 @@ namespace MPM.CLI {
 			foreach (var package in resolvedArchConfiguration.Packages) {
 				var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}_{package.Platform}";
 				if (cacheManager.Contains(cacheEntryName)) {
-					Console.WriteLine("Package {0} already cached.", package.PackageName);
+					Console.WriteLine($"Package {package.PackageName} already cached.");
 					continue;
 				}
-				Console.WriteLine("Downloading package {0} to cache...", package.PackageName);
+				Console.WriteLine($"Downloading package {package.PackageName} to cache...");
 				var packageArchive = await hashRepository.RetrieveArchive(package.PackageName, package.Hashes);
 				cacheManager.Store(cacheEntryName, packageArchive);
 			}

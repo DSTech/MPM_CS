@@ -24,6 +24,7 @@ namespace MPM.Data {
 		/// Collects and assembles an archive's hashes from the given hash repository.
 		/// </summary>
 		/// <param name="hashRepository">The repository within which to search for hashes.</param>
+		/// <param name="packageName">The package to look up</param>
 		/// <param name="hashes">The hashes which must be assembled, in order, to produce the package archive</param>
 		/// <returns>A byte array of the unpacked archive.</returns>
 		/// <exception cref="KeyNotFoundException">Thrown when a package could not be resolved to an archive or retrieved.</exception>

@@ -25,7 +25,7 @@ namespace MPM.Extensions {
 			} else {
 				anyOrs = conflictCondition.Or.Any(andEntry => andEntry.CheckPackageConflictCondition(packages, interfaces));
 			}
-			if (anyOrs == false) {
+			if (!anyOrs) {
 				return false;
 			}
 			bool allAnds;
@@ -34,7 +34,7 @@ namespace MPM.Extensions {
 			} else {
 				allAnds = conflictCondition.And.All(andEntry => andEntry.CheckPackageConflictCondition(packages, interfaces));
 			}
-			if (allAnds == false) {
+			if (!allAnds) {
 				return false;
 			}
 			return true;

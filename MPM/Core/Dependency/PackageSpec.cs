@@ -63,6 +63,7 @@ namespace MPM.Core.Dependency {
 		/// Looks up a package, returning named builds qualifying for the specification.
 		/// Must return in descending order of version.
 		/// </summary>
+		/// <param name="repository">Repository to look up the spec from within</param>
 		/// <param name="packageSpec">Specification to look up</param>
 		/// <returns>Builds in descending order of version</returns>
 		/// <remarks>Should be converted to return IQueryable to allow optimized behavior with constraint lookup</remarks>

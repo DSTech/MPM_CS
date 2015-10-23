@@ -39,7 +39,7 @@ namespace MPM.CLI {
 		public void UpdateForge(UpdateForgeArgs args) {
 			Console.WriteLine("UpdateForge called, directory was " + args.ForgeDirectory);
 			IServerManager manager = new ForgeServerManager(args.ForgeDirectory);
-			Console.WriteLine("Current version is {0}", manager.Version);
+			Console.WriteLine($"Current version is {manager.Version}");
 			foreach (var update in manager.FindUpdates()) {
 				Console.WriteLine(update);
 			}

@@ -22,9 +22,7 @@ namespace MPM.Archival {
 			using (var sha256 = new SHA256Managed()) {
 				leadingHash = sha256.ComputeHash(contents);
 			}
-			var header = Enumerable.Concat(
-				BitConverter.GetBytes(Convert.ToInt16(leadingHash.Length)),
-				leadingHash);
+			var header = BitConverter.GetBytes(Convert.ToInt16(leadingHash.Length)).Concat(leadingHash);
 			return Enumerable.Concat(header, contents).ToArray();
 		}
 

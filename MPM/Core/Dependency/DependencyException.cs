@@ -27,7 +27,7 @@ namespace MPM.Core.Dependency {
 		}
 
 		public override string ToString() {
-			return String.Format("({0})=>{1}:\n{2}", this.Dependent?.PackageName ?? "<dependent>", this.PackageSpec, base.ToString());
+			return $"({this.Dependent?.PackageName ?? "<dependent>"})=>{this.PackageSpec}:\n{base.ToString()}";
 		}
 	}
 }

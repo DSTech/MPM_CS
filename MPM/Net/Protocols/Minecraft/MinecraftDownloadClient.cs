@@ -52,7 +52,6 @@ namespace MPM.Net.Protocols.Minecraft {
 		}
 
 		/// <summary>
-		/// 
 		/// </summary>
 		/// <param name="package"></param>
 		/// <param name="name"></param>
