@@ -9,7 +9,7 @@ namespace MPM.Core.Profiles {
 	/// <summary>
 	/// Allows reading of <see cref="IProfile"/>s from a profile store.
 	/// </summary>
-	public interface IProfileReader : IDisposable {
+	public interface IProfileReader {
 		IEnumerable<IProfile> Entries { get; }
 		IEnumerable<Guid> Ids { get; }
 

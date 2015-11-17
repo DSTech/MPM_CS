@@ -99,19 +99,17 @@ namespace MPM.CLI {
 
 		private void RegisterPackageRepository(ref ContainerBuilder cb) {
 			cb.Register<IPackageRepository>(ctxt => {
-				using (var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>()) {//Use to fetch custom package repositories
-					var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
-					return new HttpPackageRepository(packageRepositoryUri);
-				}
+				var meta = ctxt.Resolve<IMetaDataManager>();//Use to fetch custom package repositories
+				var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
+				return new HttpPackageRepository(packageRepositoryUri);
 			}).SingleInstance();
 		}
 
 		private void RegisterHashStore(ref ContainerBuilder cb) {
 			cb.Register<IHashRepository>(ctxt => {
-				using (var meta = ctxt.Resolve<IUntypedKeyValueStore<String>>()) {//Use to fetch custom hash repositories
-					var hashStoreUri = new Uri(meta.Get<String>("hashStoreUri") ?? "http://dst.dessix.net:8951/");
-					return new NaiveHttpHashRepository(hashStoreUri);
-				}
+				var meta = ctxt.Resolve<IMetaDataManager>();//Use to fetch custom hash repositories
+				var hashStoreUri = new Uri(meta.Get<String>("hashStoreUri") ?? "http://dst.dessix.net:8951/");
+				return new NaiveHttpHashRepository(hashStoreUri);
 			}).SingleInstance();
 		}
 	}

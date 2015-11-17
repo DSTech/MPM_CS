@@ -26,7 +26,7 @@ namespace MPM.Core.Instances.Installation {
 			this.instance = instance;
 			this.packageRepository = packageRepository;
 			this.hashRepository = hashRepository;
-			this.fileSystem = instance.GetFileSystem();
+			this.fileSystem = instance.FetchFileSystem();
 			this.cacheManager = cacheManager;
 			this.protocolResolver = protocolResolver;
 		}

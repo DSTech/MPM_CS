@@ -7,28 +7,22 @@ namespace MPM.Core.Instances.Cache {
 
 	//TODO: Replace standard filesystem usage with Platform.VirtualFileSystem
 	public class FileSystemCacheManager : ICacheManager {
-		private string cachePath { get; }
-
-		private IEnumerable<string> cacheEntryPaths => Directory.GetFiles(cachePath);
 
 		public FileSystemCacheManager(string cachePath) {
 			this.cachePath = cachePath;
 			Directory.CreateDirectory(cachePath);
 		}
 
-		private void ValidateEntryPath(string cacheEntryName) {
-			if (cacheEntryName.Contains("..") || cacheEntryName.Contains(":/") || cacheEntryName.StartsWith("/")) {
-				throw new InvalidOperationException("No parent directory access allowed.");
-			}
-		}
-
 		public IEnumerable<ICacheEntry> Entries {
 			get {
 				return cacheEntryPaths
-					.Select(entryPath => new FileSystemCacheEntry(entryPath))
+					.Select(entryPath => new CacheEntry(entryPath))
 					.ToArray();
 			}
 		}
+
+		private IEnumerable<string> cacheEntryPaths => Directory.GetFiles(cachePath);
+		private string cachePath { get; }
 
 		public void Clear() {
 			foreach (var cachePathEntry in cacheEntryPaths) {
@@ -48,7 +42,7 @@ namespace MPM.Core.Instances.Cache {
 			if (!Contains(cacheEntryName)) {
 				return null;
 			}
-			return new FileSystemCacheEntry(Path.Combine(cachePath, cacheEntryName));
+			return new CacheEntry(Path.Combine(cachePath, cacheEntryName));
 		}
 
 		public void Store(string cacheEntryName, byte[] entryData) {
@@ -56,6 +50,24 @@ namespace MPM.Core.Instances.Cache {
 			var itemPath = Path.Combine(cachePath, cacheEntryName);
 			Directory.CreateDirectory(Path.GetDirectoryName(itemPath));
 			File.WriteAllBytes(itemPath, entryData);
+		}
+
+		private void ValidateEntryPath(string cacheEntryName) {
+			if (cacheEntryName.Contains("..") || cacheEntryName.Contains(":/") || cacheEntryName.StartsWith("/")) {
+				throw new InvalidOperationException("No parent directory access allowed.");
+			}
+		}
+
+		private class CacheEntry : ICacheEntry {
+			private string cachePath;
+
+			public CacheEntry(string cachePath) {
+				this.cachePath = cachePath;
+			}
+
+			public Stream FetchStream() {
+				return File.OpenRead(cachePath);
+			}
 		}
 	}
 }

@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using MPM.CLI;
 
 namespace MPM.Extensions {
 
@@ -33,6 +29,36 @@ namespace MPM.Extensions {
 		public static DisposerStreamWrapper AndDispose(this DisposerStreamWrapper stream, params IDisposable[] additionalDisposables) {
 			stream.AddDisposables(additionalDisposables);
 			return stream;
+		}
+
+		public static byte[] ReadToEndAndClose(this Stream stream) {
+			using (stream) {
+				return stream.ReadToEnd();
+			}
+		}
+
+		public static async Task<byte[]> ReadToEndAndCloseAsync(this Stream stream) {
+			using (stream) {
+				return await stream.ReadToEndAsync();
+			}
+		}
+
+		public static void CopyToAndClose(this Stream stream, Stream destination) {
+			using (stream) {
+				stream.CopyTo(destination: destination);
+			}
+		}
+
+		public static void CopyToAndClose(this Stream stream, Stream destination, int bufferSize) {
+			using (stream) {
+				stream.CopyTo(destination: destination, bufferSize: bufferSize);
+			}
+		}
+
+		public static async Task CopyToAndCloseAsync(this Stream stream, Stream destination) {
+			using (stream) {
+				await stream.CopyToAsync(destination: destination);
+			}
 		}
 	}
 }

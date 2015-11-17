@@ -16,13 +16,12 @@ namespace MPMTest.Core.Instances.Cache {
 
 	public class CacheTests {
 		[Fact]
-		public void LiteDbCacheManagerFileManagement() {
-			var dbFilePath = "./testCacheData.litedb";
-			if (File.Exists(dbFilePath)) {
-				File.Delete(dbFilePath);
-				Thread.Sleep(TimeSpan.FromSeconds(0.05));
+		public void FileSystemCacheManagerFileManagement() {
+			var cachePath = "./testCache/";
+			if (!Directory.Exists(cachePath)) {
+				Directory.CreateDirectory(cachePath);
 			}
-			var cache = new LiteDbCacheManager($"filename={dbFilePath}; journal=false");
+			var cache = new FileSystemCacheManager(cachePath);
 			cache.Clear();
 			var keyToStore = "test";
 			var valueToStore = "testData";
@@ -34,9 +33,6 @@ namespace MPMTest.Core.Instances.Cache {
 			cache.Delete(keyToStore);
 			Assert.False(cache.Contains(keyToStore));
 			Assert.Null(cache.Fetch(keyToStore));
-			if (File.Exists(dbFilePath)) {
-				File.Delete(dbFilePath);
-			}
 		}
 	}
 }

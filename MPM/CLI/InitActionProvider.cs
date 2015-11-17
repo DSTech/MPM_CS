@@ -128,52 +128,53 @@ namespace MPM.CLI {
 		}
 
 		public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform, string instancePath) {
-			var instance = new Instance(instancePath) {
+			using (var instance = new Instance(instancePath) {
 				Name = $"{instanceArch}_{instanceSide}_{instancePlatform}",//TODO: make configurable and able to be immediately registered upon creation
 				LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden
 				Configuration = InstanceConfiguration.Empty,
-			};
+			}) {
 
-			//TODO: Install arch pseudopackage
-			var resolver = factory.Resolve<IResolver>();
-			var repository = factory.Resolve<IPackageRepository>();
+				//TODO: Install arch pseudopackage
+				var resolver = factory.Resolve<IResolver>();
+				var repository = factory.Resolve<IPackageRepository>();
 
-			Console.WriteLine("Generating configuration...");
-			var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
+				Console.WriteLine("Generating configuration...");
+				var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
 
-			Console.WriteLine("Attempting to resolve packages...");
-			var resolvedArchConfiguration = await resolver.Resolve(archConfiguration, repository);
-			Console.WriteLine("Configuration resolved.");
+				Console.WriteLine("Attempting to resolve packages...");
+				var resolvedArchConfiguration = await resolver.Resolve(archConfiguration, repository);
+				Console.WriteLine("Configuration resolved.");
 
-			var cacheManager = factory.Resolve<ICacheManager>();
-			var hashRepository = factory.Resolve<IHashRepository>();
+				var cacheManager = factory.Resolve<ICacheManager>();
+				var hashRepository = factory.Resolve<IHashRepository>();
 
-			instance.Configuration = resolvedArchConfiguration;
+				instance.Configuration = resolvedArchConfiguration;
 
-			foreach (var package in resolvedArchConfiguration.Packages) {
-				var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}_{package.Platform}";
-				if (cacheManager.Contains(cacheEntryName)) {
-					Console.WriteLine($"Package {package.PackageName} already cached.");
-					continue;
+				foreach (var package in resolvedArchConfiguration.Packages) {
+					var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}_{package.Platform}";
+					if (cacheManager.Contains(cacheEntryName)) {
+						Console.WriteLine($"Package {package.PackageName} already cached.");
+						continue;
+					}
+					Console.WriteLine($"Downloading package {package.PackageName} to cache...");
+					var packageArchive = await hashRepository.RetrieveArchive(package.PackageName, package.Hashes);
+					cacheManager.Store(cacheEntryName, packageArchive);
 				}
-				Console.WriteLine($"Downloading package {package.PackageName} to cache...");
-				var packageArchive = await hashRepository.RetrieveArchive(package.PackageName, package.Hashes);
-				cacheManager.Store(cacheEntryName, packageArchive);
+
+				var installer = new Installer(
+					instance,
+					repository,
+					factory.Resolve<IHashRepository>(),
+					cacheManager,
+					factory.Resolve<IProtocolResolver>()
+				);
+
+				await installer.Install(resolvedArchConfiguration);
+
+				//var cacheManager = factory.Resolve<ICacheManager>();
+				//var protocolResolver = factory.Resolve<IProtocolResolver>();
+				throw new NotImplementedException();
 			}
-
-			var installer = new Installer(
-				instance,
-				repository,
-				factory.Resolve<IHashRepository>(),
-				cacheManager,
-				factory.Resolve<IProtocolResolver>()
-			);
-
-			await installer.Install(resolvedArchConfiguration);
-
-			//var cacheManager = factory.Resolve<ICacheManager>();
-			//var protocolResolver = factory.Resolve<IProtocolResolver>();
-			throw new NotImplementedException();
 		}
 	}
 }

@@ -9,81 +9,69 @@ using MPM.Data;
 using LiteDB;
 
 namespace MPM.Data {
-	public class LiteDbMetaDataManager : IMetaDataManager, IDisposable {
-		private readonly LiteDB.LiteDatabase Db;
-		private readonly string MetaCollectionName;
-		private LiteCollection<MetaDataEntry> MetaCollection => Db.GetCollection<MetaDataEntry>(MetaCollectionName);
+	public class LiteDbMetaDataManager : IMetaDataManager {
+		public class MetaDataEntry {
+			public static implicit operator KeyValuePair<string, string>(MetaDataEntry entry) => new KeyValuePair<string, string>(entry.Key, entry.Value);
+			public static implicit operator MetaDataEntry(KeyValuePair<string, string> pair) => new MetaDataEntry(pair.Key, pair.Value);
+			public MetaDataEntry() {
+			}
+			public MetaDataEntry(string key, string value) {
+				this.Key = key;
+				this.Value = value;
+			}
+			[LiteDB.BsonId]
+			public string Key { get; set; }
+			[LiteDB.BsonField]
+			public string Value { get; set; }
+		}
+		private JsonSerializerSettings JsonSettings = new JsonSerializerSettings {
+			TypeNameHandling = TypeNameHandling.Auto,
+		};
+		private readonly LiteDB.LiteCollection<MetaDataEntry> Collection;
 
-		public IEnumerable<string> Keys => MetaCollection.FindAll().Select(x => x.Key);
+		public IEnumerable<string> Keys => Collection.FindAll().Select(x => x.Key);
 
-		public IEnumerable<KeyValuePair<string, object>> Pairs => MetaCollection
+		public IEnumerable<KeyValuePair<string, object>> Pairs => Collection
 			.FindAll()
 			.Select(x => new KeyValuePair<string, object>(x.Key, JsonConvert.DeserializeObject(x.Value)));
 
-		public IEnumerable<object> Values => MetaCollection
-			.FindAll()
-			.Select(x => JsonConvert.DeserializeObject(x.Value));
-
-		public LiteDbMetaDataManager(LiteDB.LiteDatabase db, string metaCollectionName) {
-			if ((this.Db = db) == null) {
-				throw new ArgumentNullException(nameof(db));
+		public LiteDbMetaDataManager(LiteDB.LiteCollection<BsonDocument> metaDataCollection) {
+			if (metaDataCollection == null) {
+				throw new ArgumentNullException(nameof(metaDataCollection));
 			}
-			if ((this.MetaCollectionName = metaCollectionName) == null) {
-				throw new ArgumentNullException(nameof(metaCollectionName));
+			this.Collection = metaDataCollection.Database.GetCollection<MetaDataEntry>(metaDataCollection.Name);
+		}
+
+		public bool Contains(String key) {
+			return Collection.Exists(entry => entry.Key == key);
+		}
+
+		public void Delete(String key) => Collection.Delete(kvp => kvp.Key == key);
+
+		public void Clear() => Collection.Delete(Query.All());
+
+		public void Set<VALUETYPE>(string key, VALUETYPE value) where VALUETYPE : class {
+			if (value == null) {
+				Delete(key);
+				return;
 			}
+			Collection.Upsert(new MetaDataEntry(key, JsonConvert.SerializeObject(value, typeof(VALUETYPE), JsonSettings)));
 		}
 
-		public void Set(String key, object value, Type type) {
-			MetaCollection.Upsert(new KeyValuePair<string, string>(key, JsonConvert.SerializeObject(value, type, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto })));
-		}
-
-		public void Set(string key, string value) {
-			MetaCollection.Upsert(new KeyValuePair<string, string>(key, JsonConvert.SerializeObject(value, typeof(string), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto })));
-		}
-
-		public string Get(string key) => MetaCollection.FindOne(kvp => kvp.Key == key)?.Value;
-
-		public string Get(string key, string defaultValue) => MetaCollection.FindOne(kvp => kvp.Key == key)?.Value ?? defaultValue;
-
-		public object Get(String key, Type type) {
-			var value = Get(key);
-			if (value != null) {
-				return JsonConvert.DeserializeObject(value, type);
+		public VALUETYPE Get<VALUETYPE>(string key) where VALUETYPE : class {
+			var stored = Collection.FindOne(kvp => kvp.Key == key)?.Value;
+			if (stored == null) {
+				return null;
 			}
-			return value;
+			return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
 		}
 
-		public void Clear(String key) => MetaCollection.Delete(kvp => kvp.Key == key);
-
-		public void Clear() => MetaCollection.Delete(Query.All());
-
-		public void Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private bool disposed = false;
-		protected virtual void Dispose(bool disposing) {
-			if (disposing) {
-				if (!disposed) {
-					Db.Dispose();
-					disposed = true;
-				}
-			}
-		}
-
-		public void Set<VALUETYPE>(string key, VALUETYPE value) {
-			MetaCollection.Upsert(new MetaDataEntry(key, JsonConvert.SerializeObject(value, typeof(VALUETYPE), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto })));
-		}
-
-		public VALUETYPE Get<VALUETYPE>(string key) => (VALUETYPE)Get(key, typeof(VALUETYPE));
-
-		public VALUETYPE Get<VALUETYPE>(string key, VALUETYPE defaultValue) {
-			var value = Get<VALUETYPE>(key);
-			if (value.Equals(default(VALUETYPE))) {
+		public VALUETYPE Get<VALUETYPE>(string key, VALUETYPE defaultValue) where VALUETYPE : class {
+			var stored = Collection.FindOne(kvp => kvp.Key == key)?.Value;
+			if (stored == null) {
 				return defaultValue;
 			}
-			return value;
+			return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace MPMTest.Core {
 			this.output = output;
 		}
 
-		public class DbTestPair {
+		private class TestPair {
 			public static DbTestPair<TK, TV> Create<TK, TV>(TK key, TV value) => new DbTestPair<TK, TV>(key, value);
 		}
 
@@ -51,7 +51,7 @@ namespace MPMTest.Core {
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 				Func<string, string> formatter = baseKey => $"testDat{baseKey}";
 				foreach (var baseKey in baseKeys) {
-					dbCol.Insert(new DbTestPair<string, string>(baseKey, formatter(baseKey)));
+					dbCol.Insert(TestPair.Create(baseKey, formatter(baseKey)));
 				}
 				{
 					var contents = dbCol.FindAll();
@@ -74,9 +74,9 @@ namespace MPMTest.Core {
 				File.Delete(dbFilePath);
 				Thread.Sleep(TimeSpan.FromSeconds(0.05));
 			}
-			var db = new LiteDatabase($"filename={dbFilePath}; journal=false");
-			db.DropCollection("metaData");
-			using (var meta = new LiteDbMetaDataManager(db, "metaData")) {
+			using (var db = new LiteDatabase($"filename={dbFilePath}; journal=false")) {
+				db.DropCollection("metaData");
+				var meta = new LiteDbMetaDataManager(db.GetCollection("metaData"));
 				Assert.Empty(meta.Keys);
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 				Func<string, string> formatter = baseKey => $"testDat{baseKey}";
@@ -85,7 +85,7 @@ namespace MPMTest.Core {
 				}
 				{
 					var keys = meta.Keys.ToArray();
-					var contents = keys.Select(k => new KeyValuePair<string, string>(k, meta.Get<string>(k))).ToArray();
+					var contents = keys.Select(k => TestPair.Create(k, meta.Get<string>(k))).ToArray();
 					Assert.Equal<string>(baseKeys, keys);
 					var elements = contents.ToArray();
 					Assert.Equal<string>(elements.Select(e => e.Value), baseKeys.Select(formatter));
@@ -94,7 +94,7 @@ namespace MPMTest.Core {
 				{
 					var keyToDelete = meta.Keys.First();
 					Assert.NotNull(meta.Get<object>(keyToDelete));
-					meta.Clear(keyToDelete);
+					meta.Delete(keyToDelete);
 					Assert.Null(meta.Get<object>(keyToDelete));
 					Assert.DoesNotContain(keyToDelete, meta.Keys);
 				}
@@ -112,9 +112,9 @@ namespace MPMTest.Core {
 				File.Delete(dbFilePath);
 				Thread.Sleep(TimeSpan.FromSeconds(0.05));
 			}
-			var db = new LiteDatabase($"filename={dbFilePath}; journal=false");
-			db.DropCollection("profileData");
-			using (var profMgr = new LiteDbProfileManager(db, "profileData")) {
+			using (var db = new LiteDatabase($"filename={dbFilePath}; journal=false")) {
+				db.DropCollection("profileData");
+				var profMgr = new LiteDbProfileManager(db.GetCollection("profileData"));
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 
 				var profiles = new List<MutableProfile>();

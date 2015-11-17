@@ -9,74 +9,69 @@ using MPM.Extensions;
 
 namespace MPM.Data {
 	public class LiteDbCacheManager : ICacheManager {
-		private class LiteDbCacheEntry : ICacheEntry {
-			//Change to use connection string
-			private readonly string ConnectionString;
-			public readonly string Id;
-			public LiteDbCacheEntry(string connectionString, string id) {
-				this.ConnectionString = connectionString;
-				this.Id = id;
-			}
-			public Stream FetchStream() {
-				var memstr = new MemoryStream();
-				using (var db = new LiteDatabase(ConnectionString)) {
-					db.FileStorage.FindById(id: Id).OpenRead().CopyTo(memstr);
-					memstr.Seek(0, SeekOrigin.Begin);
-				}
-				return memstr;
-			}
-		}
 
-		public readonly String ConnectionString;
+		public readonly LiteDatabase Db;
 
-		public LiteDbCacheManager(string connectionString) {
-			this.ConnectionString = connectionString;
+		public LiteDbCacheManager(LiteDatabase db) {
+			if ((this.Db = db) == null) {
+				throw new ArgumentNullException(nameof(db));
+			}
 		}
 
 		public IEnumerable<ICacheEntry> Entries {
 			get {
-				using (var db = new LiteDatabase(ConnectionString)) {
-					return db.FileStorage.FindAll().Select(fileInfo => new LiteDbCacheEntry(ConnectionString, fileInfo.Id)).ToArray();
-				}
+				return Db.FileStorage.FindAll().Select(fileInfo => new LiteDbCacheEntry(this, fileInfo.Id)).ToArray();
 			}
 		}
 
 		public void Clear() {
-			using (var db = new LiteDatabase(ConnectionString)) {
-				var fileStorage = db.FileStorage;
-				foreach (var entryId in fileStorage.FindAll().Select(fileInfo => fileInfo.Id).ToArray()) {
-					fileStorage.Delete(entryId);
-				}
+			var fileStorage = Db.FileStorage;
+			foreach (var entryId in fileStorage.FindAll().Select(fileInfo => fileInfo.Id).ToArray()) {
+				fileStorage.Delete(entryId);
 			}
 		}
 
 		public bool Contains(string cacheEntryName) {
-			using (var db = new LiteDatabase(ConnectionString)) {
-				return db.FileStorage.FindById(cacheEntryName) != null;
-			}
+			return Db.FileStorage.FindById(cacheEntryName) != null;
 		}
 
 		public void Delete(string cacheEntryName) {
-			using (var db = new LiteDatabase(ConnectionString)) {
-				db.FileStorage.Delete(cacheEntryName);
-			}
+			Db.FileStorage.Delete(cacheEntryName);
 		}
 
 		public ICacheEntry Fetch(string cacheEntryName) {
-			using (var db = new LiteDatabase(ConnectionString)) {
-				var fileEntry = db.FileStorage.FindById(cacheEntryName);
-				if (fileEntry == null) {
-					return null;
-				}
-				return new LiteDbCacheEntry(ConnectionString, fileEntry.Id);
+			var fileEntry = Db.FileStorage.FindById(cacheEntryName);
+			if (fileEntry == null) {
+				return null;
 			}
+			return new LiteDbCacheEntry(this, fileEntry.Id);
 		}
 
 		public void Store(string cacheEntryName, byte[] entryData) {
-			using (var db = new LiteDatabase(ConnectionString)) {
-				using (var uploadStream = new MemoryStream(entryData, false)) {
-					db.FileStorage.Upload(new LiteFileInfo(cacheEntryName, cacheEntryName), uploadStream);
-				}
+			using (var uploadStream = new MemoryStream(entryData, false)) {
+				Db.FileStorage.Upload(new LiteFileInfo(cacheEntryName, cacheEntryName), uploadStream);
+			}
+		}
+
+		private Stream GetStreamForFileId(string id) {
+			var stream = Db.FileStorage.OpenRead(id);
+			if (stream == null) {
+				return null;
+			}
+			return stream;
+		}
+		private class LiteDbCacheEntry : ICacheEntry {
+			public LiteDbCacheEntry(LiteDbCacheManager cacheManager, string id) {
+				this.CacheManager = cacheManager;
+				this.Id = id;
+			}
+			public LiteDbCacheManager CacheManager { get; set; }
+			public string Id { get; set; }
+			public Stream FetchStream() {
+				var memstr = new MemoryStream();
+				CacheManager.GetStreamForFileId(id: Id).CopyToAndClose(memstr);
+				memstr.Seek(0, SeekOrigin.Begin);
+				return memstr;
 			}
 		}
 	}

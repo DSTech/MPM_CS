@@ -92,8 +92,8 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="LiteDB, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiteDB.1.0.3\lib\net40\LiteDB.dll</HintPath>
+    <Reference Include="LiteDB, Version=1.0.4.0, Culture=neutral, PublicKeyToken=5c2fff750805920e, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.1.0.4\lib\net40\LiteDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -120,8 +120,8 @@
       <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform, Version=1.1.0.215, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.1.0.215\lib\net40\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.1.0.229, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.1.0.229\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.1.0.109, Culture=neutral, processorArchitecture=MSIL">
@@ -132,8 +132,8 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.1.0.109\lib\net40\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.215, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.215\lib\net40\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.1.0.229, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.229\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerArgs, Version=2.7.0.0, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
@@ -206,7 +206,6 @@
     <Compile Include="Core\Dependency\InstanceConfigurationExtensions.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
-    <Compile Include="Core\Instances\Cache\FileSystemCacheEntry.cs" />
     <Compile Include="Core\Instances\Cache\FileSystemCacheManager.cs" />
     <Compile Include="Core\Dependency\Configuration.cs" />
     <Compile Include="Core\Dependency\DependencyException.cs" />
@@ -227,7 +226,7 @@
     <Compile Include="Data\LiteCollectionExtensions.cs" />
     <Compile Include="Data\LiteDbCacheManager.cs" />
     <Compile Include="Data\LiteDbMetaDataManager.cs" />
-    <Compile Include="Data\MetaDataEntry.cs" />
+    <Compile Include="Data\SyncInfo.cs" />
     <Compile Include="DisposerStreamWrapper.cs" />
     <Compile Include="Extensions\EnumeratorExtensions.cs" />
     <Compile Include="Core\Equality.cs" />
@@ -262,7 +261,6 @@
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Instances\Info\PackageInfoParser.cs" />
     <Compile Include="Core\Instances\Info\PackageJsonParser.cs" />
-    <Compile Include="Core\Profiles\DbProfileManager.cs" />
     <Compile Include="Core\Profiles\IProfileManager.cs" />
     <Compile Include="Core\Profiles\IProfileWriter.cs" />
     <Compile Include="Core\Profiles\IProfileReader.cs" />
@@ -271,21 +269,14 @@
     <Compile Include="Core\GlobalStorage.cs" />
     <Compile Include="Core\Profiles\MutableProfile.cs" />
     <Compile Include="Core\Protocols\IProtocolResolver.cs" />
-    <Compile Include="Data\BaseUntypedKeyValueStore.cs" />
-    <Compile Include="Data\DbUntypedKeyValueStore.cs" />
-    <Compile Include="Data\DbMetaDataManager.cs" />
-    <Compile Include="Data\DbPackageRepositoryCache.cs" />
     <Compile Include="Data\IHashRepository.cs" />
     <Compile Include="Data\IHashRetriever.cs" />
     <Compile Include="Data\HttpPackageRepository.cs" />
-    <Compile Include="Data\ITypedKeyValueStore.cs" />
-    <Compile Include="Data\IUntypedKeyValueStore.cs" />
     <Compile Include="Data\IPackageRepository.cs" />
     <Compile Include="Data\IPackageRepositoryCache.cs" />
     <Compile Include="Data\IMetaDataManager.cs" />
     <Compile Include="Data\NaiveHttpHashRepository.cs" />
     <Compile Include="Data\NaiveHttpHashRetriever.cs" />
-    <Compile Include="Data\TypifiedKeyValueStore.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\StackExtensions.cs" />
@@ -373,8 +364,8 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\codecracker.CSharp.1.0.0-rc3\analyzers\dotnet\cs\CodeCracker.Common.dll" />
-    <Analyzer Include="..\packages\codecracker.CSharp.1.0.0-rc3\analyzers\dotnet\cs\CodeCracker.CSharp.dll" />
+    <Analyzer Include="..\packages\codecracker.CSharp.1.0.0-rc4\analyzers\dotnet\cs\CodeCracker.Common.dll" />
+    <Analyzer Include="..\packages\codecracker.CSharp.1.0.0-rc4\analyzers\dotnet\cs\CodeCracker.CSharp.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.96.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.96.0\build\net45\System.Data.SQLite.Core.targets')" />

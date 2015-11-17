@@ -5,33 +5,13 @@ using LiteDB;
 using MPM.Data;
 
 namespace MPM.Core.Profiles {
-	public class LiteDbProfileManager : IProfileManager, IDisposable {
-		public readonly LiteDatabase Db;
-		public readonly string ProfileCollectionName;
-		private LiteCollection<MutableProfile> ProfileCollection => Db.GetCollection<MutableProfile>(ProfileCollectionName);
+	public class LiteDbProfileManager : IProfileManager {
+		private readonly LiteCollection<MutableProfile> ProfileCollection;
 
-		public LiteDbProfileManager(LiteDatabase db, string profileCollectionName) {
-			if ((this.Db = db) == null) {
-				throw new ArgumentNullException(nameof(db));
+		public LiteDbProfileManager(LiteCollection<BsonDocument> profileCollection) {
+			if ((this.ProfileCollection = profileCollection.Database.GetCollection<MutableProfile>(profileCollection.Name)) == null) {
+				throw new ArgumentNullException(nameof(profileCollection));
 			}
-			if ((this.ProfileCollectionName = profileCollectionName) == null) {
-				throw new ArgumentNullException(nameof(profileCollectionName));
-			}
-		}
-
-		public void Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-
-		private bool disposed = false;
-		protected virtual void Dispose(bool disposing) {
-			if (!disposing || disposed) {
-				return;
-			}
-			Db.Dispose();
-			disposed = true;
 		}
 
 		public IEnumerable<IProfile> Entries => ProfileCollection.FindAll();

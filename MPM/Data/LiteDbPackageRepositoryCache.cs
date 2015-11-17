@@ -14,7 +14,7 @@ using semver.tools;
 
 namespace MPM.Data {
 
-	public class LiteDbPackageRepositoryCache : IPackageRepositoryCache, IDisposable {
+	public class LiteDbPackageRepositoryCache : IPackageRepositoryCache {
 		public class PackageEntry {
 			public PackageEntry() { }
 			public PackageEntry(Package package) {
@@ -25,7 +25,9 @@ namespace MPM.Data {
 
 			[BsonId]
 			public String Name { get; set; }
+			[BsonField]
 			public Net.DTO.Author[] Authors { get; set; }
+			[BsonField]
 			public Net.DTO.Build[] Builds { get; set; }
 
 			public static implicit operator PackageEntry(Package package) {
@@ -48,33 +50,19 @@ namespace MPM.Data {
 		}
 
 		private const string SyncInfoMetaName = "syncInfo";
-
-		/// <summary>
-		/// Optionally-disposable,
-		/// </summary>
 		private readonly IPackageRepository repository;
-
-		/// <summary>
-		/// Whether or not the instance owns <see cref="repository"/> and must dispose of it if possible.
-		/// </summary>
-		private readonly bool ownsRepositoryInstance;
-
-		private readonly bool ownsMetaInstance;
 
 		private readonly LiteCollection<PackageEntry> Packages;
 		private readonly IMetaDataManager metaDb;
 
 
 		/// <param name="packageCacheDbFactory">Factory to fetch a package-cache database connection which may be disposed after usage.</param>
-		/// <param name="metaDbFactory">Factory to fetch a meta database connection which may be disposed after usage.</param>
+		/// <param name="metaDb">Metadata Manager</param>
 		/// <param name="repository">The repository that will be cached</param>
-		/// <param name="ownsRepositoryInstance">Whether or not this instance is responsible for disposal of the <paramref name="repository"/> instance</param>
-		public LiteDbPackageRepositoryCache(LiteDB.LiteCollection<PackageEntry> packages, IMetaDataManager metaDb, IPackageRepository repository, bool ownsMetaInstance = false, bool ownsRepositoryInstance = false) {
-			this.Packages = packages;
+		public LiteDbPackageRepositoryCache(LiteCollection<BsonDocument> packages, IMetaDataManager metaDb, IPackageRepository repository) {
+			this.Packages = packages.Database.GetCollection<PackageEntry>(packages.Name);
 			this.metaDb = metaDb;
 			this.repository = repository;
-			this.ownsMetaInstance = ownsMetaInstance;
-			this.ownsRepositoryInstance = ownsRepositoryInstance;
 		}
 
 		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
@@ -151,28 +139,6 @@ namespace MPM.Data {
 			await Task.Run(() => {
 				Packages.Upsert(package);
 			});
-		}
-
-		public void Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool disposing) {
-			if (disposing) {
-				if (metaDb != null) {
-					metaDb.Dispose();
-				}
-				if (repository != null) {
-					if (ownsRepositoryInstance) {
-						var disposableRepository = repository as IDisposable;
-						if (disposableRepository != null) {
-							disposableRepository.Dispose();
-							disposableRepository = null;
-						}
-					}
-				}
-			}
 		}
 	}
 }

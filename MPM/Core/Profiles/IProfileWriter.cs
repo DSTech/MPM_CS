@@ -9,7 +9,7 @@ namespace MPM.Core.Profiles {
 	/// <summary>
 	/// Allows writing of <see cref="IProfile"/>s to a profile store.
 	/// </summary>
-	public interface IProfileWriter : IDisposable {
+	public interface IProfileWriter {
 
 		void Store(IProfile profileData);
 
