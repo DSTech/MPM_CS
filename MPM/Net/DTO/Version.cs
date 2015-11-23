@@ -1,8 +1,37 @@
 using System;
+using MPM.Types;
 
 namespace MPM.Net.DTO {
 
-	public class Version {
+	public class Version : IEquatable<Version> {
+
+		public bool Equals(Version other) {
+			if (other == null) return false;
+			return (this.Major.Equals(other.Major) && this.Minor.Equals(other.Minor) && this.Patch.Equals(other.Patch));
+		}
+
+		public override bool Equals(object obj) => Equals(obj as Version);
+
+		public override int GetHashCode() {
+			return new Tuple<UInt16, UInt16, UInt16>(Major, Minor, Patch).GetHashCode();
+		}
+
+		public static bool operator ==(Version first, Version second) {
+			if (object.ReferenceEquals(first, second)) return true;
+			if (object.ReferenceEquals(first, null)) return false;
+			if (object.ReferenceEquals(second, null)) return false;
+
+			return first.Equals(second);
+		}
+
+		public static bool operator !=(Version first, Version second) {
+			if (object.ReferenceEquals(first, second)) return false;
+			if (object.ReferenceEquals(first, null)) return true;
+			if (object.ReferenceEquals(second, null)) return true;
+
+			return !first.Equals(second);
+		}
+
 		public UInt16 Major { get; set; }
 		public UInt16 Minor { get; set; }
 		public UInt16 Patch { get; set; }

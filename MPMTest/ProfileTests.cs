@@ -13,22 +13,21 @@ namespace MPMTest {
 		[Fact]
 		public void ProfileSaving() {
 			var gstore = new GlobalStorage();
-			Assert.Null(gstore.FetchProfile(Guid.Empty));
+			//Assert.Null(gstore.FetchProfile(Guid.Empty));
 			var profMgr = gstore.FetchProfileManager();
-			var testProfile = new MutableProfile(Guid.NewGuid(), "testProfile", new Dictionary<string, string> {
+			var testProfile = new MutableProfile("testProfile", new Dictionary<string, string> {
 				["testAttribute"] = "testValue",
 			});
 			try {
 				profMgr.Store(testProfile);//Profiles can be stored
-				var guidToLoad = new Guid(testProfile.Id.ToString());//Guids can be converted to and from strings
-				var loadedProfile = profMgr.Fetch(guidToLoad);//Profiles can be loaded
-				Assert.Equal(testProfile.Id, loadedProfile.Id);
+				var nameToLoad = testProfile.Name;
+				var loadedProfile = profMgr.Fetch(nameToLoad);//Profiles can be loaded
 				Assert.Equal(testProfile.Name, loadedProfile.Name);
 				foreach (var preferencePair in testProfile.Preferences) {
 					Assert.Equal(preferencePair.Value, loadedProfile.Preferences[preferencePair.Key]);
 				}
 			} finally {
-				profMgr.Delete(testProfile.Id);
+				profMgr.Delete(testProfile.Name);
 			}
 		}
 	}

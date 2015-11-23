@@ -44,12 +44,12 @@ namespace MPM.Core {
 				.SingleInstance()
 				.Named<ICacheManager>("GlobalCache");
 
-			cb.Register<IProfileManager>(ctxt => new LiteDbProfileManager(ctxt.Resolve<LiteDatabase>().GetCollection(ProfilesName)))
+			cb.Register<IProfileManager>(ctxt => new LiteDbProfileManager(ctxt.Resolve<LiteDatabase>().GetCollection<MutableProfile>(ProfilesName)))
 				.As<IProfileManager>()
 				.SingleInstance()
 				.Named<IProfileManager>("GlobalProfiles");
 
-			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection(MetaName)))
+			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
 				.As<IMetaDataManager>()
 				.SingleInstance()
 				.Named<IMetaDataManager>("GlobalMetaData");
@@ -77,7 +77,7 @@ namespace MPM.Core {
 
 		public IMetaDataManager FetchMetaDataManager() => Factory.Resolve<IMetaDataManager>();
 
-		public IProfile FetchProfile(Guid profileId) => FetchProfileManager().Fetch(profileId);
+		public IProfile FetchProfile(string profileName) => FetchProfileManager().Fetch(profileName);
 
 		public IProfileManager FetchProfileManager() => Factory.Resolve<IProfileManager>();
 

@@ -89,8 +89,8 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="LiteDB, Version=1.0.4.0, Culture=neutral, PublicKeyToken=5c2fff750805920e, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiteDB.1.0.4\lib\net40\LiteDB.dll</HintPath>
+    <Reference Include="LiteDB, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.2.0.0-beta\lib\net40\LiteDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -178,7 +178,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Core\VersionTests.cs" />
     <Compile Include="Core\Instances\Cache\CacheTests.cs" />
+    <Compile Include="Data\RepositoryTests.cs" />
     <Compile Include="Data\DbTests.cs" />
     <Compile Include="Extensions\StreamExtensionsTests.cs" />
     <Compile Include="InstallationScriptTests.cs" />

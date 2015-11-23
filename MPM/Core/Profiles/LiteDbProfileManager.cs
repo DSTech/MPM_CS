@@ -8,23 +8,23 @@ namespace MPM.Core.Profiles {
 	public class LiteDbProfileManager : IProfileManager {
 		private readonly LiteCollection<MutableProfile> ProfileCollection;
 
-		public LiteDbProfileManager(LiteCollection<BsonDocument> profileCollection) {
-			if ((this.ProfileCollection = profileCollection.Database.GetCollection<MutableProfile>(profileCollection.Name)) == null) {
+		public LiteDbProfileManager(LiteCollection<MutableProfile> profileCollection) {
+			if ((this.ProfileCollection = profileCollection) == null) {
 				throw new ArgumentNullException(nameof(profileCollection));
 			}
 		}
 
 		public IEnumerable<IProfile> Entries => ProfileCollection.FindAll();
 
-		public IEnumerable<Guid> Ids => ProfileCollection.FindAll().Select(x => x.Id);
+		public IEnumerable<String> Names => ProfileCollection.FindAll().Select(x => x.Name);
 
 		public void Clear() => ProfileCollection.Delete(Query.All());
 
-		public bool Contains(Guid profileId) => Fetch(profileId) != null;
+		public bool Contains(String profileName) => Fetch(profileName) != null;
 
-		public void Delete(Guid profileId) => ProfileCollection.Delete(profileId);
+		public void Delete(String profileName) => ProfileCollection.Delete(profile => profile.Name == profileName);
 
-		public IProfile Fetch(Guid profileId) => ProfileCollection.FindById(profileId);
+		public IProfile Fetch(String profileName) => ProfileCollection.FindOne(profile => profile.Name == profileName);
 
 		public void Store(IProfile profileData) {
 			var mutableProfile = profileData.ToMutableProfile();

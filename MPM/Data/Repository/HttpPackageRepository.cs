@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using semver.tools;
 
-namespace MPM.Data {
+namespace MPM.Data.Repository {
 
 	public class HttpPackageRepository : IPackageRepository {
 		private readonly Uri baseUri;

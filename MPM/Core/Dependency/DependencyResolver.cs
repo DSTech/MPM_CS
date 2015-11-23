@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
+using MPM.Data.Repository;
 using MPM.Types;
 using QuickGraph;
 using QuickGraph.Algorithms;
@@ -17,7 +18,7 @@ using QuickGraph.Data;
 
 namespace MPM.Core.Dependency {
 
-	public class Resolver : IResolver {
+	public class DependencyResolver : IDependencyResolver {
 
 		public async Task<InstanceConfiguration> Resolve(Configuration target, IPackageRepository repository) {
 			//Packages which exist in the resultant configuration- Only one version of a package may exist in the result
@@ -97,7 +98,7 @@ namespace MPM.Core.Dependency {
 					output.AddRange(resolvedDeps);
 				}
 				return SortBuilds(output).ToArray();
-			nextBuild: continue;
+				nextBuild: continue;
 			}
 			throw new DependencyException("Could not resolve package, no viable dependency tree found", packageSpec);
 		}

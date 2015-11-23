@@ -13,7 +13,7 @@ namespace MPM.Core.Profiles {
 
 		void Store(IProfile profileData);
 
-		void Delete(Guid profileId);
+		void Delete(String profileName);
 
 		void Clear();
 	}

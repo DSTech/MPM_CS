@@ -4,38 +4,35 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 using MPM.Extensions;
+using Newtonsoft.Json;
 
 namespace MPM.Core.Profiles {
 	public static class MutableProfileExtensions {
 		public static MutableProfile ToMutableProfile(this IProfile profile) {
 			return new MutableProfile {
-				Id = profile.Id,
 				Name = profile.Name,
 				Preferences = profile.Preferences.ToDictionary(x => x.Key, x => x.Value),
 			};
 		}
 	}
 	public class MutableProfile : IProfile {
-
 		public MutableProfile() {
 		}
 
-		public MutableProfile(Guid id, String name, IReadOnlyDictionary<string, string> preferences = null) {
-			this.Id = id;
+		public MutableProfile(String name, IReadOnlyDictionary<string, string> preferences = null) {
 			this.Name = name;
 			this.Preferences = preferences?.ToDictionary(pair => pair.Key, pair => pair.Value);
 		}
 
-		[LiteDB.BsonId]
-		public Guid Id { get; set; }
-
-		[LiteDB.BsonField, LiteDB.BsonIndex]
+		[BsonField, BsonIndex]
 		public string Name { get; set; }
 
-		[LiteDB.BsonField]
-		public IDictionary<string, string> Preferences { get; set; } = new Dictionary<string, string>();
+		[BsonField]
+		public Dictionary<string, string> Preferences { get; set; } = new Dictionary<string, string>();
 
+		[BsonIgnore]
 		IReadOnlyDictionary<string, string> IProfile.Preferences => Preferences.AsReadOnly();
 	}
 }

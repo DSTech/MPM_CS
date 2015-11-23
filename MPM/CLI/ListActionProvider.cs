@@ -13,6 +13,7 @@ using MPM.Core.Instances;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Data;
+using MPM.Data.Repository;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 using semver.tools;

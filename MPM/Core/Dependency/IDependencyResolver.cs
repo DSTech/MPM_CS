@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
+using MPM.Data.Repository;
 using MPM.Types;
 
 namespace MPM.Core.Dependency {
@@ -12,7 +13,7 @@ namespace MPM.Core.Dependency {
 	public static class IResolverExtensions {
 	}
 
-	public interface IResolver {
+	public interface IDependencyResolver {
 
 		/// <summary>
 		/// Returns a configuration containing the non-manual dependencies required for installation.

@@ -45,7 +45,7 @@ namespace MPM.Core.Instances {
 				.SingleInstance()
 				.Named<IFileSystem>("InstanceProfiles");
 
-			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection(MetaName)))
+			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
 				.As<IMetaDataManager>()
 				.SingleInstance()
 				.Named<IMetaDataManager>("InstanceMetaData");

@@ -76,8 +76,8 @@ namespace MPM.Net {
 
 		public static DTO.Package ToDTO(this Types.Package package) => new DTO.Package {
 			Name = package.Name,
-			Authors = package.Authors.Select(author => author.ToDTO()).ToArray(),
-			Builds = package.Builds.Select(build => build.ToDTO()).ToArray(),
+			Authors = package.Authors.Select(author => author.ToDTO()).ToList(),
+			Builds = package.Builds.Select(build => build.ToDTO()).ToList(),
 		};
 
 		//Build
@@ -100,14 +100,14 @@ namespace MPM.Net {
 		public static DTO.Build ToDTO(this Types.Build build) => new DTO.Build {
 			Package = build.PackageName,
 			Arch = build.Arch.ToDTO(),
-			Conflicts = build.Conflicts.Select(conflict => conflict.ToDTO()).ToArray(),
-			Interfaces = build.InterfaceProvisions.Select(interfaceProvision => interfaceProvision.ToDTO()).ToArray(),
+			Conflicts = build.Conflicts.Select(conflict => conflict.ToDTO()).ToList(),
+			Interfaces = build.InterfaceProvisions.Select(interfaceProvision => interfaceProvision.ToDTO()).ToList(),
 			Dependencies = new DTO.DependencySpec {
 				Interfaces = build.InterfaceDependencies.Select(interfaceDependency => interfaceDependency.ToDTO()).ToArray(),
 				Packages = build.PackageDependencies.Select(packageDependency => packageDependency.ToDTO()).ToArray(),
 			},
 			GivenVersion = build.GivenVersion,
-			Hashes = build.Hashes.Denull().Select(hash => hash.ToString()).ToArray(),
+			Hashes = build.Hashes.Denull().Select(hash => hash.ToString()).ToList(),
 			Platform = build.Platform.ToDTO(),
 			Recommended = build.Recommended,
 			Side = build.Side.ToDTO(),

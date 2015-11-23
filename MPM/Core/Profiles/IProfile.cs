@@ -14,7 +14,6 @@ namespace MPM.Core.Profiles {
 	/// such as- for example- non-gameplay-affecting game configuration. Launcher-specific keys should be formatted launcherName_preferenceName.
 	/// </remarks>
 	public interface IProfile {
-		Guid Id { get; }
 		string Name { get; }
 		IReadOnlyDictionary<string, string> Preferences { get; }
 	}

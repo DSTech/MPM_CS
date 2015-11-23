@@ -35,11 +35,10 @@ namespace MPM.Data {
 			.FindAll()
 			.Select(x => new KeyValuePair<string, object>(x.Key, JsonConvert.DeserializeObject(x.Value)));
 
-		public LiteDbMetaDataManager(LiteDB.LiteCollection<BsonDocument> metaDataCollection) {
-			if (metaDataCollection == null) {
+		public LiteDbMetaDataManager(LiteDB.LiteCollection<MetaDataEntry> metaDataCollection) {
+			if ((this.Collection = metaDataCollection) == null) {
 				throw new ArgumentNullException(nameof(metaDataCollection));
 			}
-			this.Collection = metaDataCollection.Database.GetCollection<MetaDataEntry>(metaDataCollection.Name);
 		}
 
 		public bool Contains(String key) {

@@ -13,6 +13,7 @@ using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Installation;
 using MPM.Core.Protocols;
 using MPM.Data;
+using MPM.Data.Repository;
 using MPM.Types;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
@@ -135,7 +136,7 @@ namespace MPM.CLI {
 			}) {
 
 				//TODO: Install arch pseudopackage
-				var resolver = factory.Resolve<IResolver>();
+				var resolver = factory.Resolve<IDependencyResolver>();
 				var repository = factory.Resolve<IPackageRepository>();
 
 				Console.WriteLine("Generating configuration...");

@@ -11,10 +11,10 @@ namespace MPM.Core.Profiles {
 	/// </summary>
 	public interface IProfileReader {
 		IEnumerable<IProfile> Entries { get; }
-		IEnumerable<Guid> Ids { get; }
+		IEnumerable<String> Names { get; }
 
-		bool Contains(Guid profileId);
+		bool Contains(String name);
 
-		IProfile Fetch(Guid profileId);
+		IProfile Fetch(String name);
 	}
 }

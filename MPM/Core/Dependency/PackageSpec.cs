@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
+using MPM.Data.Repository;
 using MPM.Types;
 using semver.tools;
 
@@ -24,6 +25,7 @@ namespace MPM.Core.Dependency {
 		}
 
 		public static bool IsPlatformCompatible(CompatibilityPlatform package, CompatibilityPlatform environment) {
+			//Take care of bitness-specific platform specifications
 			if (package == environment) {
 				return true;
 			}

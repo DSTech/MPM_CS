@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using MPM.Types;
 using semver.tools;
 
-namespace MPM.Data {
+namespace MPM.Data.Repository {
 
 	/// <summary>
 	/// Provides a package repository interface to allow the loading of package information.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MPM.Types;
 
-namespace MPM.Data {
+namespace MPM.Data.Repository {
 
 	public static class IHashRepositoryExtensions {
 

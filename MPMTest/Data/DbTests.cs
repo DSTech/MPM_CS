@@ -13,7 +13,7 @@ using MPM.Core.Profiles;
 using System.IO;
 using System.Threading;
 
-namespace MPMTest.Core {
+namespace MPMTest.Data {
 
 	public class DbTests {
 		private readonly ITestOutputHelper output;
@@ -22,7 +22,7 @@ namespace MPMTest.Core {
 			this.output = output;
 		}
 
-		private class TestPair {
+		private class DbTestPair {
 			public static DbTestPair<TK, TV> Create<TK, TV>(TK key, TV value) => new DbTestPair<TK, TV>(key, value);
 		}
 
@@ -51,7 +51,7 @@ namespace MPMTest.Core {
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 				Func<string, string> formatter = baseKey => $"testDat{baseKey}";
 				foreach (var baseKey in baseKeys) {
-					dbCol.Insert(TestPair.Create(baseKey, formatter(baseKey)));
+					dbCol.Insert(DbTestPair.Create(baseKey, formatter(baseKey)));
 				}
 				{
 					var contents = dbCol.FindAll();
@@ -76,7 +76,7 @@ namespace MPMTest.Core {
 			}
 			using (var db = new LiteDatabase($"filename={dbFilePath}; journal=false")) {
 				db.DropCollection("metaData");
-				var meta = new LiteDbMetaDataManager(db.GetCollection("metaData"));
+				var meta = new LiteDbMetaDataManager(db.GetCollection<LiteDbMetaDataManager.MetaDataEntry>("metaData"));
 				Assert.Empty(meta.Keys);
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 				Func<string, string> formatter = baseKey => $"testDat{baseKey}";
@@ -85,7 +85,7 @@ namespace MPMTest.Core {
 				}
 				{
 					var keys = meta.Keys.ToArray();
-					var contents = keys.Select(k => TestPair.Create(k, meta.Get<string>(k))).ToArray();
+					var contents = keys.Select(k => DbTestPair.Create(k, meta.Get<string>(k))).ToArray();
 					Assert.Equal<string>(baseKeys, keys);
 					var elements = contents.ToArray();
 					Assert.Equal<string>(elements.Select(e => e.Value), baseKeys.Select(formatter));
@@ -114,12 +114,12 @@ namespace MPMTest.Core {
 			}
 			using (var db = new LiteDatabase($"filename={dbFilePath}; journal=false")) {
 				db.DropCollection("profileData");
-				var profMgr = new LiteDbProfileManager(db.GetCollection("profileData"));
+				var profMgr = new LiteDbProfileManager(db.GetCollection<MutableProfile>("profileData"));
 				var baseKeys = new[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 
 				var profiles = new List<MutableProfile>();
 				foreach (var baseKey in baseKeys) {
-					profiles.Add(new MutableProfile(Guid.NewGuid(), baseKey, new Dictionary<string, string> {
+					profiles.Add(new MutableProfile(baseKey, new Dictionary<string, string> {
 						["name"] = baseKey,
 					}));
 				}
@@ -129,8 +129,8 @@ namespace MPMTest.Core {
 				}
 
 				foreach (var profile in profiles) {
-					Assert.True(profMgr.Contains(profileId: profile.Id));
-					var fetchedProfile = profMgr.Fetch(profileId: profile.Id);
+					Assert.True(profMgr.Contains(profileName: profile.Name));
+					var fetchedProfile = profMgr.Fetch(profileName: profile.Name);
 					Assert.NotNull(fetchedProfile);
 					Assert.Equal(profile.Name, fetchedProfile.Name);
 					var prefKeysOrdered = profile.Preferences.Keys.OrderBy(x => x);
@@ -140,14 +140,14 @@ namespace MPMTest.Core {
 				}
 
 				{
-					var profileCount = profMgr.Ids.Count();
+					var profileCount = profMgr.Names.Count();
 					Assert.Equal(profileCount, profMgr.Entries.Count());
 					{
 						var profileToDelete = profiles[new Random().Next(profiles.Count)];
-						profMgr.Delete(profileId: profileToDelete.Id);
-						Assert.False(profMgr.Contains(profileId: profileToDelete.Id));
+						profMgr.Delete(profileName: profileToDelete.Name);
+						Assert.False(profMgr.Contains(profileName: profileToDelete.Name));
 					}
-					Assert.Equal(profileCount - 1, profMgr.Ids.Count());
+					Assert.Equal(profileCount - 1, profMgr.Names.Count());
 				}
 			}
 			if (File.Exists(dbFilePath)) {

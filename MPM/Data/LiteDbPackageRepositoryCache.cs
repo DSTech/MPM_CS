@@ -11,6 +11,7 @@ using MPM.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using semver.tools;
+using MPM.Data.Repository;
 
 namespace MPM.Data {
 
@@ -19,16 +20,16 @@ namespace MPM.Data {
 			public PackageEntry() { }
 			public PackageEntry(Package package) {
 				this.Name = package.Name;
-				this.Authors = package.Authors.Select(DTOTranslationExtensions.ToDTO).ToArray();
-				this.Builds = package.Builds.Select(DTOTranslationExtensions.ToDTO).ToArray();
+				this.Authors = package.Authors.Select(DTOTranslationExtensions.ToDTO).ToList();
+				this.Builds = package.Builds.Select(DTOTranslationExtensions.ToDTO).ToList();
 			}
 
 			[BsonId]
 			public String Name { get; set; }
 			[BsonField]
-			public Net.DTO.Author[] Authors { get; set; }
+			public List<Net.DTO.Author> Authors { get; set; }
 			[BsonField]
-			public Net.DTO.Build[] Builds { get; set; }
+			public List<Net.DTO.Build> Builds { get; set; }
 
 			public static implicit operator PackageEntry(Package package) {
 				return new PackageEntry(package);
@@ -59,8 +60,10 @@ namespace MPM.Data {
 		/// <param name="packageCacheDbFactory">Factory to fetch a package-cache database connection which may be disposed after usage.</param>
 		/// <param name="metaDb">Metadata Manager</param>
 		/// <param name="repository">The repository that will be cached</param>
-		public LiteDbPackageRepositoryCache(LiteCollection<BsonDocument> packages, IMetaDataManager metaDb, IPackageRepository repository) {
-			this.Packages = packages.Database.GetCollection<PackageEntry>(packages.Name);
+		public LiteDbPackageRepositoryCache(LiteCollection<PackageEntry> packages, IMetaDataManager metaDb, IPackageRepository repository) {
+			if ((this.Packages = packages) == null) {
+				throw new ArgumentNullException(nameof(packages));
+			}
 			this.metaDb = metaDb;
 			this.repository = repository;
 		}

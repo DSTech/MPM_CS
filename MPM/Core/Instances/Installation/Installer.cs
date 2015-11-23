@@ -9,6 +9,7 @@ using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Info;
 using MPM.Core.Protocols;
 using MPM.Data;
+using MPM.Data.Repository;
 using MPM.Types;
 using Platform.VirtualFileSystem;
 
@@ -30,7 +31,7 @@ namespace MPM.Core.Instances.Installation {
 			this.cacheManager = cacheManager;
 			this.protocolResolver = protocolResolver;
 		}
-		
+
 		/// <summary>
 		/// Adds a package to an instance's configuration, then performs necessary filesystem modifications the package requests.
 		/// </summary>
