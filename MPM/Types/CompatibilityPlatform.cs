@@ -1,5 +1,4 @@
 namespace MPM.Types {
-
 	public enum CompatibilityPlatform {
 		Lin32,//Linux x32
 		Lin64,//Linux x64
@@ -11,6 +10,6 @@ namespace MPM.Types {
 
 		Universal32,//Platform independent x32
 		Universal64,//Platform independent x64
-		Universal,//Platform and bitness independent
+		Universal//Platform and bitness independent
 	}
 }

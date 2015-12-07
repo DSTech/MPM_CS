@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MPM.Types {
-
 	public class Hash {
+		public Hash() {
+		}
 
 		public Hash(string algorithm, byte[] checksum) {
 			this.Algorithm = algorithm;
@@ -18,24 +15,24 @@ namespace MPM.Types {
 			this.Checksum = checksum;
 		}
 
-		public String Algorithm { get; }
+		public String Algorithm { get; set; }
 
-		public Byte[] Checksum { get; }
+		public Byte[] Checksum { get; set; }
 
 		public static Hash Parse(string hashString) {
-			var _hashString = hashString.ToLower().Trim();
+			var lowerHashString = hashString.ToLower().Trim();
 
-			var algChecksumPair = _hashString.Split(new[] { ':' }, 2);//Destructuring for C# 7 please?
+			var algChecksumPair = lowerHashString.Split(new[] { ':' }, 2);//Destructuring for C# 7 please?
 
 			if (algChecksumPair.Length == 2) {
 				var algorithm = algChecksumPair[0];
 				var checksum = Convert.FromBase64String(algChecksumPair[1]);
 
-				return new Hash(algorithm: algorithm, checksum: checksum);
+				return new Hash(algorithm, checksum);
 			} else {
 				var checksum = Convert.FromBase64String(algChecksumPair[0]);
 
-				return new Hash(checksum: checksum);
+				return new Hash(checksum);
 			}
 		}
 

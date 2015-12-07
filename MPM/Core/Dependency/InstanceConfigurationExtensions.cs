@@ -14,19 +14,17 @@ namespace MPM.Core.Dependency {
 		/// Checks for conflicts in the specified configuration.
 		/// </summary>
 		/// <param name="configuration"><see cref="InstanceConfiguration"/> within which to check for conflicts</param>
-		/// <returns>An enumerable of tuples containing a specific <see cref="NamedBuild"/> and <see cref="PackageConflict"/> specified by the returned build.</returns>
+		/// <returns>An enumerable of tuples containing a specific <see cref="NamedBuild"/> and <see cref="Net.DTO.PackageConflict"/> specified by the returned build.</returns>
 		public static IEnumerable<Tuple<Build, Conflict>> FindConflicts(this InstanceConfiguration configuration) {
-			foreach (var build in configuration.Packages) {
-				var conflicts = build.FindConflicts(
-					configuration
-						.Packages
-						.Where(spec => spec.PackageName != build.PackageName)
-						.ToArray()
-				);
-				foreach (var conflict in conflicts) {
-					yield return Tuple.Create(build, conflict);
-				}
-			}
+			return from build in configuration.Packages
+						 let conflicts = build.FindConflicts(
+configuration
+.Packages
+.Where(spec => spec.PackageName != build.PackageName)
+.ToArray()
+)
+						 from conflict in conflicts
+						 select Tuple.Create(build, conflict);
 		}
 
 		/// <summary>
@@ -37,7 +35,7 @@ namespace MPM.Core.Dependency {
 		/// </remarks>
 		/// <param name="build">The build for which to check conflict conditions</param>
 		/// <param name="otherBuilds">The other builds in the <see cref="InstanceConfiguration"/> to check conditions against</param>
-		/// <returns>Any <see cref="PackageConflict"/> triggered by a particular set of packages interacting with the given <see cref="NamedBuild"/></returns>
+		/// <returns>Any <see cref="Net.DTO.PackageConflict"/> triggered by a particular set of packages interacting with the given <see cref="NamedBuild"/></returns>
 		public static IEnumerable<Conflict> FindConflicts(this Build build, Build[] otherBuilds) {
 			var packageNames = otherBuilds
 				.Select(b => b.PackageName)
