@@ -1,41 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using LiteDB;
+using MPM.Core.Profiles;
+using MPM.Data;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
-using Newtonsoft.Json;
-using MPM.Extensions;
-using LiteDB;
-using MPM.Data;
-using MPM.Core.Profiles;
-using System.IO;
-using System.Threading;
 
 namespace MPMTest.Data {
-
 	public class DbTests {
 		private readonly ITestOutputHelper output;
 
 		public DbTests(ITestOutputHelper output) {
 			this.output = output;
-		}
-
-		private class DbTestPair {
-			public static DbTestPair<TK, TV> Create<TK, TV>(TK key, TV value) => new DbTestPair<TK, TV>(key, value);
-		}
-
-		public class DbTestPair<TK, TV> {
-			public TK Key { get; set; }
-			public TV Value { get; set; }
-			public DbTestPair() { }
-			public DbTestPair(TK key, TV value) {
-				this.Key = key;
-				this.Value = value;
-			}
-			public static implicit operator KeyValuePair<TK, TV>(DbTestPair<TK, TV> pair) => new KeyValuePair<TK, TV>(pair.Key, pair.Value);
-			public static implicit operator DbTestPair<TK, TV>(KeyValuePair<TK, TV> pair) => new DbTestPair<TK, TV>(pair.Key, pair.Value);
 		}
 
 		[Fact]
@@ -58,7 +38,7 @@ namespace MPMTest.Data {
 					var keys = contents.Select(kv => kv.Key).ToArray();
 					Assert.Equal<string>(baseKeys, keys);
 					var elements = contents.ToArray();
-					Assert.Equal<string>(elements.Select(e => e.Value), baseKeys.Select(formatter));
+					Assert.Equal(elements.Select(e => e.Value), baseKeys.Select(formatter));
 					output.WriteLine(JsonConvert.SerializeObject(elements));
 				}
 			}
@@ -88,7 +68,7 @@ namespace MPMTest.Data {
 					var contents = keys.Select(k => DbTestPair.Create(k, meta.Get<string>(k))).ToArray();
 					Assert.Equal<string>(baseKeys, keys);
 					var elements = contents.ToArray();
-					Assert.Equal<string>(elements.Select(e => e.Value), baseKeys.Select(formatter));
+					Assert.Equal(elements.Select(e => e.Value), baseKeys.Select(formatter));
 					output.WriteLine(JsonConvert.SerializeObject(elements));
 				}
 				{
@@ -119,9 +99,12 @@ namespace MPMTest.Data {
 
 				var profiles = new List<MutableProfile>();
 				foreach (var baseKey in baseKeys) {
-					profiles.Add(new MutableProfile(baseKey, new Dictionary<string, string> {
-						["name"] = baseKey,
-					}));
+					profiles.Add(
+						new MutableProfile(
+							baseKey,
+							new Dictionary<string, string> {
+								["name"] = baseKey
+							}));
 				}
 
 				foreach (var profile in profiles) {
@@ -129,14 +112,16 @@ namespace MPMTest.Data {
 				}
 
 				foreach (var profile in profiles) {
-					Assert.True(profMgr.Contains(profileName: profile.Name));
-					var fetchedProfile = profMgr.Fetch(profileName: profile.Name);
+					Assert.True(profMgr.Contains(profile.Name));
+					var fetchedProfile = profMgr.Fetch(profile.Name);
 					Assert.NotNull(fetchedProfile);
 					Assert.Equal(profile.Name, fetchedProfile.Name);
 					var prefKeysOrdered = profile.Preferences.Keys.OrderBy(x => x);
 					var fetchedKeysOrdered = fetchedProfile.Preferences.Keys.OrderBy(x => x);
 					Assert.Equal<string>(prefKeysOrdered, fetchedKeysOrdered);
-					Assert.Equal<string>(prefKeysOrdered.Select(key => profile.Preferences[key]), fetchedKeysOrdered.Select(key => fetchedProfile.Preferences[key]));
+					Assert.Equal(
+						prefKeysOrdered.Select(key => profile.Preferences[key]),
+						fetchedKeysOrdered.Select(key => fetchedProfile.Preferences[key]));
 				}
 
 				{
@@ -144,8 +129,8 @@ namespace MPMTest.Data {
 					Assert.Equal(profileCount, profMgr.Entries.Count());
 					{
 						var profileToDelete = profiles[new Random().Next(profiles.Count)];
-						profMgr.Delete(profileName: profileToDelete.Name);
-						Assert.False(profMgr.Contains(profileName: profileToDelete.Name));
+						profMgr.Delete(profileToDelete.Name);
+						Assert.False(profMgr.Contains(profileToDelete.Name));
 					}
 					Assert.Equal(profileCount - 1, profMgr.Names.Count());
 				}
@@ -153,6 +138,29 @@ namespace MPMTest.Data {
 			if (File.Exists(dbFilePath)) {
 				File.Delete(dbFilePath);
 			}
+		}
+
+		private class DbTestPair {
+			public static DbTestPair<TK, TV> Create<TK, TV>(TK key, TV value) => new DbTestPair<TK, TV>(key, value);
+		}
+
+		public class DbTestPair<TK, TV> {
+			public DbTestPair() {
+			}
+
+			public DbTestPair(TK key, TV value) {
+				this.Key = key;
+				this.Value = value;
+			}
+
+			public TK Key { get; set; }
+			public TV Value { get; set; }
+
+			public static implicit operator KeyValuePair<TK, TV>(DbTestPair<TK, TV> pair)
+				=> new KeyValuePair<TK, TV>(pair.Key, pair.Value);
+
+			public static implicit operator DbTestPair<TK, TV>(KeyValuePair<TK, TV> pair)
+				=> new DbTestPair<TK, TV>(pair.Key, pair.Value);
 		}
 	}
 }

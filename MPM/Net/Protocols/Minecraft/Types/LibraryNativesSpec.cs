@@ -14,6 +14,8 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 	/// }
 	/// </example>
 	public class LibraryNativesSpec {
+		public LibraryNativesSpec() {
+		}
 
 		public LibraryNativesSpec(string windows, string linux, string osx) {
 			this.Windows = windows ?? "natives-windows";
@@ -62,16 +64,16 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>
-		public string Windows { get; }
+		public string Windows { get; set; }
 
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>
-		public string Linux { get; }
+		public string Linux { get; set; }
 
 		///<summary>
 		/// See info for <seealso cref="LibraryNativesSpec"/>
 		///</summary>
-		public string Osx { get; }
+		public string Osx { get; set; }
 	}
 }

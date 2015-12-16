@@ -1,9 +1,8 @@
-using System;
+using System.Collections.Generic;
 
 namespace MPM.Net.DTO {
-
 	public class DependencySpec {
-		public PackageDependency[] Packages { get; set; }
-		public InterfaceDependency[] Interfaces { get; set; }
+		public List<PackageDependency> Packages { get; set; }
+		public List<InterfaceDependency> Interfaces { get; set; }
 	}
 }

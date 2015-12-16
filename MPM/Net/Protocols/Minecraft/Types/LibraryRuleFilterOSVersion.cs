@@ -4,6 +4,8 @@ using MPM.Types;
 namespace MPM.Net.Protocols.Minecraft.Types {
 
 	public class LibraryRuleFilterOSVersion : LibraryRuleFilter {
+		public LibraryRuleFilterOSVersion() {
+		}
 		public LibraryRuleFilterOSVersion(string version) {
 			this.Version = version.ToLowerInvariant();
 		}
@@ -16,6 +18,6 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 			//TODO: OS versions are unaccounted for, for now. They are not part of the MPM specification.
 			return true;
 		}
-		public string Version { get; }
+		public string Version { get; set; }
 	}
 }

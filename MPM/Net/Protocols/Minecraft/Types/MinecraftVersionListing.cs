@@ -8,6 +8,8 @@ using MPM.Extensions;
 namespace MPM.Net.Protocols.Minecraft.Types {
 
 	public class MinecraftVersionListing {
+		public MinecraftVersionListing() {
+		}
 		public MinecraftVersionListing(
 			string id,
 			DateTime releaseTime,
@@ -18,16 +20,16 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 			this.Type = releaseType;
 		}
 
-		public string Id { get; }
+		public string Id { get; set; }
 
 		/// <summary>
 		/// Time of release in string format, eg: 2014-05-14T19:29:23+02:00
 		/// </summary>
-		public DateTime ReleaseTime { get; }
+		public DateTime ReleaseTime { get; set; }
 
 		/// <summary>
 		/// <see cref="ReleaseType"/> of version, eg <see cref="ReleaseType.Release"/> or <see cref="ReleaseType.Snapshot"/>
 		/// </summary>
-		public ReleaseType Type { get; }
+		public ReleaseType Type { get; set; }
 	}
 }

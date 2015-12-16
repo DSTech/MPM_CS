@@ -6,6 +6,8 @@ using MPM.Types;
 namespace MPM.Net.Protocols.Minecraft.Types {
 
 	public class LibrarySpec {
+		public LibrarySpec() {
+		}
 
 		public LibrarySpec(string package, string name, string version, LibraryNativesSpec nativesSpec, LibraryExtractSpec extractSpec, IEnumerable<LibraryRuleSpec> rules) {
 			this.Package = package;
@@ -13,40 +15,40 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 			this.Version = version;
 			this.Natives = nativesSpec;
 			this.Extract = extractSpec;
-			this.Rules = rules.ToArray();
+			this.Rules = rules.ToList();
 		}
 
 		/// <summary>
 		/// Package of the library being specified, eg: "com.google.code.gson"
 		/// </summary>
-		public string Package { get; }
+		public string Package { get; set; }
 
 		/// <summary>
 		/// Name of the library being specified, eg: "gson"
 		/// </summary>
-		public string Name { get; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Version of the library being specified, eg: "2.2.4"
 		/// </summary>
-		public string Version { get; }
+		public string Version { get; set; }
 
 		/// <summary>
 		/// A description of native libraries to be used to supplement a particular library
 		/// </summary>
-		public LibraryNativesSpec Natives { get; }
+		public LibraryNativesSpec Natives { get; set; }
 
 		public string ApplyNatives(CompatibilityPlatform platform) => Natives?.AppliedTo(platform);
 
 		/// <summary>
 		/// A description of how a package should be extracted, with optional exclusions
 		/// </summary>
-		public LibraryExtractSpec Extract { get; }
+		public LibraryExtractSpec Extract { get; set; }
 
 		/// <summary>
 		/// A series of rules for whether or not a library is allowed on an operating system. Later entries take precedence over previous ones
 		/// </summary>
-		public IReadOnlyList<LibraryRuleSpec> Rules { get; }
+		public List<LibraryRuleSpec> Rules { get; set; }
 
 		public bool Applies(CompatibilityPlatform platform) {
 			if (Rules.Count == 0) {

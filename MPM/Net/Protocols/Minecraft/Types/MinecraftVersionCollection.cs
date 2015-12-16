@@ -9,17 +9,19 @@ using MPM.Extensions;
 namespace MPM.Net.Protocols.Minecraft.Types {
 
 	public class MinecraftVersionCollection : IReadOnlyList<MinecraftVersionListing> {
+		public MinecraftVersionCollection() {
+		}
 
 		public MinecraftVersionCollection(MinecraftVersionListing latestRelease, MinecraftVersionListing latestSnapshot, IEnumerable<MinecraftVersionListing> versions) {
 			this.LatestRelease = latestRelease;
 			this.LatestSnapshot = latestSnapshot;
-			this.Versions = versions.Denull().ToArray();
+			this.Versions = versions.Denull().ToList();
 		}
 
-		public MinecraftVersionListing LatestSnapshot { get; }
-		public MinecraftVersionListing LatestRelease { get; }
+		public MinecraftVersionListing LatestSnapshot { get; set; }
+		public MinecraftVersionListing LatestRelease { get; set; }
 
-		public IReadOnlyList<MinecraftVersionListing> Versions { get; }
+		public List<MinecraftVersionListing> Versions { get; set; }
 
 		public int Count => Versions.Count;
 

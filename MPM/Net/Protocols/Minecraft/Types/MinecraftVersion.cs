@@ -8,6 +8,8 @@ using MPM.Extensions;
 namespace MPM.Net.Protocols.Minecraft.Types {
 
 	public class MinecraftVersion {
+		public MinecraftVersion() {
+		}
 		public MinecraftVersion(
 			string id,
 			DateTime releaseTime,
@@ -23,25 +25,25 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 			this.MinecraftArguments = minecraftArguments;
 			this.MinimumLauncherVersion = minimumLauncherVersion;
 			this.AssetsIdentifier = assetsIdentifier;
-			this.Libraries = libraries.Denull().ToArray();
+			this.Libraries = libraries.Denull().ToList();
 		}
 
-		public string Id { get; }
+		public string Id { get; set; }
 
 		/// <summary>
 		/// Time of release in string format, eg: 2014-05-14T19:29:23+02:00
 		/// </summary>
-		public DateTime ReleaseTime { get; }
+		public DateTime ReleaseTime { get; set; }
 
 		/// <summary>
 		/// <see cref="ReleaseType"/> of version, eg <see cref="ReleaseType.Release"/> or <see cref="ReleaseType.Snapshot"/>
 		/// </summary>
-		public ReleaseType Type { get; }
+		public ReleaseType Type { get; set; }
 
 		/// <summary>
 		/// A string with ${placeholders} that should be substituted before launching, using the string as command line arguments
 		/// </summary>
-		public string MinecraftArguments { get; }
+		public string MinecraftArguments { get; set; }
 
 		public string FillArguments(
 			string username,
@@ -68,13 +70,13 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 		/// <summary>
 		/// Minimum launcher spec version capable of launching the particular version
 		/// </summary>
-		public int MinimumLauncherVersion { get; }
+		public int MinimumLauncherVersion { get; set; }
 
 		/// <summary>
 		/// Version for which assets should be loaded, eg: "1.7.10"
 		/// </summary>
-		public string AssetsIdentifier { get; }
+		public string AssetsIdentifier { get; set; }
 
-		public IReadOnlyList<LibrarySpec> Libraries { get; }
+		public List<LibrarySpec> Libraries { get; set; }
 	}
 }

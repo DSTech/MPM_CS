@@ -24,6 +24,6 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 					throw new NotSupportedException();
 			}
 		}
-		public string OS { get; }
+		public string OS { get; set; }
 	}
 }
