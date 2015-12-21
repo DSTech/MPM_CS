@@ -13,71 +13,62 @@ using semver.tools;
 
 namespace MPM.Data.Repository {
 
-	public class HttpPackageRepository : IPackageRepository {
-		private readonly Uri baseUri;
+    public class HttpPackageRepository : IPackageRepository {
+        private readonly Uri baseUri;
 
-		public HttpPackageRepository(Uri baseUri) {
-			this.baseUri = baseUri;
-		}
+        public HttpPackageRepository(Uri baseUri) {
+            this.baseUri = baseUri;
+        }
 
-		public async Task<Build> FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
-			//TODO: Support "arch" and "platform" filters?
-			var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{packageName}/{version}"));
-			byte[] responseData;
-			using (var response = await req.GetResponseAsync()) {
-				using (var responseStream = response.GetResponseStream()) {
-					responseData = await responseStream.ReadToEndAsync();
-				}
-			}
-			var build = JsonConvert.DeserializeObject<MPM.Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
-			build.Package = build.Package ?? packageName;
-			return build.FromDTO();
-		}
+        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{platform}/{side}/{packageName}/{version}"));
+            byte[] responseData;
+            using (var response = req.GetResponse()) {
+                responseData = response.GetResponseStream()?.ReadToEndAndClose();
+            }
+            var build = JsonConvert.DeserializeObject<MPM.Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
+            build.Package = build.Package ?? packageName;
+            return build.FromDTO();
+        }
 
-		public async Task<IEnumerable<Build>> FetchBuilds(string packageName, VersionSpec versionSpec) {
-			var package = await FetchPackage(packageName);
-			var matchingBuilds = package
-				.Builds
-				.Where(b => versionSpec.Satisfies(b.Version))
-				.ToArray();
-			return matchingBuilds;
-		}
+        public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
+            var package = this.FetchPackage(packageName);
+            var matchingBuilds = package
+                .Builds
+                .Where(b => versionSpec.Satisfies(b.Version))
+                .ToArray();
+            return matchingBuilds;
+        }
 
-		public async Task<Package> FetchPackage(string packageName) {
-			var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{packageName}"));
-			byte[] responseData;
-			using (var response = await req.GetResponseAsync()) {
-				using (var responseStream = response.GetResponseStream()) {
-					responseData = await responseStream.ReadToEndAsync();
-				}
-			}
-			var package = JsonConvert.DeserializeObject<MPM.Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
-			return package.FromDTO();
-		}
+        public Package FetchPackage(string packageName) {
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{packageName}"));
+            byte[] responseData;
+            using (var response = req.GetResponse()) {
+                responseData = response.GetResponseStream().ReadToEndAndClose();
+            }
+            var package = JsonConvert.DeserializeObject<MPM.Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
+            return package.FromDTO();
+        }
 
-		public async Task<IEnumerable<Package>> FetchPackageList() {
-			var req = WebRequest.CreateHttp(new Uri(baseUri, "/packages/"));
-			byte[] responseData;
-			using (var response = await req.GetResponseAsync()) {
-				using (var responseStream = response.GetResponseStream()) {
-					responseData = await responseStream.ReadToEndAsync();
-				}
-			}
-			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-			return packageList.Select(package => package.FromDTO()).ToArray();
-		}
+        public IEnumerable<Package> FetchPackageList() {
+            var req = WebRequest.CreateHttp(new Uri(baseUri, "/packages/"));
+            byte[] responseData;
+            using (var response = req.GetResponse()) {
+                responseData = response.GetResponseStream().ReadToEndAndClose();
+            }
+            var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+            return packageList.Select(package => package.FromDTO()).ToArray();
+        }
 
-		public async Task<IEnumerable<Package>> FetchPackageList(DateTime updatedAfter) {
-			var updatedAfterTimestamp = (long)(updatedAfter.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-			var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/?LastSync={updatedAfterTimestamp}"));
-			byte[] responseData;
-			using (var response = await req.GetResponseAsync()) {
-				using (var responseStream = response.GetResponseStream()) {
-					responseData = await responseStream.ReadToEndAsync();
-				}
-			}
-			var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-			return packageList.Select(package => package.FromDTO()).ToArray();
-		}
-	}
+        public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
+            var updatedAfterTimestamp = (long)(updatedAfter.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/?LastSync={updatedAfterTimestamp}"));
+            byte[] responseData;
+            using (var response = req.GetResponse()) {
+                responseData = response.GetResponseStream().ReadToEndAndClose();
+            }
+            var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+            return packageList.Select(package => package.FromDTO()).ToArray();
+        }
+    }
 }

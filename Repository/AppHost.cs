@@ -60,39 +60,42 @@ namespace Repository {
         //Injected by IOC
         public LiteDbPackageRepository Repository { get; set; }
 
-        public async Task<object> Get(Builds request) {
+        public object Get(Builds request) {
             List<MPM.Net.DTO.Build> retVal;
             //return request.Ids.IsEmpty()
             //    ? Repository.GetAll()
             //    : Repository.GetByIds(request.Ids);
             request.PackageNames = request.PackageNames.Denull().ToArray();
             if (request.PackageNames.Length == 0) {
-                var packageList = await Repository.FetchPackageList();
+                var packageList = Repository.FetchPackageList();
                 retVal = packageList.SelectMany(p => p.Builds).Select(b => b.ToDTO()).ToList();
                 return retVal;
             }
-            var reqSet = request.PackageNames.Select(name => Get(new SinglePackage(name)).ToObservable().Cast<MPM.Types.Build>().Select(t => t.ToDTO()));
-            retVal = (await reqSet.Merge().ToArray()).ToList();
+            retVal = request.PackageNames
+                .Select(name => Get(new SinglePackage(name)))
+                .Cast<MPM.Types.Build>()
+                .Select(t => t.ToDTO())
+                .ToList();
             return retVal;
         }
 
-        private async Task<object> Get(SinglePackage request) {
+        private object Get(SinglePackage request) {
             if (String.IsNullOrWhiteSpace(request.PackageName)) {
                 return null;
             }
-            var pkg = await Repository.FetchPackage(request.PackageName);
+            var pkg = Repository.FetchPackage(request.PackageName);
             var builds = pkg?.Builds;
             return (List<MPM.Net.DTO.Build>)builds.Denull().Select(b => b.ToDTO()).ToList();
         }
 
-        public async Task<object> Post(Build build) {
+        public object Post(Build build) {
             var buildInfo = build?.BuildInfo?.FromDTO();
             if (buildInfo == null) {
                 return null;
             }
-            var pkg = await Repository.FetchPackage(build.PackageName);
+            var pkg = Repository.FetchPackage(build.PackageName);
             if (pkg == null) {
-                pkg = await Repository.RegisterPackage(build.BuildInfo.Package, buildInfo.Authors);
+                pkg = Repository.RegisterPackage(build.BuildInfo.Package, buildInfo.Authors);
             }
             return Repository.RegisterBuild(buildInfo);
         }

@@ -49,10 +49,10 @@ namespace MPMTest.Data {
                 Thread.Sleep(TimeSpan.FromSeconds(0.05));
             }
             using (var repo = new RepositoryServer(dbFilePath)) {
-                await repo.Packages.RegisterPackage("testPackage", new Author[] { new Author("testAuthor", "testAuthor@testSide.test") });
-                await repo.Packages.RegisterBuild(testBuild);
-                await repo.Packages.RegisterBuild(testBuild);
-                var packageList = (await repo.Packages.FetchPackageList()).ToArray();
+                repo.Packages.RegisterPackage("testPackage", new Author[] { new Author("testAuthor", "testAuthor@testSide.test") });
+                repo.Packages.RegisterBuild(testBuild);
+                repo.Packages.RegisterBuild(testBuild);
+                var packageList = repo.Packages.FetchPackageList().ToArray();
                 Assert.True(packageList.Length == 1);
                 foreach (var package in packageList) {
                     output.WriteLine(package.ToString());
@@ -61,12 +61,12 @@ namespace MPMTest.Data {
                 var testHash = Encoding.UTF8.GetBytes("testHash");
                 var testHashContents = Encoding.UTF8.GetBytes("testHashContents");
 
-                Assert.Null(await (await repo.Hashes.Resolve(testHash)).Retrieve());
+                Assert.Null(repo.Hashes.Resolve(testHash).Retrieve());
                 {
                     var contentStream = new MemoryStream(testHashContents);
                     repo.Hashes.Register(testHash, contentStream);
                 }
-                var hashContentFetcher = await repo.Hashes.Resolve(testHash);
+                var hashContentFetcher = repo.Hashes.Resolve(testHash);
                 var hashContents = await hashContentFetcher.Retrieve();
                 Assert.Equal(testHashContents, hashContents);
             }

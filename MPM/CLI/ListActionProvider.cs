@@ -20,24 +20,24 @@ using semver.tools;
 
 namespace MPM.CLI {
 
-	public class ListActionProvider {
+    public class ListActionProvider {
 
-		public void Provide(IContainer factory, ListArgs args) {
-			this.List(factory).WaitAndUnwrapException();
-		}
+        public void Provide(IContainer factory, ListArgs args) {
+            this.List(factory);
+        }
 
-		public async Task List(IContainer factory) {
-			var repository = factory.Resolve<IPackageRepository>();
+        public void List(IContainer factory) {
+            var repository = factory.Resolve<IPackageRepository>();
 
-			var packageList = await repository.FetchPackageList();
+            var packageList = repository.FetchPackageList();
 
-			foreach (var _package in packageList) {
-				var package = repository.FetchPackage(_package.Name).WaitAndUnwrapException();
-				Console.WriteLine($"{package.Name} <{String.Join(", ", package.Authors)}>");
-				foreach (var build in package.Builds) {
-					Console.WriteLine($"\t{(build.Arch)}#{build.Version} ({(build.Stable ? "STABLE" : "UNSTABLE")}): {build.GivenVersion}");
-				}
-			}
-		}
-	}
+            foreach (var _package in packageList) {
+                var package = repository.FetchPackage(_package.Name);
+                Console.WriteLine($"{package.Name} <{String.Join(", ", package.Authors)}>");
+                foreach (var build in package.Builds) {
+                    Console.WriteLine($"\t{(build.Arch)}#{build.Version} ({(build.Stable ? "STABLE" : "UNSTABLE")}): {build.GivenVersion}");
+                }
+            }
+        }
+    }
 }

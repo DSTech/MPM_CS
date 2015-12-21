@@ -44,8 +44,8 @@ namespace MPM.Data.Repository {
 			return hashes.Select(CreateRetriever).ToArray();
 		}
 
-		public Task<IEnumerable<IHashRetriever>> Resolve(IEnumerable<byte[]> hashes) {
-			return Task.FromResult(CreateRetrievers(hashes));
+		public IEnumerable<IHashRetriever> Resolve(IEnumerable<byte[]> hashes) {
+			return CreateRetrievers(hashes);
 		}
 
 		public byte[] Register(byte[] hash, Stream content) {

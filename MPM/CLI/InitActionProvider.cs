@@ -143,7 +143,7 @@ namespace MPM.CLI {
 				var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
 
 				Console.WriteLine("Attempting to resolve packages...");
-				var resolvedArchConfiguration = await resolver.Resolve(archConfiguration, repository);
+				var resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
 				Console.WriteLine("Configuration resolved.");
 
 				var cacheManager = factory.Resolve<ICacheManager>();
