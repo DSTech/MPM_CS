@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using LiteDB;
 using MPM.Data.Repository;
 using MPM.Types;
@@ -102,7 +101,11 @@ namespace MPM.Data.Repository {
         }
 
         public Package FetchPackage(string packageName) {
-            return ((Net.DTO.Package)PackageCollection.FindOne(p => p.Name == packageName))?.FromDTO();
+            var package = PackageCollection.FindOne(p => p.Name == packageName);
+            if (package == null) {
+                return null;
+            }
+            return ((Net.DTO.Package)package)?.FromDTO();
         }
 
         public IEnumerable<Package> FetchPackageList() {
@@ -147,6 +150,13 @@ namespace MPM.Data.Repository {
             };
             PackageCollection.Insert(newPackage);
             return newPackage;
+        }
+
+        public bool DeletePackage(string packageName) {
+            if (String.IsNullOrWhiteSpace(packageName)) {
+                throw new ArgumentException("Argument is null or whitespace", nameof(packageName));
+            }
+            return PackageCollection.Delete(p => p.Name == packageName) > 0;
         }
     }
 }

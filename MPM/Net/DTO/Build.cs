@@ -16,6 +16,5 @@ namespace MPM.Net.DTO {
         public List<PackageConflict> Conflicts { get; set; }
         public List<String> Hashes { get; set; }
         public bool Stable { get; set; }
-        public bool Recommended { get; set; }
     }
 }

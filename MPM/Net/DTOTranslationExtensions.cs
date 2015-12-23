@@ -124,8 +124,7 @@ namespace MPM.Net {
             build.Dependencies?.Packages.Denull().Select(packageDependency => packageDependency.FromDTO()),
             build.Conflicts.Denull().Select(packageConflict => packageConflict.FromDTO()),
             build.Hashes.Denull().Select(hash => Hash.Parse(hash)),
-            build.Stable,
-            build.Recommended
+            build.Stable
             );
 
         public static DTO.Build ToDTO(this Build build) => new DTO.Build {
@@ -140,7 +139,6 @@ namespace MPM.Net {
             GivenVersion = build.GivenVersion,
             Hashes = build.Hashes.Denull().Select(hash => hash.ToString()).ToList(),
             Platform = build.Platform.ToDTO(),
-            Recommended = build.Recommended,
             Side = build.Side.ToDTO(),
             Stable = build.Stable,
             Version = build.Version.ToDTO()

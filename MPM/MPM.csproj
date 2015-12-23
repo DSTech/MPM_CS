@@ -120,6 +120,26 @@
       <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceKit, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.1.0.40\lib\net35\NServiceKit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceKit.Common, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.Common.1.0.40\lib\net35\NServiceKit.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceKit.Interfaces, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.Common.1.0.40\lib\net35\NServiceKit.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceKit.ServiceInterface, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.1.0.40\lib\net35\NServiceKit.ServiceInterface.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NServiceKit.Text, Version=1.0.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.Text.1.0.10\lib\net35\NServiceKit.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Platform, Version=1.1.0.229, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Platform.NET.1.1.0.229\lib\net40\Platform.dll</HintPath>
       <Private>True</Private>
@@ -293,6 +313,7 @@
     <Compile Include="Net\DTO\Author.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
     <Compile Include="Net\DTOTranslationExtensions.cs" />
+    <Compile Include="Net\DTO\Repository\Packages\PackageTypes.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
     <Compile Include="Net\IArchResolver.cs" />

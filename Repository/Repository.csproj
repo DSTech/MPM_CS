@@ -42,12 +42,12 @@
       <HintPath>..\packages\NServiceKit.1.0.40\lib\net35\NServiceKit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NServiceKit.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceKit.Common.1.0.11\lib\net35\NServiceKit.Common.dll</HintPath>
+    <Reference Include="NServiceKit.Common, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.Common.1.0.40\lib\net35\NServiceKit.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NServiceKit.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceKit.Common.1.0.11\lib\net35\NServiceKit.Interfaces.dll</HintPath>
+    <Reference Include="NServiceKit.Interfaces, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceKit.Common.1.0.40\lib\net35\NServiceKit.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceKit.ServiceInterface, Version=1.0.40.0, Culture=neutral, processorArchitecture=MSIL">
@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppHost.cs" />
+    <Compile Include="PackageService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
