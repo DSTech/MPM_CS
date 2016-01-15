@@ -20,8 +20,8 @@ namespace MPM.Data {
             public PackageEntry() { }
             public PackageEntry(Package package) {
                 this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationExtensions.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationExtensions.ToDTO).ToList();
+                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
+                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
             }
 
             [BsonId]
@@ -37,8 +37,8 @@ namespace MPM.Data {
             public static implicit operator Package(PackageEntry entry) {
                 return new Package(
                     entry.Name,
-                    entry.Authors.Select(DTOTranslationExtensions.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationExtensions.FromDTO).ToArray()
+                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
+                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
                 );
             }
             public static implicit operator Net.DTO.Package(PackageEntry entry) {

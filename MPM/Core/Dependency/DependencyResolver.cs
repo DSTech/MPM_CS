@@ -77,7 +77,8 @@ namespace MPM.Core.Dependency {
         }
 
         public IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
-            var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, constraints, resolutionMode);
+            var dependencyConstraints = constraints as DependencyConstraint[] ?? constraints.ToArray();
+            var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, dependencyConstraints, resolutionMode);
             Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");
             foreach (var possibleBuild in possibleBuilds) {
                 var output = new List<Build>();
@@ -90,7 +91,7 @@ namespace MPM.Core.Dependency {
                     }
                     IReadOnlyCollection<Build> resolvedDeps;
                     try {
-                        resolvedDeps = ResolveRecursive(depSpec, repository, packageSide, constraints, resolutionMode);
+                        resolvedDeps = ResolveRecursive(depSpec, repository, packageSide, dependencyConstraints, resolutionMode);
                         Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
                     } catch (DependencyException) {
                         goto nextBuild;

@@ -93,7 +93,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="LiteDB, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiteDB.2.0.0-beta\lib\net40\LiteDB.dll</HintPath>
+      <HintPath>..\packages\LiteDB.2.0.0-rc\lib\net40\LiteDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -104,8 +104,8 @@
       <HintPath>..\packages\EnterpriseLibrary.TransientFaultHandling.Data.6.0.1304.1\lib\NET45\Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -224,7 +224,7 @@
     <Compile Include="CLI\InitArgs.cs" />
     <Compile Include="CLI\UpdateForgeArgs.cs" />
     <Compile Include="CLI\UpdateCauldronArgs.cs" />
-    <Compile Include="Core\Dependency\InstanceConfigurationExtensions.cs" />
+    <Compile Include="Core\Dependency\InstanceConfigurationX.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
     <Compile Include="Core\Instances\Cache\FileSystemCacheManager.cs" />
@@ -244,7 +244,7 @@
     <Compile Include="Core\Instances\Installation\Scripts\ArchFileDeclaration.cs" />
     <Compile Include="Core\Profiles\LiteDbProfileManager.cs" />
     <Compile Include="Data\LiteDbPackageRepositoryCache.cs" />
-    <Compile Include="Data\LiteCollectionExtensions.cs" />
+    <Compile Include="Data\LiteCollectionX.cs" />
     <Compile Include="Data\LiteDbCacheManager.cs" />
     <Compile Include="Data\LiteDbMetaDataManager.cs" />
     <Compile Include="Data\Repository\LiteDbHashRepository.cs" />
@@ -255,7 +255,7 @@
     <Compile Include="Data\Repository\RepositoryServer.cs" />
     <Compile Include="Data\SyncInfo.cs" />
     <Compile Include="DisposerStreamWrapper.cs" />
-    <Compile Include="Extensions\EnumeratorExtensions.cs" />
+    <Compile Include="Extensions\EnumeratorX.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
     <Compile Include="Core\Instances\Info\ScriptFileDeclarationExtensions.cs" />
@@ -304,15 +304,16 @@
     <Compile Include="Data\IMetaDataManager.cs" />
     <Compile Include="Data\NaiveHttpHashRepository.cs" />
     <Compile Include="Data\NaiveHttpHashRetriever.cs" />
-    <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Extensions\IEnumerableExtensions.cs" />
-    <Compile Include="Extensions\StackExtensions.cs" />
+    <Compile Include="Extensions\DateTimeX.cs" />
+    <Compile Include="Extensions\EnumerableX.cs" />
+    <Compile Include="Extensions\StackX.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
-    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Extensions\StringX.cs" />
+    <Compile Include="Extensions\StreamX.cs" />
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Net\DTO\Author.cs" />
     <Compile Include="Net\DTO\DependencySpec.cs" />
-    <Compile Include="Net\DTOTranslationExtensions.cs" />
+    <Compile Include="Net\DTOTranslationX.cs" />
     <Compile Include="Net\DTO\Repository\Packages\PackageTypes.cs" />
     <Compile Include="Net\DTO\VersionSpec.cs" />
     <Compile Include="Net\DTO\Version.cs" />
@@ -320,7 +321,7 @@
     <Compile Include="Net\Protocols\MetaArchResolver.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\MinecraftVersionListing.cs" />
     <Compile Include="Net\Protocols\Minecraft\MinecraftArchResolver.cs" />
-    <Compile Include="Net\Protocols\Minecraft\DTOTranslationExtensions.cs" />
+    <Compile Include="Net\Protocols\Minecraft\DTOTranslationX.cs" />
     <Compile Include="Net\Protocols\Minecraft\Types\LibraryExtractSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\Types\LibraryNativesSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\Types\LibraryRuleFilterOSVersion.cs" />
@@ -354,7 +355,7 @@
     <Compile Include="VersionSpecConverter.cs" />
     <Compile Include="SemanticVersionConverter.cs" />
     <Compile Include="SolidifyingReadOnlyCollection.cs" />
-    <Compile Include="Extensions\ActionProviderArgExtensions.cs" />
+    <Compile Include="Extensions\ActionProviderArgX.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
     <Compile Include="Archival\ArchiveChunk.cs" />
     <Compile Include="Archival\Archive.cs" />
@@ -365,7 +366,7 @@
     <Compile Include="Net\DTO\ForcedDependency.cs" />
     <Compile Include="Net\DTO\InstallationResolution.cs" />
     <Compile Include="Net\DTO\PackageSide.cs" />
-    <Compile Include="Extensions\PackageConflictExtensions.cs" />
+    <Compile Include="Extensions\PackageConflictX.cs" />
     <Compile Include="Net\DTO\InterfaceProvision.cs" />
     <Compile Include="Net\DTO\Build.cs" />
     <Compile Include="Net\DTO\PackageConflict.cs" />

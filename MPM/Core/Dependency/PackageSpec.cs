@@ -102,7 +102,7 @@ namespace MPM.Core.Dependency {
                 + Manual.GetHashCode();
         }
 
-        private int GetVersionSpecHashCode(VersionSpec spec) {
+        private static int GetVersionSpecHashCode(IVersionSpec spec) {
             return
                 unchecked(
                     spec.IsMinInclusive.GetHashCode() +
@@ -111,7 +111,7 @@ namespace MPM.Core.Dependency {
                     spec.MaxVersion.GetHashCode());
         }
 
-        private bool VersionSpecsEqual(VersionSpec first, VersionSpec second) {
+        private bool VersionSpecsEqual(IVersionSpec first, IVersionSpec second) {
             return
                 first.IsMinInclusive == second.IsMinInclusive &&
                 first.IsMaxInclusive == second.IsMaxInclusive &&

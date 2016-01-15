@@ -8,7 +8,7 @@ using MPM.Net.Protocols.Minecraft.Types;
 
 namespace MPM.Net.Protocols.Minecraft {
 
-	public static class DTOTranslationExtensions {
+	public static class DTOTranslationX {
 
 		//MinecraftVersion
 		public static MinecraftVersion FromDTO(this DTO.MinecraftVersion dto) {

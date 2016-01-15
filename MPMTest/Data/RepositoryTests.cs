@@ -61,7 +61,7 @@ namespace MPMTest.Data {
                 var testHash = Encoding.UTF8.GetBytes("testHash");
                 var testHashContents = Encoding.UTF8.GetBytes("testHashContents");
 
-                Assert.Null(repo.Hashes.Resolve(testHash).Retrieve());
+                Assert.Null(await repo.Hashes.Resolve(testHash).Retrieve());
                 {
                     var contentStream = new MemoryStream(testHashContents);
                     repo.Hashes.Register(testHash, contentStream);

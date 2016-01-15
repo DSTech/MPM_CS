@@ -35,7 +35,7 @@ namespace Repository {
         }
 
         private object Get(BuildRequest request) {
-            if (String.IsNullOrWhiteSpace(request.PackageName)) {
+            if (request.PackageName.IsNullOrWhiteSpace()) {
                 return null;
             }
             var pkg = this.Repository.FetchPackage(request.PackageName);
@@ -48,16 +48,26 @@ namespace Repository {
             if (buildInfo == null) {
                 return null;
             }
+            if (buildInfo.PackageName.IsNullOrWhiteSpace()) {
+                if (newBuild.PackageName.IsNullOrWhiteSpace()) {
+                    return null;
+                }
+                buildInfo.PackageName = newBuild.PackageName;
+            }
             var pkg = this.Repository.FetchPackage(newBuild.PackageName);
             if (pkg == null) {
                 pkg = this.Repository.RegisterPackage(newBuild.BuildInfo.Package, buildInfo.Authors);
             }
+            buildInfo.PackageName = pkg.Name;
             return this.Repository.RegisterBuild(buildInfo);
         }
 
         public object Put(BuildSubmission newBuild) {
-            //return Repository.Store(todo);
-            throw new NotImplementedException();
+            var buildInfo = newBuild?.BuildInfo?.FromDTO();
+            if (buildInfo == null) {
+                return null;
+            }
+            return Repository.RegisterBuild(buildInfo);
         }
 
         public void Delete(BuildRequest request) {

@@ -18,7 +18,7 @@ using Version = MPM.Net.DTO.Version;
 using VersionSpec = semver.tools.VersionSpec;
 
 namespace MPM.Net {
-    public static class DTOTranslationExtensions {
+    public static class DTOTranslationX {
         //CompatibilityPlatform
         public static CompatibilityPlatform FromCompatibilityPlatformDTO(string platformDto)
             => (CompatibilityPlatform)Enum.Parse(typeof(CompatibilityPlatform), platformDto, true);

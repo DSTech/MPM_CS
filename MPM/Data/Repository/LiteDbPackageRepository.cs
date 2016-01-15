@@ -15,8 +15,8 @@ namespace MPM.Data.Repository {
             public PackageRepositoryEntry() { }
             public PackageRepositoryEntry(Package package) {
                 this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationExtensions.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationExtensions.ToDTO).ToList();
+                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
+                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
             }
 
             [BsonId]
@@ -34,8 +34,8 @@ namespace MPM.Data.Repository {
             public static implicit operator Package(PackageRepositoryEntry entry) {
                 return new Package(
                     entry.Name,
-                    entry.Authors.Select(DTOTranslationExtensions.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationExtensions.FromDTO).ToArray()
+                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
+                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
                 );
             }
             public static implicit operator Net.DTO.Package(PackageRepositoryEntry entry) {
@@ -71,7 +71,7 @@ namespace MPM.Data.Repository {
                     b.Version == dtoVersion
                     && b.Side == dtoSide
                     && b.Arch == dtoArch
-                    && MeetsCompatibilityRequirements(DTOTranslationExtensions.FromCompatibilityPlatformDTO(b.Platform), platform)//TODO: Add universal and non-bitness platform support
+                    && MeetsCompatibilityRequirements(DTOTranslationX.FromCompatibilityPlatformDTO(b.Platform), platform)//TODO: Add universal and non-bitness platform support
                     ;
         }
 
@@ -139,13 +139,13 @@ namespace MPM.Data.Repository {
         public Package RegisterPackage(String packageName, IEnumerable<Author> authors) {
             var existingPackage = PackageCollection.FindOne(p => p.Name == packageName);
             if (existingPackage != null) {
-                existingPackage.Authors = authors.Select(DTOTranslationExtensions.ToDTO).ToList();
+                existingPackage.Authors = authors.Select(DTOTranslationX.ToDTO).ToList();
                 PackageCollection.Update(existingPackage);
                 return existingPackage;
             }
             var newPackage = new PackageRepositoryEntry {
                 Name = packageName,
-                Authors = authors.Select(DTOTranslationExtensions.ToDTO).ToList(),
+                Authors = authors.Select(DTOTranslationX.ToDTO).ToList(),
                 Builds = Enumerable.Empty<Net.DTO.Build>().ToList(),
             };
             PackageCollection.Insert(newPackage);
