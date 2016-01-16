@@ -7,11 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPM", "MPM\MPM.csproj", "{8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPMTest", "MPMTest\MPMTest.csproj", "{D63EAE0F-BC1D-4B6D-A3D7-4D4878339B77}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FB6D0BEF-47AF-4765-B7D5-E4C893919D16}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{DDA0E91C-4AA6-4DBD-92E2-0CB0970E1E3C}"
 EndProject
 Global
