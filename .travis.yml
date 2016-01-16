@@ -1,5 +1,5 @@
 language: csharp
-mono: nightly
+mono: weekly
 solution: MPM.sln
 sudo: false
 cache:
