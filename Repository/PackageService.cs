@@ -72,7 +72,7 @@ namespace Repository {
 
         public void Delete(BuildRequest request) {
             if (request.PackageName.IsEmpty()) {
-                throw HttpError.NotFound("No package specified to find.");
+                throw HttpError.NotFound("No package specified to delete.");
             }
             Repository.DeletePackage(request.PackageName);
         }
