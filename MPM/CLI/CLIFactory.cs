@@ -32,7 +32,6 @@ namespace MPM.CLI {
 
 			var container = cb.Build();
 			Debug.Assert(container.IsRegistered<GlobalStorage>());
-			Debug.Assert(container.IsRegistered<LiteDatabase>());
 			Debug.Assert(container.IsRegistered<IDependencyResolver>());
 			Debug.Assert(container.IsRegistered<IPackageRepository>());
 			Debug.Assert(container.IsRegistered<IHashRepository>());

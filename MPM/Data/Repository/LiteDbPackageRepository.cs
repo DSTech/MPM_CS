@@ -55,14 +55,10 @@ namespace MPM.Data.Repository {
             }
         }
 
-        private bool MeetsCompatibilityRequirements(CompatibilityPlatform assigned, CompatibilityPlatform requested) {
-            return PackageSpecExtensions.IsPlatformCompatible(assigned, requested);
-        }
         private Func<Net.DTO.Build, bool> CreatePackageFilter(
                 SemanticVersion version,
                 CompatibilitySide side,
-                Arch arch,
-                CompatibilityPlatform platform
+                Arch arch
             ) {
             var dtoSide = side.ToDTO();
             var dtoVersion = version.ToDTO();
@@ -71,17 +67,13 @@ namespace MPM.Data.Repository {
                     b.Version == dtoVersion
                     && b.Side == dtoSide
                     && b.Arch == dtoArch
-                    && MeetsCompatibilityRequirements(DTOTranslationX.FromCompatibilityPlatformDTO(b.Platform), platform)//TODO: Add universal and non-bitness platform support
                     ;
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
+        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
             var package = PackageCollection.FindOne(p => p.Name == packageName);
-            if (package == null) {
-                return null;
-            }
 
-            var build = package.Builds.AsEnumerable().FirstOrDefault(CreatePackageFilter(version, side, arch, platform));
+            var build = package?.Builds.AsEnumerable().FirstOrDefault(CreatePackageFilter(version, side, arch));
             return build?.FromDTO();
         }
 

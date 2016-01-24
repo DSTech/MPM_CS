@@ -35,7 +35,7 @@ namespace MPM.CLI {
                 var package = repository.FetchPackage(_package.Name);
                 Console.WriteLine($"{package.Name} <{String.Join(", ", package.Authors)}>");
                 foreach (var build in package.Builds) {
-                    Console.WriteLine($"\t{(build.Arch)}#{build.Version} ({(build.Stable ? "STABLE" : "UNSTABLE")}): {build.GivenVersion}");
+                    Console.WriteLine($"\t{(build.Arch)}#{build.Version} {build.GivenVersion}");
                 }
             }
         }

@@ -12,37 +12,15 @@ namespace MPM.Core.Dependency {
 
     public static class PackageSpecExtensions {
 
-        public static PackageSpec ToSpec(this PackageDependency dependency, Arch arch, CompatibilityPlatform platform, bool manual = false) {
+        public static PackageSpec ToSpec(this PackageDependency dependency, Arch arch, bool manual = false) {
             var spec = new PackageSpec {
                 Manual = manual,
                 Arch = arch,
-                Platform = platform,
                 Name = dependency.PackageName,
                 Side = dependency.Side,
                 VersionSpec = dependency.VersionSpec,
             };
             return spec;
-        }
-
-        public static bool IsPlatformCompatible(CompatibilityPlatform package, CompatibilityPlatform environment) {
-            //Take care of bitness-specific platform specifications
-            if (package == environment) {
-                return true;
-            }
-            switch (package) {
-                case CompatibilityPlatform.Universal:
-                    return true;
-                case CompatibilityPlatform.Universal32:
-                    return environment == CompatibilityPlatform.Universal32 || environment == CompatibilityPlatform.Win32 || environment == CompatibilityPlatform.Lin32;
-                case CompatibilityPlatform.Universal64:
-                    return environment == CompatibilityPlatform.Universal64 || environment == CompatibilityPlatform.Win64 || environment == CompatibilityPlatform.Lin64;
-                case CompatibilityPlatform.Lin:
-                    return environment == CompatibilityPlatform.Lin || environment == CompatibilityPlatform.Lin32 || environment == CompatibilityPlatform.Lin64;
-                case CompatibilityPlatform.Win:
-                    return environment == CompatibilityPlatform.Win || environment == CompatibilityPlatform.Win32 || environment == CompatibilityPlatform.Win64;
-                default:
-                    return false;
-            }
         }
 
         /// <summary>
@@ -54,7 +32,6 @@ namespace MPM.Core.Dependency {
         public static bool Satisfies(this PackageSpec spec, Build build) {
             return spec.Name == build.PackageName
                 //&& spec.Arch == build.Arch//TODO: Add ARCH to the API
-                && IsPlatformCompatible(build.Platform, spec.Platform)
                 && (
                     spec.Side == build.Side || build.Side == CompatibilitySide.Universal
                 )
@@ -80,7 +57,6 @@ namespace MPM.Core.Dependency {
     public class PackageSpec : IEquatable<PackageSpec> {
         public String Name { get; set; }
         public Arch Arch { get; set; }
-        public CompatibilityPlatform Platform { get; set; }
         public VersionSpec @VersionSpec { get; set; }
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
         public bool Manual { get; set; } = false;
@@ -97,7 +73,6 @@ namespace MPM.Core.Dependency {
             return
                 (Name?.GetHashCode() ?? 0)
                 + (Arch?.GetHashCode() ?? 0)
-                + Platform.GetHashCode()
                 + (VersionSpec != null ? GetVersionSpecHashCode(VersionSpec) : 0)
                 + Manual.GetHashCode();
         }
@@ -123,7 +98,6 @@ namespace MPM.Core.Dependency {
             return
                 Name == other.Name
                 && this.Arch == other.Arch
-                && this.Platform == other.Platform
                 && this.VersionSpec.ToString() == other.VersionSpec.ToString()
                 && this.Manual == other.Manual;
         }

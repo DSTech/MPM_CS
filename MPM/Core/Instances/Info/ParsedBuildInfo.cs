@@ -18,7 +18,6 @@ namespace MPM.Core.Instances.Info {
             SemanticVersion version,
             string givenVersion,
             Arch arch,
-            CompatibilityPlatform platformCompatibility,
             CompatibilitySide side,
             IEnumerable<InterfaceProvision> interfaceProvisions,
             IEnumerable<InterfaceDependency> interfaceDependencies,
@@ -34,15 +33,12 @@ namespace MPM.Core.Instances.Info {
             version,
             givenVersion,
             arch,
-            platformCompatibility,
             side,
             interfaceProvisions,
             interfaceDependencies,
             packageDependencies,
             conflicts,
-            hashes,
-            stable,
-            recommended
+            hashes
         ) {
             this.Installation = installation.ToArray();
         }
@@ -56,15 +52,12 @@ namespace MPM.Core.Instances.Info {
             build.Version,
             build.GivenVersion,
             build.Arch,
-            build.Platform,
             build.Side,
             build.InterfaceProvisions,
             build.InterfaceDependencies,
             build.PackageDependencies,
             build.Conflicts,
-            build.Hashes,
-            build.Stable,
-            build.Recommended
+            build.Hashes
         ) {
             this.Installation = installation.ToArray();
         }

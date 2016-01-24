@@ -18,7 +18,7 @@ namespace MPM.Data.Repository {
         IEnumerable<Package> FetchPackageList();
 
         /// <summary>
-        /// Similar to <see cref="FetchPackageList"/>, fetches only packages which have changed since the specified <paramref name="updatedAfter"/> time.
+        /// Similar to <see cref="FetchPackageList()"/>, this fetches only packages which have changed since the specified <paramref name="updatedAfter"/> time.
         /// May contain more packages than strictly those updated after the specified time, depending on the repository's server-side implementation.
         /// </summary>
         /// <param name="updatedAfter"></param>
@@ -34,12 +34,11 @@ namespace MPM.Data.Repository {
         /// <param name="version"></param>
         /// <param name="side"></param>
         /// <param name="arch"></param>
-        /// <param name="platform"></param>
         /// <returns>
         /// A <see cref="Build"/> instance matching the specified <paramref name="packageName"/> and <paramref name="version"/>. Null when no package within the specified constraints was found.
         /// Builds must be returned in descending order of version, with side-specific returned before universal packages.
         /// </returns>
-        Build FetchBuild(String packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform);
+        Build FetchBuild(String packageName, SemanticVersion version, CompatibilitySide side, Arch arch);
 
         /// <summary>
         /// Looks up a package for any versions matching a specifier.

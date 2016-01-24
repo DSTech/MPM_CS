@@ -20,8 +20,8 @@ namespace MPM.Data.Repository {
             this.baseUri = baseUri;
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
-            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{platform}/{side}/{packageName}/{version}"));
+        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{side}/{packageName}/{version}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream()?.ReadToEndAndClose();

@@ -38,7 +38,7 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 		/// </summary>
 		public LibraryNativesSpec Natives { get; set; }
 
-		public string ApplyNatives(CompatibilityPlatform platform) => Natives?.AppliedTo(platform);
+		public string ApplyNatives(PlatformID platform, bool x64 = true) => Natives?.AppliedTo(platform, x64);
 
 		/// <summary>
 		/// A description of how a package should be extracted, with optional exclusions
@@ -50,7 +50,7 @@ namespace MPM.Net.Protocols.Minecraft.Types {
 		/// </summary>
 		public List<LibraryRuleSpec> Rules { get; set; }
 
-		public bool Applies(CompatibilityPlatform platform) {
+		public bool Applies(PlatformID platform) {
 			if (Rules.Count == 0) {
 				//No rules means no restrictions
 				return true;

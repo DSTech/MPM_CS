@@ -64,47 +64,10 @@ namespace MPM.CLI {
 				default:
 					throw new ArgumentOutOfRangeException(nameof(instanceSide));
 			}
-			InstancePlatform instancePlatform;
-			switch (args.Platform) {
-				case "lin32":
-					instancePlatform = InstancePlatform.Lin32;
-					break;
-				case "lin64":
-					instancePlatform = InstancePlatform.Lin64;
-					break;
-				case "win32":
-					instancePlatform = InstancePlatform.Win32;
-					break;
-				case "win64":
-					instancePlatform = InstancePlatform.Win64;
-					break;
-				case "current": {
-						var is64Bit = Environment.Is64BitOperatingSystem;
-						var isLinux = Environment.OSVersion.Platform == PlatformID.Unix;
-						if (isLinux) {
-							instancePlatform = is64Bit ? InstancePlatform.Lin64 : InstancePlatform.Lin32;
-						} else {
-							instancePlatform = is64Bit ? InstancePlatform.Win64 : InstancePlatform.Win32;
-						}
-					}
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(instancePlatform));
-			}
-			this.Init(factory, instanceArch, instanceSide, instancePlatform, args.InstancePath).WaitAndUnwrapException();
+			
+			this.Init(factory, instanceArch, instanceSide, args.InstancePath).WaitAndUnwrapException();
 		}
-
-		public CompatibilityPlatform ConvertToCompatibility(InstancePlatform instancePlatform) {
-			switch (instancePlatform) {
-				case InstancePlatform.Lin32: return CompatibilityPlatform.Lin32;
-				case InstancePlatform.Lin64: return CompatibilityPlatform.Lin64;
-				case InstancePlatform.Win32: return CompatibilityPlatform.Win32;
-				case InstancePlatform.Win64: return CompatibilityPlatform.Win64;
-				default: return CompatibilityPlatform.Universal;
-			}
-		}
-
-		public Configuration GenerateArchConfiguration(SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform) {
+		public Configuration GenerateArchConfiguration(SemanticVersion instanceArch, InstanceSide instanceSide) {
 			CompatibilitySide packageSide;
 			switch (instanceSide) {
 				case InstanceSide.Client:
@@ -121,16 +84,15 @@ namespace MPM.CLI {
 					Name = "minecraft",
 					Arch = new Arch(instanceArch.ToString()),
 					Manual = true,
-					Platform = ConvertToCompatibility(instancePlatform),
 					Side = packageSide,
 					VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.0"), true, SemanticVersion.Parse("9999.9999.9999"), true),
 				},
 			});
 		}
 
-		public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, InstancePlatform instancePlatform, string instancePath) {
+		public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, string instancePath) {
 			using (var instance = new Instance(instancePath) {
-				Name = $"{instanceArch}_{instanceSide}_{instancePlatform}",//TODO: make configurable and able to be immediately registered upon creation
+				Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
 				LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden
 				Configuration = InstanceConfiguration.Empty,
 			}) {
@@ -140,7 +102,7 @@ namespace MPM.CLI {
 				var repository = factory.Resolve<IPackageRepository>();
 
 				Console.WriteLine("Generating configuration...");
-				var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide, instancePlatform);
+				var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide);
 
 				Console.WriteLine("Attempting to resolve packages...");
 				var resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
@@ -152,7 +114,7 @@ namespace MPM.CLI {
 				instance.Configuration = resolvedArchConfiguration;
 
 				foreach (var package in resolvedArchConfiguration.Packages) {
-					var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}_{package.Platform}";
+					var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}";
 					if (cacheManager.Contains(cacheEntryName)) {
 						Console.WriteLine($"Package {package.PackageName} already cached.");
 						continue;

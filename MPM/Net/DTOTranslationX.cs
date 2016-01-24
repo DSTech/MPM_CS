@@ -19,12 +19,6 @@ using VersionSpec = semver.tools.VersionSpec;
 
 namespace MPM.Net {
     public static class DTOTranslationX {
-        //CompatibilityPlatform
-        public static CompatibilityPlatform FromCompatibilityPlatformDTO(string platformDto)
-            => (CompatibilityPlatform)Enum.Parse(typeof(CompatibilityPlatform), platformDto, true);
-
-        public static string ToDTO(this CompatibilityPlatform platform) => platform.ToString();
-
         //CompatibilitySide
         public static CompatibilitySide FromDTO(this PackageSide side) {
             switch (side) {
@@ -117,14 +111,12 @@ namespace MPM.Net {
             build.Version.FromDTO(),
             build.GivenVersion,
             FromArchDTO(build.Arch),
-            build.Platform != null ? FromCompatibilityPlatformDTO(build.Platform) : CompatibilityPlatform.Universal,
             FromDTO(build.Side),
             build.Interfaces.Denull().Select(interfaceProvision => interfaceProvision.FromDTO()),
             build.Dependencies?.Interfaces.Denull().Select(interfaceDependency => interfaceDependency.FromDTO()),
             build.Dependencies?.Packages.Denull().Select(packageDependency => packageDependency.FromDTO()),
             build.Conflicts.Denull().Select(packageConflict => packageConflict.FromDTO()),
-            build.Hashes.Denull().Select(hash => Hash.Parse(hash)),
-            build.Stable
+            build.Hashes.Denull().Select(hash => Hash.Parse(hash))
             );
 
         public static DTO.Build ToDTO(this Build build) => new DTO.Build {
@@ -138,9 +130,7 @@ namespace MPM.Net {
             },
             GivenVersion = build.GivenVersion,
             Hashes = build.Hashes.Denull().Select(hash => hash.ToString()).ToList(),
-            Platform = build.Platform.ToDTO(),
             Side = build.Side.ToDTO(),
-            Stable = build.Stable,
             Version = build.Version.ToDTO()
         };
 

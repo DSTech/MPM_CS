@@ -59,6 +59,13 @@ namespace MPM.CLI {
 			listActionProvider.Provide(Resolver, args);
 		}
 
+        [ArgActionMethod]
+        [ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("pack"), ArgShortcut("create"), ArgShortcut("build")]
+        public void CreatePackage(CreatePackageArgs args) {
+            var createPackageActionProvider = new CreatePackageActionProvider();
+            createPackageActionProvider.Provide(Resolver, args);
+        }
+
 		/*[ArgActionMethod]
 		[ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("s"), ArgShortcut("--sync")]
 		public void Sync(InitArgs args) {

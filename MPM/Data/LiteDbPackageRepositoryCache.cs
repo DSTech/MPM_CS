@@ -68,12 +68,14 @@ namespace MPM.Data {
             this.repository = repository;
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch, CompatibilityPlatform platform) {
-            var builds = this.FetchBuilds(packageName, new VersionSpec(version));
+        public Build FetchBuild(string packageName, SemanticVersion fetchVersion, CompatibilitySide fetchSide, Arch fetchArch) {
+            var builds = this.FetchBuilds(packageName, new VersionSpec(fetchVersion));
             var build = builds
-                .Where(b => b.Version == version && b.Arch == arch && b.Platform == platform && (b.Side == side || b.Side == CompatibilitySide.Universal))
-                .OrderByDescending(b => b.Version)//Prefer higher versions
-                .ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
+                .Where(b => true
+                    && b.Version == fetchVersion
+                    && b.Arch == fetchArch
+                    && (b.Side == fetchSide || b.Side == CompatibilitySide.Universal))
+                .OrderByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
                 .FirstOrDefault();
             return build;
         }

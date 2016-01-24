@@ -23,10 +23,5 @@ namespace MPM.CLI {
 		[ArgDefaultValue("client")]
 		[ArgShortcut("-s"), ArgShortcut("--side"), ArgShortcut(ArgShortcutPolicy.ShortcutsOnly)]
 		public string Side { get; set; }
-
-		[ArgDescription("The platform to use, eg current, lin32, lin64, win32, win64")]
-		[ArgDefaultValue("current")]
-		[ArgShortcut("-p"), ArgShortcut("--platform"), ArgShortcut(ArgShortcutPolicy.ShortcutsOnly)]
-		public string Platform { get; set; }
 	}
 }

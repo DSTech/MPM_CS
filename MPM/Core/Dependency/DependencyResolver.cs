@@ -62,8 +62,7 @@ namespace MPM.Core.Dependency {
                 case ResolutionMode.HighestStable:
                     result = namedBuilds
                         .Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
-                        .OrderByDescending(nb => nb.Stable)
-                        .ThenByDescending(nb => nb.Version)
+                        .OrderByDescending(nb => nb.Version)
                         .ThenByDescending(nb => nb.Side == packageSide)
                         .ToArray();
                     break;
@@ -85,7 +84,7 @@ namespace MPM.Core.Dependency {
                 Debug.Assert(possibleBuild != null, "ResolveDependency must not return null elements");
                 output.Add(possibleBuild);
                 foreach (var dependency in possibleBuild.PackageDependencies) {
-                    var depSpec = dependency.ToSpec(packageSpec.Arch, packageSpec.Platform);
+                    var depSpec = dependency.ToSpec(packageSpec.Arch);
                     if (packageSide != CompatibilitySide.Universal && dependency.Side != CompatibilitySide.Universal && dependency.Side != packageSide) {
                         continue;
                     }

@@ -1,79 +1,83 @@
 using System;
+using System.Diagnostics;
 using MPM.Types;
 
 namespace MPM.Net.Protocols.Minecraft.Types {
 
-	/// <summary>
-	/// Contains native-library inclusions for each particular operating system, with an optional ${arch} placeholder in circumstances where bitness matters
-	/// </summary>
-	/// <example>
-	/// {
-	///  "linux": "natives-linux",
-	///  "windows": "natives-windows-${arch}",
-	///  "osx": "natives-osx",
-	/// }
-	/// </example>
-	public class LibraryNativesSpec {
-		public LibraryNativesSpec() {
-		}
+    /// <summary>
+    /// Contains native-library inclusions for each particular operating system, with an optional ${bitness} placeholder in circumstances where bitness matters
+    /// </summary>
+    /// <example>
+    /// {
+    ///  "linux": "natives-linux",
+    ///  "windows": "natives-windows-${bitness}",
+    ///  "osx": "natives-osx",
+    /// }
+    /// </example>
+    /// <seealso cref="http://wiki.vg/Game_Files"/>
+    public class LibraryNativesSpec {
+        public LibraryNativesSpec() {
+        }
 
-		public LibraryNativesSpec(string windows, string linux, string osx) {
-			this.Windows = windows ?? "natives-windows";
-			this.Linux = linux ?? "natives-linux";
-			this.Osx = osx ?? "natives-osx";
-		}
+        public LibraryNativesSpec(string windows, string linux, string osx) {
+            this.Windows = windows ?? "natives-windows";
+            this.Linux = linux ?? "natives-linux";
+            this.Osx = osx ?? "natives-osx";
+        }
 
-		//Returns a string for the natives-name which native variant is to be downloaded for the specified platform,
-		//or null if the native variant does not apply
-		public string AppliedTo(CompatibilityPlatform platform) {
-			switch (platform) {
-				case CompatibilityPlatform.Win:
-				case CompatibilityPlatform.Win32:
-				case CompatibilityPlatform.Win64:
-					if (String.IsNullOrWhiteSpace(Windows)) {
-						return null;
-					}
-					if (Windows.Contains("${arch}")) {
-						if (platform == CompatibilityPlatform.Win) {
-							throw new ArgumentOutOfRangeException(nameof(platform), $"Bitness-inspecific natives are not available for spec {Windows}");
-						}
-						return Windows.Replace("${arch}", (platform == CompatibilityPlatform.Win32 ? "32" : "64"));
-					} else {
-						return Windows;
-					}
-				case CompatibilityPlatform.Lin:
-				case CompatibilityPlatform.Lin32:
-				case CompatibilityPlatform.Lin64:
-					if (String.IsNullOrWhiteSpace(Linux)) {
-						return null;
-					}
-					if (Linux.Contains("${arch}")) {
-						if (platform == CompatibilityPlatform.Lin) {
-							throw new ArgumentOutOfRangeException(nameof(platform), $"Bitness-inspecific natives are not available for spec {Linux}");
-						}
-						return Linux.Replace("${arch}", (platform == CompatibilityPlatform.Lin32 ? "32" : "64"));
-					} else {
-						return Linux;
-					}
-				//Sorry OSX, make a pull request with support
-				default:
-					throw new NotSupportedException();
-			}
-		}
+        //Tells which file "natives-spec" to download on the given platform, or returns null if none need downloaded.
+        public string AppliedTo(PlatformID platform, bool x64 = true) {
+            string platformStr;
+            switch (platform) {
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE: {
+                        const string msg = "This system isn't even supported by .NET.";
+                        Debug.Assert(false, msg);
+                        throw new NotSupportedException(msg);
+                    }
+                case PlatformID.Xbox: {
+                        const string msg = "How are you even running this?";
+                        Debug.Assert(false, msg);
+                        throw new NotSupportedException();
+                    }
+                case PlatformID.Win32NT:
+                    if (String.IsNullOrWhiteSpace(Windows)) {
+                        return null;
+                    }
+                    platformStr = Windows;
+                    break;
+                case PlatformID.Unix:
+                    if (String.IsNullOrWhiteSpace(Linux)) {
+                        return null;
+                    }
+                    platformStr = Linux;
+                    break;
+                case PlatformID.MacOSX:
+                    platformStr = Osx;
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+            if (platformStr.Contains("${platform}")) {
+                return platformStr.Replace("${platform}", (x64 ? "64" : "32"));
+            }
+            return platformStr;
+        }
 
-		///<summary>
-		/// See info for <seealso cref="LibraryNativesSpec"/>
-		///</summary>
-		public string Windows { get; set; }
+        ///<summary>
+        /// See info for <seealso cref="LibraryNativesSpec"/>
+        ///</summary>
+        public string Windows { get; set; }
 
-		///<summary>
-		/// See info for <seealso cref="LibraryNativesSpec"/>
-		///</summary>
-		public string Linux { get; set; }
+        ///<summary>
+        /// See info for <seealso cref="LibraryNativesSpec"/>
+        ///</summary>
+        public string Linux { get; set; }
 
-		///<summary>
-		/// See info for <seealso cref="LibraryNativesSpec"/>
-		///</summary>
-		public string Osx { get; set; }
-	}
+        ///<summary>
+        /// See info for <seealso cref="LibraryNativesSpec"/>
+        ///</summary>
+        public string Osx { get; set; }
+    }
 }

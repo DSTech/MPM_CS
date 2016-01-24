@@ -24,26 +24,23 @@ namespace MPMTest.Data {
             this.output = output;
         }
 
-        private static Build testBuild = new Build(
+        private static readonly Build testBuild = new Build(
             "testPackage",
             Enumerable.Empty<Author>(),
             new semver.tools.SemanticVersion(0, 0, 0),
             "testVersion",
             new Arch("test"),
-            CompatibilityPlatform.Universal,
             CompatibilitySide.Universal,
             Enumerable.Empty<InterfaceProvision>(),
             Enumerable.Empty<InterfaceDependency>(),
             Enumerable.Empty<PackageDependency>(),
             Enumerable.Empty<Conflict>(),
-            Enumerable.Empty<Hash>(),
-            stable: false,
-            recommended: false
+            Enumerable.Empty<Hash>()
         );
 
         [Fact]//TODO: Figure out why async unit tests are absolutely terrible, and how to address it
         public async Task RepositoryTest() {
-            var dbFilePath = "./testRepository.litedb";
+            const string dbFilePath = "./testRepository.litedb";
             if (File.Exists(dbFilePath)) {
                 File.Delete(dbFilePath);
                 Thread.Sleep(TimeSpan.FromSeconds(0.05));
