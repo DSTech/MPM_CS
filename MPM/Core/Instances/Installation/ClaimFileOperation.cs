@@ -9,26 +9,25 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+    public class ClaimFileOperation : IFileOperation {
+        public ClaimFileOperation() {
+        }
 
-	public class ClaimFileOperation : IFileOperation {
-		public bool UsesPreviousContents => true;
+        public ClaimFileOperation(string packageName, SemanticVersion packageVersion) {
+            this.PackageName = packageName;
+            this.PackageVersion = packageVersion;
+        }
 
-		public string PackageName { get; set; }
+        public bool UsesPreviousContents => true;
 
-		public SemanticVersion PackageVersion { get; set; }
+        public string PackageName { get; set; }
 
-		public ClaimFileOperation() {
-		}
+        public SemanticVersion PackageVersion { get; set; }
 
-		public ClaimFileOperation(string packageName, SemanticVersion packageVersion) {
-			this.PackageName = packageName;
-			this.PackageVersion = packageVersion;
-		}
+        public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
+            //A no-op
+        }
 
-		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
-			//A no-op
-		}
-
-		public override string ToString() => $"<Claim>";
-	}
+        public override string ToString() => $"<Claim>";
+    }
 }

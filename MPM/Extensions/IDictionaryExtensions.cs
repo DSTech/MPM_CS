@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using MPM.CLI;
 
 namespace MPM.Extensions {
-
     class ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> {
         private readonly IDictionary<TKey, TValue> dictionary;
 

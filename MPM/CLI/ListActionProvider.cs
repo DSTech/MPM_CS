@@ -19,9 +19,7 @@ using Nito.AsyncEx.Synchronous;
 using semver.tools;
 
 namespace MPM.CLI {
-
     public class ListActionProvider {
-
         public void Provide(IContainer factory, ListArgs args) {
             this.List(factory);
         }

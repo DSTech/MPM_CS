@@ -7,24 +7,23 @@ using MPM.Core.Instances;
 using MPM.Core.Profiles;
 
 namespace MPM.ActionProviders {
+    public class MinecraftLauncher : ILauncher, IDisposable {
+        public string UserName { get; set; }
 
-	public class MinecraftLauncher : ILauncher, IDisposable {
-		public string UserName { get; set; }
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		public void Launch(Instance instance, IProfile profile) {
-			throw new NotImplementedException();
-		}
+        public void Launch(Instance instance, IProfile profile) {
+            throw new NotImplementedException();
+        }
 
-		public void Dispose() {
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		protected virtual void Dispose(bool Disposing) {
-			if (!Disposing) {
-				return;
-			}
-			//Dispose of resources here
-		}
-	}
+        protected virtual void Dispose(bool Disposing) {
+            if (!Disposing) {
+                return;
+            }
+            //Dispose of resources here
+        }
+    }
 }

@@ -3,9 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace MPM.Extensions {
-
     public static class StreamX {
-
         public static byte[] ReadToEnd(this Stream stream) {
             using (var ms = new MemoryStream()) {
                 stream.CopyTo(ms);

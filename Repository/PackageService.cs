@@ -40,7 +40,7 @@ namespace Repository {
             }
             var pkg = this.Repository.FetchPackage(request.PackageName);
             var builds = pkg?.Builds;
-            return (List<MPM.Net.DTO.Build>)builds.Denull().Select(b => b.ToDTO()).ToList();
+            return (List<MPM.Net.DTO.Build>) builds.Denull().Select(b => b.ToDTO()).ToList();
         }
 
         public object Post(BuildSubmission newBuild) {

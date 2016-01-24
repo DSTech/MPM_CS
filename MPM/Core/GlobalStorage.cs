@@ -15,80 +15,77 @@ using Newtonsoft.Json;
 using Autofac;
 
 namespace MPM.Core {
+    /// <summary>
+    ///     Should:
+    ///     Provide:
+    ///     Root Meta Database: <see cref="IUntypedKeyValueStore{String}" />
+    ///     Profile Store: <see cref="Func{Guid, IProfile}" />
+    ///     Global Cache: <see cref="Func{ICacheManager}" />
+    /// </summary>
+    public class GlobalStorage : ICancelable {
+        private const string CacheName = "cache";
+        private const string DbName = "global";
+        private const string MetaName = "meta";
+        private const string MpmDirName = ".mpm";
+        private const string ProfilesName = "profiles";
 
-	/// <summary>
-	/// Should:
-	///	 Provide:
-	///	  Root Meta Database: <see cref="IUntypedKeyValueStore{String}"/>
-	///	  Profile Store: <see cref="Func{Guid, IProfile}"/>
-	///   Global Cache: <see cref="Func{ICacheManager}"/>
-	/// </summary>
-	public class GlobalStorage : ICancelable {
+        public GlobalStorage() {
+            var cb = new ContainerBuilder();
 
-		private const string CacheName = "cache";
-		private const string DbName = "global";
-		private const string MetaName = "meta";
-		private const string MpmDirName = ".mpm";
-		private const string ProfilesName = "profiles";
+            cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath}; journal=false"))
+                .AsSelf()
+                .SingleInstance()
+                .Named<LiteDatabase>("GlobalDb");
 
-		public GlobalStorage() {
-			var cb = new ContainerBuilder();
+            cb.Register<ICacheManager>(ctxt => new FileSystemCacheManager(CachePath))
+                .As<ICacheManager>()
+                .SingleInstance()
+                .Named<ICacheManager>("GlobalCache");
 
-			cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath}; journal=false"))
-				.AsSelf()
-				.SingleInstance()
-				.Named<LiteDatabase>("GlobalDb");
+            cb.Register<IProfileManager>(ctxt => new LiteDbProfileManager(ctxt.Resolve<LiteDatabase>().GetCollection<MutableProfile>(ProfilesName)))
+                .As<IProfileManager>()
+                .SingleInstance()
+                .Named<IProfileManager>("GlobalProfiles");
 
-			cb.Register<ICacheManager>(ctxt => new FileSystemCacheManager(CachePath))
-				.As<ICacheManager>()
-				.SingleInstance()
-				.Named<ICacheManager>("GlobalCache");
+            cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
+                .As<IMetaDataManager>()
+                .SingleInstance()
+                .Named<IMetaDataManager>("GlobalMetaData");
 
-			cb.Register<IProfileManager>(ctxt => new LiteDbProfileManager(ctxt.Resolve<LiteDatabase>().GetCollection<MutableProfile>(ProfilesName)))
-				.As<IProfileManager>()
-				.SingleInstance()
-				.Named<IProfileManager>("GlobalProfiles");
+            this.Factory = cb.Build();
+        }
 
-			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
-				.As<IMetaDataManager>()
-				.SingleInstance()
-				.Named<IMetaDataManager>("GlobalMetaData");
+        public string CachePath => Directory.CreateDirectory(Path.Combine(HomePath, CacheName)).FullName;
 
-			this.Factory = cb.Build();
-		}
+        public string DbPath => Path.Combine(HomePath, $"{DbName}.litedb");
+        private IContainer Factory { get; set; }
 
-		public string CachePath => Directory.CreateDirectory(Path.Combine(HomePath, CacheName)).FullName;
+        private String HomePath =>
+            Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), MpmDirName)).FullName;
 
-		public string DbPath => Path.Combine(HomePath, $"{DbName}.litedb");
+        public bool IsDisposed { get; private set; }
 
-		public bool IsDisposed { get; private set; }
-		private IContainer Factory { get; set; }
+        public void Dispose() {
+            Dispose(true);
+        }
 
-		private String HomePath =>
-			Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), MpmDirName)).FullName;
+        public LiteDatabase FetchDataStore() => Factory.Resolve<LiteDatabase>();
 
-		public void Dispose() {
-			Dispose(true);
-		}
+        public ICacheManager FetchGlobalCache() => Factory.Resolve<ICacheManager>();
 
-		public LiteDatabase FetchDataStore() => Factory.Resolve<LiteDatabase>();
+        public IMetaDataManager FetchMetaDataManager() => Factory.Resolve<IMetaDataManager>();
 
-		public ICacheManager FetchGlobalCache() => Factory.Resolve<ICacheManager>();
+        public IProfile FetchProfile(string profileName) => FetchProfileManager().Fetch(profileName);
 
-		public IMetaDataManager FetchMetaDataManager() => Factory.Resolve<IMetaDataManager>();
+        public IProfileManager FetchProfileManager() => Factory.Resolve<IProfileManager>();
 
-		public IProfile FetchProfile(string profileName) => FetchProfileManager().Fetch(profileName);
-
-		public IProfileManager FetchProfileManager() => Factory.Resolve<IProfileManager>();
-
-		protected virtual void Dispose(bool disposing) {
-			if (IsDisposed) {
-				return;
-			}
-			Factory.Dispose();
-			GC.SuppressFinalize(this);
-			IsDisposed = true;
-		}
-
-	}
+        protected virtual void Dispose(bool disposing) {
+            if (IsDisposed) {
+                return;
+            }
+            Factory.Dispose();
+            GC.SuppressFinalize(this);
+            IsDisposed = true;
+        }
+    }
 }

@@ -17,6 +17,7 @@ namespace MPM.Core.Profiles {
             };
         }
     }
+
     public class MutableProfile : IProfile {
         public MutableProfile() {
         }
@@ -26,11 +27,11 @@ namespace MPM.Core.Profiles {
             this.Preferences = preferences?.ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
-        [BsonId, BsonField, BsonIndex]
-        public string Name { get; set; }
-
         [BsonField]
         public Dictionary<string, string> Preferences { get; set; } = new Dictionary<string, string>();
+
+        [BsonId, BsonField, BsonIndex]
+        public string Name { get; set; }
 
         [BsonIgnore]
         IReadOnlyDictionary<string, string> IProfile.Preferences => Preferences.AsReadOnly();

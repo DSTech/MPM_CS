@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using MPM.Data.Repository;
 
 namespace MPM.Data {
-
     public class NaiveHttpHashRepository : IHashRepository {
-
         public NaiveHttpHashRepository() {
         }
 
@@ -27,8 +25,8 @@ namespace MPM.Data {
                             new Uri(
                                 BaseUri,
                                 Convert.ToBase64String(hash)
+                                )
                             )
-                        )
                 );
         }
     }

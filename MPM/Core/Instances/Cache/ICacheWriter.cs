@@ -5,13 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Cache {
+    public interface ICacheWriter {
+        void Store(string cacheEntryName, byte[] entryData);
 
-	public interface ICacheWriter {
+        void Delete(string cacheEntryName);
 
-		void Store(string cacheEntryName, byte[] entryData);
-
-		void Delete(string cacheEntryName);
-
-		void Clear();
-	}
+        void Clear();
+    }
 }

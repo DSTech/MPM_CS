@@ -1,7 +1,6 @@
 namespace MPM.CLI {
-
-	public enum InstanceSide {
-		Client,
-		Server,
-	}
+    public enum InstanceSide {
+        Client,
+        Server,
+    }
 }

@@ -1,7 +1,6 @@
 using System;
 
 namespace MPM.Extensions {
-
     public static class DateTimeX {
         public static DateTime UnixEpoc => new DateTime(1970, 1, 1);
 

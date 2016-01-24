@@ -16,14 +16,7 @@ using MPM.Data.Repository;
 using MPM.Types;
 
 namespace MPMTest.Data {
-
     public class RepositoryTests {
-        private readonly ITestOutputHelper output;
-
-        public RepositoryTests(ITestOutputHelper output) {
-            this.output = output;
-        }
-
         private static readonly Build testBuild = new Build(
             "testPackage",
             Enumerable.Empty<Author>(),
@@ -36,7 +29,13 @@ namespace MPMTest.Data {
             Enumerable.Empty<PackageDependency>(),
             Enumerable.Empty<Conflict>(),
             Enumerable.Empty<Hash>()
-        );
+            );
+
+        private readonly ITestOutputHelper output;
+
+        public RepositoryTests(ITestOutputHelper output) {
+            this.output = output;
+        }
 
         [Fact]//TODO: Figure out why async unit tests are absolutely terrible, and how to address it
         public async Task RepositoryTest() {

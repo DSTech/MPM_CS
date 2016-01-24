@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using MPM.Types;
 
 namespace MPM.Data.Repository {
-
     public static class IHashRepositoryExtensions {
-
         public static IEnumerable<IHashRetriever> Resolve(this IHashRepository hashRepository, string[] hashes) {
             return hashRepository.Resolve(hashes.Select(hash => System.Text.Encoding.UTF8.GetBytes(hash)));
         }
@@ -21,7 +19,7 @@ namespace MPM.Data.Repository {
         }
 
         /// <summary>
-        /// Collects and assembles an archive's hashes from the given hash repository.
+        ///     Collects and assembles an archive's hashes from the given hash repository.
         /// </summary>
         /// <param name="hashRepository">The repository within which to search for hashes.</param>
         /// <param name="packageName">The package to look up</param>
@@ -46,13 +44,13 @@ namespace MPM.Data.Repository {
                                 ",\n",
                                 failedResolutions.Select(
                                     item => String.Format("\t\"{0}\"", item.Item1)
+                                    )
                                 )
-                            )
-                        ),
+                            ),
                         new AggregateException(
                             failedResolutions.Select(failedResolution => new KeyNotFoundException(failedResolution.Item1.ToString()))//An exception is created with each hash that could not be located.
-                        )
-                    );//Outputs a json-esque array to allow easy export by a user alongside an aggregate containing a more easily computer-understandable output
+                            )
+                        );//Outputs a json-esque array to allow easy export by a user alongside an aggregate containing a more easily computer-understandable output
                 }
             }
             //TODO: Switch to TPL Dataflow as described in https://msdn.microsoft.com/en-us/library/hh228603.aspx for parallelism control to prevent flooding
@@ -65,12 +63,13 @@ namespace MPM.Data.Repository {
 
     public interface IHashRepository {
         /// <summary>
-        /// Resolves a series of hashes into potential methods for fetching, wherein each method may provide caching and other services, and each hash may be fetched via differing methods.
+        ///     Resolves a series of hashes into potential methods for fetching, wherein each method may provide caching and other
+        ///     services, and each hash may be fetched via differing methods.
         /// </summary>
         /// <param name="hashes">Hashes for retrieval</param>
         /// <returns>
-        /// An enumerable of <see cref="IHashRetriever"/>, in the order of the provided hashes.
-        /// Null entries will be returned where resolution failed to find a means of fetching a hash.
+        ///     An enumerable of <see cref="IHashRetriever" />, in the order of the provided hashes.
+        ///     Null entries will be returned where resolution failed to find a means of fetching a hash.
         /// </returns>
         IEnumerable<IHashRetriever> Resolve(IEnumerable<byte[]> hashes);
     }

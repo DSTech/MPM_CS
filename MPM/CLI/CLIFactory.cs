@@ -18,53 +18,51 @@ using MPM.Net.Protocols.Minecraft;
 using MPM.Types;
 
 namespace MPM.CLI {
+    public class CLIFactory {
+        public IContainer GenerateResolver() {
+            var cb = new ContainerBuilder();
 
-	public class CLIFactory {
+            RegisterGlobalStorage(ref cb);
+            RegisterPackageRepository(ref cb);
+            RegisterHashStore(ref cb);
+            RegisterDependencyResolver(ref cb);//Consider auto-registering hashstores and packagerepo in an "IConfiguredResolver" interface?
+            RegisterProtocolResolver(ref cb);
 
-		public IContainer GenerateResolver() {
-			var cb = new ContainerBuilder();
+            var container = cb.Build();
+            Debug.Assert(container.IsRegistered<GlobalStorage>());
+            Debug.Assert(container.IsRegistered<IDependencyResolver>());
+            Debug.Assert(container.IsRegistered<IPackageRepository>());
+            Debug.Assert(container.IsRegistered<IHashRepository>());
+            Debug.Assert(container.IsRegistered<IProtocolResolver>());
+            return container;
+        }
 
-			RegisterGlobalStorage(ref cb);
-			RegisterPackageRepository(ref cb);
-			RegisterHashStore(ref cb);
-			RegisterDependencyResolver(ref cb);//Consider auto-registering hashstores and packagerepo in an "IConfiguredResolver" interface?
-			RegisterProtocolResolver(ref cb);
+        private void RegisterGlobalStorage(ref ContainerBuilder cb) {
+            cb.Register<GlobalStorage>(ctxt => new GlobalStorage()).SingleInstance();
+        }
 
-			var container = cb.Build();
-			Debug.Assert(container.IsRegistered<GlobalStorage>());
-			Debug.Assert(container.IsRegistered<IDependencyResolver>());
-			Debug.Assert(container.IsRegistered<IPackageRepository>());
-			Debug.Assert(container.IsRegistered<IHashRepository>());
-			Debug.Assert(container.IsRegistered<IProtocolResolver>());
-			return container;
-		}
+        private void RegisterPackageRepository(ref ContainerBuilder cb) {
+            cb.Register<IPackageRepository>(ctxt => {
+                var meta = ctxt.Resolve<GlobalStorage>().FetchMetaDataManager();//Use to fetch custom package repositories
+                var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
+                return new HttpPackageRepository(packageRepositoryUri);
+            }).SingleInstance();
+        }
 
-		private void RegisterGlobalStorage(ref ContainerBuilder cb) {
-			cb.Register<GlobalStorage>(ctxt => new GlobalStorage()).SingleInstance();
-		}
+        private void RegisterHashStore(ref ContainerBuilder cb) {
+            cb.Register<IHashRepository>(ctxt => {
+                var meta = ctxt.Resolve<GlobalStorage>().FetchMetaDataManager();//Use to fetch custom hash repositories
+                var hashStoreUri = new Uri(meta.Get<String>("hashStoreUri") ?? "http://dst.dessix.net:8951/");
+                return new NaiveHttpHashRepository(hashStoreUri);
+            }).SingleInstance();
+        }
 
-		private void RegisterPackageRepository(ref ContainerBuilder cb) {
-			cb.Register<IPackageRepository>(ctxt => {
-				var meta = ctxt.Resolve<GlobalStorage>().FetchMetaDataManager();//Use to fetch custom package repositories
-				var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
-				return new HttpPackageRepository(packageRepositoryUri);
-			}).SingleInstance();
-		}
+        private void RegisterDependencyResolver(ref ContainerBuilder cb) {
+            cb.Register<IDependencyResolver>(ctxt => new DependencyResolver()).SingleInstance();
+        }
 
-		private void RegisterHashStore(ref ContainerBuilder cb) {
-			cb.Register<IHashRepository>(ctxt => {
-				var meta = ctxt.Resolve<GlobalStorage>().FetchMetaDataManager();//Use to fetch custom hash repositories
-				var hashStoreUri = new Uri(meta.Get<String>("hashStoreUri") ?? "http://dst.dessix.net:8951/");
-				return new NaiveHttpHashRepository(hashStoreUri);
-			}).SingleInstance();
-		}
-
-		private void RegisterDependencyResolver(ref ContainerBuilder cb) {
-			cb.Register<IDependencyResolver>(ctxt => new DependencyResolver()).SingleInstance();
-		}
-
-		private void RegisterProtocolResolver(ref ContainerBuilder cb) {
-			cb.Register<IProtocolResolver>(ctxt => new CLIProtocolResolver(ctxt.Resolve<IHashRepository>())).SingleInstance();
-		}
-	}
+        private void RegisterProtocolResolver(ref ContainerBuilder cb) {
+            cb.Register<IProtocolResolver>(ctxt => new CLIProtocolResolver(ctxt.Resolve<IHashRepository>())).SingleInstance();
+        }
+    }
 }

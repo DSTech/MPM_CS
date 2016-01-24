@@ -11,63 +11,12 @@ using MPM.Core.Dependency;
 
 namespace MPM.Data.Repository {
     public class LiteDbPackageRepository : IPackageRepository {
-        public class PackageRepositoryEntry {
-            public PackageRepositoryEntry() { }
-            public PackageRepositoryEntry(Package package) {
-                this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
-            }
-
-            [BsonId]
-            public String Name { get; set; }
-            [BsonField]
-            public List<Net.DTO.Author> Authors { get; set; }
-            [BsonField]
-            public List<Net.DTO.Build> Builds { get; set; }
-            [BsonField]
-            public DateTime? LastUpdated { get; set; } = DateTime.Now;
-
-            public static implicit operator PackageRepositoryEntry(Package package) {
-                return new PackageRepositoryEntry(package) { LastUpdated = DateTime.Now };
-            }
-            public static implicit operator Package(PackageRepositoryEntry entry) {
-                return new Package(
-                    entry.Name,
-                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
-                );
-            }
-            public static implicit operator Net.DTO.Package(PackageRepositoryEntry entry) {
-                return new Net.DTO.Package {
-                    Name = entry.Name,
-                    Authors = entry.Authors,
-                    Builds = entry.Builds,
-                };
-            }
-        }
-
         private readonly LiteCollection<PackageRepositoryEntry> PackageCollection;
 
         public LiteDbPackageRepository(LiteCollection<PackageRepositoryEntry> packageCollection) {
             if ((this.PackageCollection = packageCollection) == null) {
                 throw new ArgumentNullException(nameof(packageCollection));
             }
-        }
-
-        private Func<Net.DTO.Build, bool> CreatePackageFilter(
-                SemanticVersion version,
-                CompatibilitySide side,
-                Arch arch
-            ) {
-            var dtoSide = side.ToDTO();
-            var dtoVersion = version.ToDTO();
-            var dtoArch = arch.ToDTO();
-            return b =>
-                    b.Version == dtoVersion
-                    && b.Side == dtoSide
-                    && b.Arch == dtoArch
-                    ;
         }
 
         public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
@@ -82,7 +31,7 @@ namespace MPM.Data.Repository {
             if (packageEntry == null) {
                 return null;
             }
-            var package = ((Net.DTO.Package)packageEntry).FromDTO();
+            var package = ((Net.DTO.Package) packageEntry).FromDTO();
             var builds = package.Builds
                 .Select(build => new { build, version = build.Version })
                 .Where(b => versionSpec.Satisfies(b.version))
@@ -97,15 +46,30 @@ namespace MPM.Data.Repository {
             if (package == null) {
                 return null;
             }
-            return ((Net.DTO.Package)package)?.FromDTO();
+            return ((Net.DTO.Package) package)?.FromDTO();
         }
 
         public IEnumerable<Package> FetchPackageList() {
-            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package)p).FromDTO()).ToArray().AsEnumerable();
+            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package) p).FromDTO()).ToArray().AsEnumerable();
         }
 
         public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
-            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package)p).FromDTO()).ToArray().AsEnumerable();
+            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package) p).FromDTO()).ToArray().AsEnumerable();
+        }
+
+        private Func<Net.DTO.Build, bool> CreatePackageFilter(
+            SemanticVersion version,
+            CompatibilitySide side,
+            Arch arch
+            ) {
+            var dtoSide = side.ToDTO();
+            var dtoVersion = version.ToDTO();
+            var dtoArch = arch.ToDTO();
+            return b =>
+                b.Version == dtoVersion
+                    && b.Side == dtoSide
+                    && b.Arch == dtoArch
+                ;
         }
 
         private Package RegisterBuildSynchronous(Build build) {
@@ -116,11 +80,11 @@ namespace MPM.Data.Repository {
             var withEquivalentVersion = existingPackage.Builds.Where(b => b.Version.FromDTO() == build.Version);
             existingPackage.Builds.Add(build.ToDTO());
             PackageCollection.Update(existingPackage);
-            return ((Net.DTO.Package)existingPackage).FromDTO();
+            return ((Net.DTO.Package) existingPackage).FromDTO();
         }
 
         /// <summary>
-        /// Registers a build into the system, or updates it.
+        ///     Registers a build into the system, or updates it.
         /// </summary>
         /// <param name="build">The build to register.</param>
         /// <returns>The package into which the build was registered</returns>
@@ -149,6 +113,49 @@ namespace MPM.Data.Repository {
                 throw new ArgumentException("Argument is null or whitespace", nameof(packageName));
             }
             return PackageCollection.Delete(p => p.Name == packageName) > 0;
+        }
+
+        public class PackageRepositoryEntry {
+            public PackageRepositoryEntry() {
+            }
+
+            public PackageRepositoryEntry(Package package) {
+                this.Name = package.Name;
+                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
+                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
+            }
+
+            [BsonId]
+            public String Name { get; set; }
+
+            [BsonField]
+            public List<Net.DTO.Author> Authors { get; set; }
+
+            [BsonField]
+            public List<Net.DTO.Build> Builds { get; set; }
+
+            [BsonField]
+            public DateTime? LastUpdated { get; set; } = DateTime.Now;
+
+            public static implicit operator PackageRepositoryEntry(Package package) {
+                return new PackageRepositoryEntry(package) { LastUpdated = DateTime.Now };
+            }
+
+            public static implicit operator Package(PackageRepositoryEntry entry) {
+                return new Package(
+                    entry.Name,
+                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
+                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
+                    );
+            }
+
+            public static implicit operator Net.DTO.Package(PackageRepositoryEntry entry) {
+                return new Net.DTO.Package {
+                    Name = entry.Name,
+                    Authors = entry.Authors,
+                    Builds = entry.Builds,
+                };
+            }
         }
     }
 }

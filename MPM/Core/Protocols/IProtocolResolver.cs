@@ -7,11 +7,9 @@ using MPM.Net;
 using MPM.Types;
 
 namespace MPM.Core.Protocols {
+    public interface IProtocolResolver {
+        byte[] Resolve(string protocol, string path, Hash hash);
 
-	public interface IProtocolResolver {
-
-		byte[] Resolve(string protocol, string path, Hash hash);
-
-		IArchResolver GetArchResolver();
-	}
+        IArchResolver GetArchResolver();
+    }
 }

@@ -17,100 +17,90 @@ using Platform.VirtualFileSystem;
 using Platform.VirtualFileSystem.Providers.Local;
 
 namespace MPM.Core.Instances {
+    public class Instance : ICancelable {
+        private const string MpmDirectoryName = ".mpm";
+        private const string DbDirectory = "db";
+        private const string DbName = "db";
+        private const string ConfigurationName = "configuration";
+        private const string MetaName = "meta";
+        private const string PackageName = "packages";
+        private const string PackageCacheName = "packagecache";
 
-	public class Instance : ICancelable {
-		private const string MpmDirectoryName = ".mpm";
-		private const string DbDirectory = "db";
-		private const string DbName = "db";
-		private const string ConfigurationName = "configuration";
-		private const string MetaName = "meta";
-		private const string PackageName = "packages";
-		private const string PackageCacheName = "packagecache";
-		public IContainer Factory { get; private set; }
-		public String Location { get; set; }
-		public String MpmDirectory => Directory.CreateDirectory(Path.Combine(Location, MpmDirectoryName)).FullName;
-		public String DbPath => Path.Combine(MpmDirectory, $"{DbName}.litedb");
+        public Instance(String location) {
+            this.Location = location;
+            var cb = new ContainerBuilder();
 
-		public Instance(String location) {
-			this.Location = location;
-			var cb = new ContainerBuilder();
+            cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath}; journal=false"))
+                .AsSelf()
+                .SingleInstance()
+                .Named<LiteDatabase>("InstanceDb");
 
-			cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath}; journal=false"))
-				.AsSelf()
-				.SingleInstance()
-				.Named<LiteDatabase>("InstanceDb");
+            cb.Register<IFileSystem>(ctxt => FileSystemManager.Default.ResolveDirectory(Location).CreateView())
+                .As<IFileSystem>()
+                .SingleInstance()
+                .Named<IFileSystem>("InstanceProfiles");
 
-			cb.Register<IFileSystem>(ctxt => FileSystemManager.Default.ResolveDirectory(Location).CreateView())
-				.As<IFileSystem>()
-				.SingleInstance()
-				.Named<IFileSystem>("InstanceProfiles");
+            cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
+                .As<IMetaDataManager>()
+                .SingleInstance()
+                .Named<IMetaDataManager>("InstanceMetaData");
 
-			cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
-				.As<IMetaDataManager>()
-				.SingleInstance()
-				.Named<IMetaDataManager>("InstanceMetaData");
+            this.Factory = cb.Build();
+        }
 
-			this.Factory = cb.Build();
-		}
+        public IContainer Factory { get; private set; }
+        public String Location { get; set; }
+        public String MpmDirectory => Directory.CreateDirectory(Path.Combine(Location, MpmDirectoryName)).FullName;
+        public String DbPath => Path.Combine(MpmDirectory, $"{DbName}.litedb");
 
-		private LiteDatabase FetchDbConnection() {
-			return Factory.Resolve<LiteDatabase>();
-		}
+        public String Name {
+            get { return FetchDbMeta().Get<String>("name"); }
+            set { FetchDbMeta().Set<String>("name", value); }
+        }
 
-		public IMetaDataManager FetchDbMeta() {
-			return Factory.Resolve<IMetaDataManager>();
-		}
+        public Type LauncherType {
+            get { return FetchDbMeta().Get<Type>("launcherType"); }
+            set { FetchDbMeta().Set<Type>("launcherType", value); }
+        }
 
-		public IFileSystem FetchFileSystem() {
-			return Factory.Resolve<IFileSystem>();
-		}
+        public InstanceConfiguration @Configuration {
+            get {
+                var conf = FetchDbMeta().Get<InstanceConfiguration>(ConfigurationName);
+                return conf ?? InstanceConfiguration.Empty;
+            }
+            set { FetchDbMeta().Set<InstanceConfiguration>(ConfigurationName, value); }
+        }
 
-		public String Name {
-			get {
-				return FetchDbMeta().Get<String>("name");
-			}
-			set {
-				FetchDbMeta().Set<String>("name", value);
-			}
-		}
+        public bool IsDisposed { get; private set; }
 
-		public Type LauncherType {
-			get {
-				return FetchDbMeta().Get<Type>("launcherType");
-			}
-			set {
-				FetchDbMeta().Set<Type>("launcherType", value);
-			}
-		}
+        public void Dispose() {
+            Dispose(true);
+        }
 
-		public InstanceConfiguration @Configuration {
-			get {
-				var conf = FetchDbMeta().Get<InstanceConfiguration>(ConfigurationName);
-				return conf ?? InstanceConfiguration.Empty;
-			}
-			set {
-				FetchDbMeta().Set<InstanceConfiguration>(ConfigurationName, value);
-			}
-		}
+        private LiteDatabase FetchDbConnection() {
+            return Factory.Resolve<LiteDatabase>();
+        }
 
-		public ILauncher CreateLauncher() {
-			var ctor = LauncherType.GetConstructor(new Type[0]);
-			return (ILauncher)ctor.Invoke(new object[0]);
-		}
+        public IMetaDataManager FetchDbMeta() {
+            return Factory.Resolve<IMetaDataManager>();
+        }
 
-		public bool IsDisposed { get; private set; }
+        public IFileSystem FetchFileSystem() {
+            return Factory.Resolve<IFileSystem>();
+        }
 
-		public void Dispose() {
-			Dispose(true);
-		}
+        public ILauncher CreateLauncher() {
+            var ctor = LauncherType.GetConstructor(new Type[0]);
+            return (ILauncher) ctor.Invoke(new object[0]);
+        }
 
-		protected void Dispose(bool disposing) {
-			if (IsDisposed) {
-				return;
-			}
-			Factory.Dispose();
-			GC.SuppressFinalize(this);
-			IsDisposed = true;
-		}
-	}
+        protected void Dispose(bool disposing) {
+            if (IsDisposed) {
+                return;
+            }
+            Factory.Dispose();
+            GC.SuppressFinalize(this);
+            IsDisposed = true;
+        }
+    }
 }

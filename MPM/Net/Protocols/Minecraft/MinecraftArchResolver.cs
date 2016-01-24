@@ -44,7 +44,7 @@ namespace MPM.Net.Protocols.Minecraft {
             string appliedNatives,
             string cacheEntryName,
             ICacheManager cacheManager
-        ) {
+            ) {
             var nativeTag = appliedNatives != null ? $"-{appliedNatives}" : null;
             if (lib.Extract != null) {
                 //generate extract def
@@ -57,7 +57,7 @@ namespace MPM.Net.Protocols.Minecraft {
                     "",
                     extractDestination,
                     lib.Extract.Exclusions
-                );
+                    );
             } else {
                 return new CopyArchInstallationOperation(
                     lib.Name,
@@ -65,7 +65,7 @@ namespace MPM.Net.Protocols.Minecraft {
                     cacheManager,
                     cacheEntryName,
                     $"libraries/{lib.Package}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTag}.jar"
-                );
+                    );
             }
         }
     }

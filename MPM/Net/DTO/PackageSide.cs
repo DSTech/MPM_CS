@@ -1,8 +1,7 @@
 namespace MPM.Net.DTO {
-
-	public enum PackageSide {
-		Client,
-		Server,
-		Universal,
-	}
+    public enum PackageSide {
+        Client,
+        Server,
+        Universal,
+    }
 }

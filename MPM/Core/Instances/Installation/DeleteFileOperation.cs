@@ -9,26 +9,25 @@ using Platform.VirtualFileSystem;
 using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
+    public class DeleteFileOperation : IFileOperation {
+        public DeleteFileOperation() {
+        }
 
-	public class DeleteFileOperation : IFileOperation {
-		public bool UsesPreviousContents => false;
+        public DeleteFileOperation(string packageName, SemanticVersion packageVersion) {
+            this.PackageName = packageName;
+            this.PackageVersion = packageVersion;
+        }
 
-		public string PackageName { get; set; }
+        public bool UsesPreviousContents => false;
 
-		public SemanticVersion PackageVersion { get; set; }
+        public string PackageName { get; set; }
 
-		public DeleteFileOperation() {
-		}
+        public SemanticVersion PackageVersion { get; set; }
 
-		public DeleteFileOperation(string packageName, SemanticVersion packageVersion) {
-			this.PackageName = packageName;
-			this.PackageVersion = packageVersion;
-		}
+        public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
+            fileSystem.ResolveFile(path).Delete();
+        }
 
-		public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
-			fileSystem.ResolveFile(path).Delete();
-		}
-
-		public override string ToString() => "<Delete>";
-	}
+        public override string ToString() => "<Delete>";
+    }
 }

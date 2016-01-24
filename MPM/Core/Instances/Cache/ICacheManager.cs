@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Cache {
-
-	public interface ICacheManager : ICacheReader, ICacheWriter {
-	}
+    public interface ICacheManager : ICacheReader, ICacheWriter {
+    }
 }

@@ -20,12 +20,10 @@ using Nito.AsyncEx.Synchronous;
 using semver.tools;
 
 namespace MPM.CLI {
-
-	public class CreatePackageActionProvider {
-
-		public void Provide(IContainer factory, CreatePackageArgs args) {
-			Console.WriteLine($"Creating package at path:\n\t{args.PackageDirectory}");
-		    throw new NotImplementedException();
-		}
-	}
+    public class CreatePackageActionProvider {
+        public void Provide(IContainer factory, CreatePackageArgs args) {
+            Console.WriteLine($"Creating package at path:\n\t{args.PackageDirectory}");
+            throw new NotImplementedException();
+        }
+    }
 }

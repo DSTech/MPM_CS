@@ -17,9 +17,7 @@ using QuickGraph.Collections;
 using QuickGraph.Data;
 
 namespace MPM.Core.Dependency {
-
     public class DependencyResolver : IDependencyResolver {
-
         public InstanceConfiguration Resolve(Configuration target, IPackageRepository repository) {
             //Packages which exist in the resultant configuration- Only one version of a package may exist in the result
             var output = new List<Build>();
@@ -98,13 +96,14 @@ namespace MPM.Core.Dependency {
                     output.AddRange(resolvedDeps);
                 }
                 return SortBuilds(output).ToArray();
-                nextBuild: continue;
+                nextBuild:
+                continue;
             }
             throw new DependencyException("Could not resolve package, no viable dependency tree found", packageSpec);
         }
 
         /// <summary>
-        /// Sorts builds topologically, from least-dependent to most-dependent.
+        ///     Sorts builds topologically, from least-dependent to most-dependent.
         /// </summary>
         /// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
         /// <returns>A sorted array of builds, with the least-dependent first</returns>
@@ -121,11 +120,11 @@ namespace MPM.Core.Dependency {
                         .Select(dep => Array.FindIndex<Build>(buildMap, nb => nb.PackageName == dep.PackageName))
                         .Where(depIndex => depIndex != -1)
                         .Select(destination => new Edge<int>(buildIndex, destination))
-                );
+                    );
             }
             var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
             var onBackEdge = new EdgeAction<int, Edge<int>>(e => {
-                var edge = (Edge<int>)e;
+                var edge = (Edge<int>) e;
                 adjGraph.RemoveEdge(edge);
             });
             try {

@@ -2,9 +2,7 @@ using System.Linq;
 using MPM.Types;
 
 namespace MPM.Extensions {
-
     public static class PackageConflictX {
-
         public static bool CheckPackageConflict(this Conflict packageConflict, string[] packages, string[] interfaces) {
             if (packageConflict.Condition == null) {
                 return false;

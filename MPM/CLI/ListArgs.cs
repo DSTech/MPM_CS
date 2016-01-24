@@ -1,7 +1,6 @@
 using PowerArgs;
 
 namespace MPM.CLI {
-
-	public class ListArgs {
-	}
+    public class ListArgs {
+    }
 }

@@ -9,9 +9,7 @@ using MPM.Types;
 using semver.tools;
 
 namespace MPM.Core.Dependency {
-
     public static class PackageSpecExtensions {
-
         public static PackageSpec ToSpec(this PackageDependency dependency, Arch arch, bool manual = false) {
             var spec = new PackageSpec {
                 Manual = manual,
@@ -24,7 +22,7 @@ namespace MPM.Core.Dependency {
         }
 
         /// <summary>
-        /// Checks if a build satisfies the given specification.
+        ///     Checks if a build satisfies the given specification.
         /// </summary>
         /// <param name="spec">Specification to check against</param>
         /// <param name="build">Build to check. Assumes (What?)</param>
@@ -34,13 +32,13 @@ namespace MPM.Core.Dependency {
                 //&& spec.Arch == build.Arch//TODO: Add ARCH to the API
                 && (
                     spec.Side == build.Side || build.Side == CompatibilitySide.Universal
-                )
+                    )
                 && spec.VersionSpec.Satisfies(build.Version);
         }
 
         /// <summary>
-        /// Looks up a package, returning named builds qualifying for the specification.
-        /// Must return in descending order of version.
+        ///     Looks up a package, returning named builds qualifying for the specification.
+        ///     Must return in descending order of version.
         /// </summary>
         /// <param name="repository">Repository to look up the spec from within</param>
         /// <param name="packageSpec">Specification to look up</param>
@@ -61,6 +59,14 @@ namespace MPM.Core.Dependency {
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
         public bool Manual { get; set; } = false;
 
+        public bool Equals(PackageSpec other) {
+            return
+                Name == other.Name
+                    && this.Arch == other.Arch
+                    && this.VersionSpec.ToString() == other.VersionSpec.ToString()
+                    && this.Manual == other.Manual;
+        }
+
         public override bool Equals(object obj) {
             var packageSpec = obj as PackageSpec;
             if (packageSpec == null) {
@@ -72,34 +78,26 @@ namespace MPM.Core.Dependency {
         public override int GetHashCode() {
             return
                 (Name?.GetHashCode() ?? 0)
-                + (Arch?.GetHashCode() ?? 0)
-                + (VersionSpec != null ? GetVersionSpecHashCode(VersionSpec) : 0)
-                + Manual.GetHashCode();
+                    + (Arch?.GetHashCode() ?? 0)
+                    + (VersionSpec != null ? GetVersionSpecHashCode(VersionSpec) : 0)
+                    + Manual.GetHashCode();
         }
 
         private static int GetVersionSpecHashCode(IVersionSpec spec) {
             return
                 unchecked(
                     spec.IsMinInclusive.GetHashCode() +
-                    spec.IsMaxInclusive.GetHashCode() +
-                    spec.MinVersion.GetHashCode() +
-                    spec.MaxVersion.GetHashCode());
+                        spec.IsMaxInclusive.GetHashCode() +
+                        spec.MinVersion.GetHashCode() +
+                        spec.MaxVersion.GetHashCode());
         }
 
         private bool VersionSpecsEqual(IVersionSpec first, IVersionSpec second) {
             return
                 first.IsMinInclusive == second.IsMinInclusive &&
-                first.IsMaxInclusive == second.IsMaxInclusive &&
-                first.MinVersion.Equals(second.MinVersion) &&
-                first.MaxVersion.Equals(second.MaxVersion);
-        }
-
-        public bool Equals(PackageSpec other) {
-            return
-                Name == other.Name
-                && this.Arch == other.Arch
-                && this.VersionSpec.ToString() == other.VersionSpec.ToString()
-                && this.Manual == other.Manual;
+                    first.IsMaxInclusive == second.IsMaxInclusive &&
+                    first.MinVersion.Equals(second.MinVersion) &&
+                    first.MaxVersion.Equals(second.MaxVersion);
         }
     }
 }

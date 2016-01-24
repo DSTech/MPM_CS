@@ -14,7 +14,8 @@ using System.Reactive.Threading.Tasks;
 namespace Repository {
     //Web Service Host Configuration
     public class AppHost : AppHostHttpListenerBase {
-        public AppHost() : base("Package and Hash Repository", typeof(PackageService).Assembly) { }
+        public AppHost() : base("Package and Hash Repository", typeof(PackageService).Assembly) {
+        }
 
         public override void Configure(Container container) {
             var dataDir = Directory.CreateDirectory(new DirectoryInfo("./data/").FullName).FullName;

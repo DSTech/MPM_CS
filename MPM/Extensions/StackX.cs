@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using MPM.CLI;
 
 namespace MPM.Extensions {
-
     public static class StackX {
-
         public static bool RemoveFirst<T>(this Stack<T> stack, Predicate<T> qualifier) {
             if (stack == null) {
                 throw new ArgumentNullException(nameof(stack));

@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 using MPM.Extensions;
 
 namespace MPM.Core.Instances.Cache {
+    public static class ICacheEntryExtensions {
+        public static byte[] Fetch(this ICacheEntry entry) {
+            using (var entryStream = entry.FetchStream()) {
+                return entryStream.ReadToEnd();
+            }
+        }
 
-	public static class ICacheEntryExtensions {
-
-		public static byte[] Fetch(this ICacheEntry entry) {
-			using (var entryStream = entry.FetchStream()) {
-				return entryStream.ReadToEnd();
-			}
-		}
-
-		public static async Task<byte[]> FetchAsync(this ICacheEntry entry) {
-			using (var entryStream = entry.FetchStream()) {
-				return await entryStream.ReadToEndAsync();
-			}
-		}
-	}
+        public static async Task<byte[]> FetchAsync(this ICacheEntry entry) {
+            using (var entryStream = entry.FetchStream()) {
+                return await entryStream.ReadToEndAsync();
+            }
+        }
+    }
 }

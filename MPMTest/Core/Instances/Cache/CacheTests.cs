@@ -13,26 +13,25 @@ using System.Threading;
 using LiteDB;
 
 namespace MPMTest.Core.Instances.Cache {
-
-	public class CacheTests {
-		[Fact]
-		public void FileSystemCacheManagerFileManagement() {
-			var cachePath = "./testCache/";
-			if (!Directory.Exists(cachePath)) {
-				Directory.CreateDirectory(cachePath);
-			}
-			var cache = new FileSystemCacheManager(cachePath);
-			cache.Clear();
-			var keyToStore = "test";
-			var valueToStore = "testData";
-			cache.Store(keyToStore, Encoding.UTF8.GetBytes(valueToStore));
-			Assert.True(cache.Contains(keyToStore));
-			var cachedByteValue = cache.Fetch(keyToStore).Fetch();
-			var cachedValue = Encoding.UTF8.GetString(cachedByteValue);
-			Assert.Equal(valueToStore, cachedValue);
-			cache.Delete(keyToStore);
-			Assert.False(cache.Contains(keyToStore));
-			Assert.Null(cache.Fetch(keyToStore));
-		}
-	}
+    public class CacheTests {
+        [Fact]
+        public void FileSystemCacheManagerFileManagement() {
+            var cachePath = "./testCache/";
+            if (!Directory.Exists(cachePath)) {
+                Directory.CreateDirectory(cachePath);
+            }
+            var cache = new FileSystemCacheManager(cachePath);
+            cache.Clear();
+            var keyToStore = "test";
+            var valueToStore = "testData";
+            cache.Store(keyToStore, Encoding.UTF8.GetBytes(valueToStore));
+            Assert.True(cache.Contains(keyToStore));
+            var cachedByteValue = cache.Fetch(keyToStore).Fetch();
+            var cachedValue = Encoding.UTF8.GetString(cachedByteValue);
+            Assert.Equal(valueToStore, cachedValue);
+            cache.Delete(keyToStore);
+            Assert.False(cache.Contains(keyToStore));
+            Assert.Null(cache.Fetch(keyToStore));
+        }
+    }
 }

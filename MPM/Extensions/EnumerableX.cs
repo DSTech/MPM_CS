@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MPM.Extensions {
-
     public static class EnumerableX {
-
         public static IEnumerable<T> Denull<T>(this IEnumerable<T> enumerable) => enumerable ?? Enumerable.Empty<T>();
 
         public static IEnumerable<T> SubEnumerable<T>(this IEnumerable<T> enumerable, int startIndex) {

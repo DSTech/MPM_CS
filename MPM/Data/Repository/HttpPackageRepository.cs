@@ -12,7 +12,6 @@ using Newtonsoft.Json.Linq;
 using semver.tools;
 
 namespace MPM.Data.Repository {
-
     public class HttpPackageRepository : IPackageRepository {
         private readonly Uri baseUri;
 
@@ -26,7 +25,7 @@ namespace MPM.Data.Repository {
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream()?.ReadToEndAndClose();
             }
-            var build = JsonConvert.DeserializeObject<MPM.Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
+            var build = JsonConvert.DeserializeObject<Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
             build.Package = build.Package ?? packageName;
             return build.FromDTO();
         }
@@ -46,7 +45,7 @@ namespace MPM.Data.Repository {
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
             }
-            var package = JsonConvert.DeserializeObject<MPM.Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
+            var package = JsonConvert.DeserializeObject<Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
             return package.FromDTO();
         }
 
@@ -56,18 +55,18 @@ namespace MPM.Data.Repository {
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
             }
-            var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+            var packageList = JsonConvert.DeserializeObject<IEnumerable<Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
             return packageList.Select(package => package.FromDTO()).ToArray();
         }
 
         public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
-            var updatedAfterTimestamp = (long)(updatedAfter.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            var updatedAfterTimestamp = (long) (updatedAfter.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/?LastSync={updatedAfterTimestamp}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
             }
-            var packageList = JsonConvert.DeserializeObject<IEnumerable<MPM.Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
+            var packageList = JsonConvert.DeserializeObject<IEnumerable<Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
             return packageList.Select(package => package.FromDTO()).ToArray();
         }
     }

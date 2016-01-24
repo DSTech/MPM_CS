@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 
 namespace MPM.Net.DTO {
-
     public class Build {
         public String Package { get; set; }
         public List<Author> Authors { get; set; }

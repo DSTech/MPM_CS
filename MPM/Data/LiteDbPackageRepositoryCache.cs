@@ -14,50 +14,18 @@ using semver.tools;
 using MPM.Data.Repository;
 
 namespace MPM.Data {
-
     public class LiteDbPackageRepositoryCache : IPackageRepositoryCache {
-        public class PackageEntry {
-            public PackageEntry() { }
-            public PackageEntry(Package package) {
-                this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
-            }
-
-            [BsonId]
-            public String Name { get; set; }
-            [BsonField]
-            public List<Net.DTO.Author> Authors { get; set; }
-            [BsonField]
-            public List<Net.DTO.Build> Builds { get; set; }
-
-            public static implicit operator PackageEntry(Package package) {
-                return new PackageEntry(package);
-            }
-            public static implicit operator Package(PackageEntry entry) {
-                return new Package(
-                    entry.Name,
-                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
-                );
-            }
-            public static implicit operator Net.DTO.Package(PackageEntry entry) {
-                return new Net.DTO.Package {
-                    Name = entry.Name,
-                    Authors = entry.Authors,
-                    Builds = entry.Builds,
-                };
-            }
-        }
-
         private const string SyncInfoMetaName = "syncInfo";
-        private readonly IPackageRepository repository;
-
-        private readonly LiteCollection<PackageEntry> Packages;
         private readonly IMetaDataManager metaDb;
 
+        private readonly LiteCollection<PackageEntry> Packages;
+        private readonly IPackageRepository repository;
 
-        /// <param name="packageCacheDbFactory">Factory to fetch a package-cache database connection which may be disposed after usage.</param>
+
+        /// <param name="packageCacheDbFactory">
+        ///     Factory to fetch a package-cache database connection which may be disposed after
+        ///     usage.
+        /// </param>
         /// <param name="metaDb">Metadata Manager</param>
         /// <param name="repository">The repository that will be cached</param>
         public LiteDbPackageRepositoryCache(LiteCollection<PackageEntry> packages, IMetaDataManager metaDb, IPackageRepository repository) {
@@ -92,7 +60,7 @@ namespace MPM.Data {
         }
 
         public Package FetchPackage(string packageName) {
-            var package = (Package)Packages.FindById(packageName);
+            var package = (Package) Packages.FindById(packageName);
             if (package == null) {
                 return null;
             }
@@ -138,6 +106,46 @@ namespace MPM.Data {
 
         public void UpsertPackage(Package package) {
             Packages.Upsert(package);
+        }
+
+        public class PackageEntry {
+            public PackageEntry() {
+            }
+
+            public PackageEntry(Package package) {
+                this.Name = package.Name;
+                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
+                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
+            }
+
+            [BsonId]
+            public String Name { get; set; }
+
+            [BsonField]
+            public List<Net.DTO.Author> Authors { get; set; }
+
+            [BsonField]
+            public List<Net.DTO.Build> Builds { get; set; }
+
+            public static implicit operator PackageEntry(Package package) {
+                return new PackageEntry(package);
+            }
+
+            public static implicit operator Package(PackageEntry entry) {
+                return new Package(
+                    entry.Name,
+                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
+                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
+                    );
+            }
+
+            public static implicit operator Net.DTO.Package(PackageEntry entry) {
+                return new Net.DTO.Package {
+                    Name = entry.Name,
+                    Authors = entry.Authors,
+                    Builds = entry.Builds,
+                };
+            }
         }
     }
 }

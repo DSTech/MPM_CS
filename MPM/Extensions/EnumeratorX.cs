@@ -5,9 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Extensions {
-
     public static class EnumeratorX {
-
         public static IEnumerable<T> TakeApply<T>(this IEnumerable<T> sequence, int count, Action<IEnumerable<T>> callback) {
             var enumr = sequence.GetEnumerator();
             callback.Invoke(enumr.Take(count));

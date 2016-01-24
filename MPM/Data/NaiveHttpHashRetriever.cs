@@ -8,29 +8,29 @@ using System.Threading.Tasks;
 using MPM.Extensions;
 
 namespace MPM.Data {
+    public class NaiveHttpHashRetriever : IHashRetriever {
+        public NaiveHttpHashRetriever(string hash, Uri uri)
+            : this(Convert.FromBase64String(hash), uri) {
+        }
 
-	public class NaiveHttpHashRetriever : IHashRetriever {
-		public byte[] Hash { get; }
-		public Uri @Uri { get; }
+        public NaiveHttpHashRetriever(byte[] hash, Uri uri) {
+            Hash = hash;
+            this.@Uri = uri;
+        }
 
-		public NaiveHttpHashRetriever(string hash, Uri uri)
-			: this(Convert.FromBase64String(hash), uri) { }
+        public Uri @Uri { get; }
+        public byte[] Hash { get; }
 
-		public NaiveHttpHashRetriever(byte[] hash, Uri uri) {
-			Hash = hash;
-			this.@Uri = uri;
-		}
+        public async Task<byte[]> Retrieve() {
+            using (var stream = await RetrieveStream()) {
+                return await stream.ReadToEndAsync();
+            }
+        }
 
-		public async Task<byte[]> Retrieve() {
-			using (var stream = await RetrieveStream()) {
-				return await stream.ReadToEndAsync();
-			}
-		}
-
-		public async Task<Stream> RetrieveStream() {
-			var req = WebRequest.CreateHttp(this.@Uri);
-			var res = await req.GetResponseAsync();
-			return new DisposerStreamWrapper(res.GetResponseStream(), res);
-		}
-	}
+        public async Task<Stream> RetrieveStream() {
+            var req = WebRequest.CreateHttp(this.@Uri);
+            var res = await req.GetResponseAsync();
+            return new DisposerStreamWrapper(res.GetResponseStream(), res);
+        }
+    }
 }
