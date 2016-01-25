@@ -214,7 +214,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Core\VersionTests.cs" />
     <Compile Include="Core\Instances\Cache\CacheTests.cs" />
     <Compile Include="Data\RepositoryTests.cs" />
     <Compile Include="Data\DbTests.cs" />

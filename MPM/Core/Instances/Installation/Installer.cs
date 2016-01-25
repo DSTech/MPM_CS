@@ -44,7 +44,7 @@ namespace MPM.Core.Instances.Installation {
         /// </exception>
         /// <exception cref="InvalidOperationException">Thrown when a version of the specified package is already installed.</exception>
         /// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
-        public async Task<InstanceConfiguration> Install(ParsedBuildInfo build) {
+        public async Task<InstanceConfiguration> Install(Build build) {
             await Task.Yield();
             //TODO: Persist the package-data for the NamedBuild being installed
             //TODO: Error if any builds of the same package are already installed

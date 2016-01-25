@@ -27,7 +27,7 @@ namespace MPM.Types {
         }
 
         public override int GetHashCode() {
-            return this.Id != null ? this.Id.GetHashCode() : 0;
+            return this.Id?.GetHashCode() ?? 0;
         }
 
         public static bool operator ==(Arch left, Arch right) {

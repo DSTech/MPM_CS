@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MPM.Types;
 using NServiceKit;
 using NServiceKit.ServiceHost;
 

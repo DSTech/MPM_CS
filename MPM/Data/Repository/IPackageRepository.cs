@@ -14,8 +14,8 @@ namespace MPM.Data.Repository {
         ///     Should be used to find packages for which further information may be looked up via
         ///     <see cref="FetchPackage(string)" /> or <see cref="FetchBuild" />.
         /// </summary>
-        /// <returns>Multiple <see cref="Package" /> instances containing, at minimum, the name of the package.</returns>
-        IEnumerable<Package> FetchPackageList();
+        /// <returns>0 to multiple <see cref="Build" /> instances containing, at minimum, the name of the package(s) to which they belong.</returns>
+        IEnumerable<Build> FetchPackageList();
 
         /// <summary>
         ///     Similar to <see cref="FetchPackageList()" />, this fetches only packages which have changed since the specified
@@ -25,9 +25,9 @@ namespace MPM.Data.Repository {
         /// </summary>
         /// <param name="updatedAfter"></param>
         /// <returns>Multiple <see cref="Package" /> instances containing, at minimum, the name of the package.</returns>
-        IEnumerable<Package> FetchPackageList(DateTime updatedAfter);
+        IEnumerable<Build> FetchPackageList(DateTime updatedAfter);
 
-        Package FetchPackage(String packageName);
+        IEnumerable<Build> FetchPackageBuilds(String packageName);
 
         /// <summary>
         ///     Looks up a particular build of a package.

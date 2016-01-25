@@ -18,7 +18,7 @@ namespace MPM.Data.Repository {
             this.Database = new LiteDatabase($"filename={dataPath}; journal=false");
             this.Database.Shrink();
             //Database.Mapper.Entity<LiteDbPackageRepository.PackageRepositoryEntry>().DbRef(entry => entry.Builds, "builds");//Must add .Include(p => p.Builds) to all appropriate usages
-            this.Packages = new LiteDbPackageRepository(Database.GetCollection<LiteDbPackageRepository.PackageRepositoryEntry>("packages"));
+            this.Packages = new LiteDbPackageRepository(Database.GetCollection<LiteDbPackageRepository.PackageRepositoryBuildEntry>("packages"));
             this.Hashes = new LiteDbHashRepository(Database.FileStorage);
         }
 

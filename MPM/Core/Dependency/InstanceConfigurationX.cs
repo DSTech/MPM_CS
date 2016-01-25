@@ -45,7 +45,7 @@ namespace MPM.Core.Dependency {
                 .Select(b => b.PackageName)
                 .ToArray();
             var interfaceNames = otherBuilds
-                .SelectMany(b => b.InterfaceProvisions)
+                .SelectMany(b => b.Interfaces)
                 .Select(b => b.InterfaceName)
                 .ToArray();
             foreach (var conflict in build.Conflicts) {

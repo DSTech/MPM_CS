@@ -81,7 +81,7 @@ namespace MPM.Core.Dependency {
                 var output = new List<Build>();
                 Debug.Assert(possibleBuild != null, "ResolveDependency must not return null elements");
                 output.Add(possibleBuild);
-                foreach (var dependency in possibleBuild.PackageDependencies) {
+                foreach (var dependency in possibleBuild.Dependencies.Packages) {
                     var depSpec = dependency.ToSpec(packageSpec.Arch);
                     if (packageSide != CompatibilitySide.Universal && dependency.Side != CompatibilitySide.Universal && dependency.Side != packageSide) {
                         continue;
@@ -116,15 +116,14 @@ namespace MPM.Core.Dependency {
                 adjGraph.AddEdgeRange(
                     buildMap
                         .ElementAt(buildIndex)
-                        .PackageDependencies
+                        .Dependencies.Packages
                         .Select(dep => Array.FindIndex<Build>(buildMap, nb => nb.PackageName == dep.PackageName))
                         .Where(depIndex => depIndex != -1)
                         .Select(destination => new Edge<int>(buildIndex, destination))
                     );
             }
             var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
-            var onBackEdge = new EdgeAction<int, Edge<int>>(e => {
-                var edge = (Edge<int>) e;
+            var onBackEdge = new EdgeAction<int, Edge<int>>(edge => {
                 adjGraph.RemoveEdge(edge);
             });
             try {

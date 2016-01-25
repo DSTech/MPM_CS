@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MPM.Core.Instances.Info;
+using MPM.Extensions;
+using Newtonsoft.Json;
 using semver.tools;
 
 namespace MPM.Types {
@@ -19,7 +22,8 @@ namespace MPM.Types {
             IEnumerable<InterfaceDependency> interfaceDependencies,
             IEnumerable<PackageDependency> packageDependencies,
             IEnumerable<Conflict> conflicts,
-            IEnumerable<Hash> hashes
+            IEnumerable<Hash> hashes = null,
+            IEnumerable<ScriptFileDeclaration> installation = null
             ) {
             this.PackageName = packageName;
             this.Authors = authors.ToList();
@@ -27,24 +31,78 @@ namespace MPM.Types {
             this.GivenVersion = givenVersion;
             this.Arch = arch;
             this.Side = side;
-            this.InterfaceProvisions = interfaceProvisions.AsEnumerable().ToList();
-            this.InterfaceDependencies = interfaceDependencies.AsEnumerable().ToList();
-            this.PackageDependencies = packageDependencies.AsEnumerable().ToList();
-            this.Conflicts = conflicts.AsEnumerable().ToList();
-            this.Hashes = hashes.AsEnumerable().ToList();
+            this.Interfaces = interfaceProvisions.Denull().ToList();
+            this.Dependencies = new BuildDependencySet {
+                Interfaces = interfaceDependencies.Denull().ToList(),
+                Packages = packageDependencies.Denull().ToList(),
+            };
+            this.Conflicts = conflicts.Denull().ToList();
+            this.Hashes = hashes?.ToList();
+            this.Installation = installation?.ToList();
         }
 
+        public Build Clone() {
+            return new Build(
+                this.PackageName,
+                this.Authors,
+                this.Version,
+                this.GivenVersion,
+                this.@Arch,
+                this.Side,
+                this.Interfaces,
+                this.Dependencies.Interfaces,
+                this.Dependencies.Packages,
+                this.Conflicts,
+                this.Hashes,
+                this.Installation
+                );
+        }
+
+        [JsonRequired]
+        [JsonProperty("name")]
         public String PackageName { get; set; }
-        public List<Author> Authors { get; set; }
+
+        [JsonProperty("authors")]
+        public List<Author> Authors { get; set; } = new List<Author>();
+
+        [JsonRequired]
+        [JsonProperty("version")]
         public SemanticVersion Version { get; set; }
-        public String GivenVersion { get; set; }
+
+        [JsonProperty("givenVersion")]
+        public String GivenVersion { get; set; } = "";
+
+        [JsonRequired]
+        [JsonProperty("arch")]
         public Arch @Arch { get; set; }
-        public CompatibilitySide Side { get; set; }
-        public List<InterfaceProvision> InterfaceProvisions { get; set; }
-        public List<InterfaceDependency> InterfaceDependencies { get; set; }
-        public List<PackageDependency> PackageDependencies { get; set; }
+
+        [JsonRequired]
+        [JsonProperty("side")]
+        public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
+
+        [JsonRequired]
+        [JsonProperty("interfaces")]
+        public List<InterfaceProvision> Interfaces { get; set; } = new List<InterfaceProvision>();
+
+        [JsonRequired]
+        [JsonProperty("dependencies", ObjectCreationHandling = ObjectCreationHandling.Replace)]
+        public BuildDependencySet Dependencies { get; set; }
+
+        [JsonRequired]
+        [JsonProperty("conflicts")]
         public List<Conflict> Conflicts { get; set; }
+
+        [JsonProperty("hashes")]
         public List<Hash> Hashes { get; set; }
+
+        /// <summary>
+        /// Operations performed by this package in order to install. Can be reverted to uninstall.
+        /// </summary>
+        /// <value>
+        /// The operations contained within. May be null on package repositories, but must exist in "package.json" files.
+        /// </value>
+        [JsonProperty("installation")]
+        public List<ScriptFileDeclaration> Installation { get; set; }
 
         #region Equality members
 
@@ -57,11 +115,11 @@ namespace MPM.Types {
                 && string.Equals(this.GivenVersion, other.GivenVersion, StringComparison.InvariantCultureIgnoreCase)
                 && Equals(this.Arch, other.Arch)
                 && this.Side == other.Side
-                && Equals(this.InterfaceProvisions, other.InterfaceProvisions)
-                && Equals(this.InterfaceDependencies, other.InterfaceDependencies)
-                && Equals(this.PackageDependencies, other.PackageDependencies)
+                && Equals(this.Interfaces, other.Interfaces)
+                && Equals(this.Dependencies, other.Dependencies)
                 && Equals(this.Conflicts, other.Conflicts)
-                && Equals(this.Hashes, other.Hashes);
+                && Equals(this.Hashes, other.Hashes)
+                && Equals(this.Installation, other.Installation);
         }
 
         public override bool Equals(object obj) {
@@ -79,11 +137,11 @@ namespace MPM.Types {
                 hashCode = (hashCode * 397) ^ (this.GivenVersion != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(this.GivenVersion) : 0);
                 hashCode = (hashCode * 397) ^ (this.Arch?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (int) this.Side;
-                hashCode = (hashCode * 397) ^ (this.InterfaceProvisions?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (this.InterfaceDependencies?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (this.PackageDependencies?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (this.Interfaces?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (this.Dependencies.GetHashCode());
                 hashCode = (hashCode * 397) ^ (this.Conflicts?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (this.Hashes?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (this.Installation?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }
@@ -95,10 +153,6 @@ namespace MPM.Types {
         public static bool operator !=(Build left, Build right) {
             return !Equals(left, right);
         }
-
-        #endregion
-
-        #region Equality members
 
         #endregion
     }

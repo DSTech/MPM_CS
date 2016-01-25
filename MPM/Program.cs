@@ -40,7 +40,6 @@ namespace MPM {
                 Converters = new List<JsonConverter> {
                     new SemanticVersionConverter(),
                     new VersionSpecConverter(),
-                    new VersionConverter(),
                 },
             };
         }

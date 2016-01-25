@@ -25,49 +25,44 @@ namespace MPM.Data.Repository {
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream()?.ReadToEndAndClose();
             }
-            var build = JsonConvert.DeserializeObject<Net.DTO.Build>(Encoding.UTF8.GetString(responseData));
-            build.Package = build.Package ?? packageName;
-            return build.FromDTO();
+            var build = JsonConvert.DeserializeObject<Build>(Encoding.UTF8.GetString(responseData));
+            build.PackageName = build.PackageName ?? packageName;
+            return build;
         }
 
         public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
-            var package = this.FetchPackage(packageName);
+            var package = this.FetchPackageBuilds(packageName);
             var matchingBuilds = package
-                .Builds
                 .Where(b => versionSpec.Satisfies(b.Version))
                 .ToArray();
             return matchingBuilds;
         }
 
-        public Package FetchPackage(string packageName) {
+        public IEnumerable<Build> FetchPackageBuilds(string packageName) {
             var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{packageName}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
             }
-            var package = JsonConvert.DeserializeObject<Net.DTO.Package>(Encoding.UTF8.GetString(responseData));
-            return package.FromDTO();
+            var builds = JsonConvert.DeserializeObject<IEnumerable<Build>>(Encoding.UTF8.GetString(responseData));
+            return builds;
         }
 
-        public IEnumerable<Package> FetchPackageList() {
-            var req = WebRequest.CreateHttp(new Uri(baseUri, "/packages/"));
+        public IEnumerable<Build> FetchPackageList() => _FetchPackageList(null);
+        public IEnumerable<Build> FetchPackageList(DateTime updatedAfter) => _FetchPackageList(updatedAfter);
+        private IEnumerable<Build> _FetchPackageList(DateTime? updatedAfter) {
+            var lastSyncClause = "";
+            if(updatedAfter.HasValue) {
+                var updatedAfterTimestamp = (long)(updatedAfter.Value.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                lastSyncClause = $"?LastSync={updatedAfterTimestamp}";
+            }
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{lastSyncClause}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
             }
-            var packageList = JsonConvert.DeserializeObject<IEnumerable<Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-            return packageList.Select(package => package.FromDTO()).ToArray();
-        }
-
-        public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
-            var updatedAfterTimestamp = (long) (updatedAfter.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/?LastSync={updatedAfterTimestamp}"));
-            byte[] responseData;
-            using (var response = req.GetResponse()) {
-                responseData = response.GetResponseStream().ReadToEndAndClose();
-            }
-            var packageList = JsonConvert.DeserializeObject<IEnumerable<Net.DTO.Package>>(Encoding.UTF8.GetString(responseData));
-            return packageList.Select(package => package.FromDTO()).ToArray();
+            var builds = JsonConvert.DeserializeObject<IEnumerable<Build>>(Encoding.UTF8.GetString(responseData));
+            return builds.ToArray();
         }
     }
 }

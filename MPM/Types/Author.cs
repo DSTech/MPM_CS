@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public class Author : IEquatable<Author> {
@@ -10,8 +11,11 @@ namespace MPM.Types {
             this.Email = email;
         }
 
-        public String Name { get; set; }
-        public String Email { get; set; }
+        [JsonProperty("name")]
+        public String Name { get; set; } = "";
+
+        [JsonProperty("email")]
+        public String Email { get; set; } = "";
 
         public override string ToString() {
             var nameExists = !String.IsNullOrWhiteSpace(Name);

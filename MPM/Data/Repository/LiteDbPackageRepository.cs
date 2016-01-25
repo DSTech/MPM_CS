@@ -8,30 +8,44 @@ using semver.tools;
 using System.Linq;
 using System.Linq.Expressions;
 using MPM.Core.Dependency;
+using Newtonsoft.Json;
 
 namespace MPM.Data.Repository {
     public class LiteDbPackageRepository : IPackageRepository {
-        private readonly LiteCollection<PackageRepositoryEntry> PackageCollection;
+        private static readonly BsonMapper mapper = new BsonMapper();
+        private static void RegisterBsonWithJsonNet<T>(BsonMapper mapper) {
+            mapper.RegisterType<T>(
+                (T t) => JsonConvert.SerializeObject(t, typeof(T), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }),
+                (BsonValue jsonT) => JsonConvert.DeserializeObject<T>(jsonT, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto })
+                );
+        }
+        static LiteDbPackageRepository() {
+            RegisterBsonWithJsonNet<Build>(mapper);
+            RegisterBsonWithJsonNet<Arch>(mapper);
+            RegisterBsonWithJsonNet<CompatibilitySide>(mapper);
+        }
 
-        public LiteDbPackageRepository(LiteCollection<PackageRepositoryEntry> packageCollection) {
-            if ((this.PackageCollection = packageCollection) == null) {
+        private readonly LiteCollection<PackageRepositoryBuildEntry> BuildCollection;
+
+        public LiteDbPackageRepository(LiteCollection<PackageRepositoryBuildEntry> packageCollection) {
+            if ((this.BuildCollection = packageCollection) == null) {
                 throw new ArgumentNullException(nameof(packageCollection));
             }
         }
 
         public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
-            var package = PackageCollection.FindOne(p => p.Name == packageName);
+            var package = BuildCollection.FindOne(p => p.Name == packageName);
 
-            var build = package?.Builds.AsEnumerable().FirstOrDefault(CreatePackageFilter(version, side, arch));
-            return build?.FromDTO();
+            var build = package?.Builds.FirstOrDefault(CreatePackageFilter(version, side, arch));
+            return build;
         }
 
         public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
-            var packageEntry = PackageCollection.FindOne(b => b.Name == packageName);
+            var packageEntry = BuildCollection.FindOne(b => b.Name == packageName);
             if (packageEntry == null) {
                 return null;
             }
-            var package = ((Net.DTO.Package) packageEntry).FromDTO();
+            var package = packageEntry;
             var builds = package.Builds
                 .Select(build => new { build, version = build.Version })
                 .Where(b => versionSpec.Satisfies(b.version))
@@ -41,46 +55,43 @@ namespace MPM.Data.Repository {
             return builds;
         }
 
-        public Package FetchPackage(string packageName) {
-            var package = PackageCollection.FindOne(p => p.Name == packageName);
+        public IEnumerable<Build> FetchPackageBuilds(string packageName) {
+            var builds = BuildCollection.FindOne(p => p.Name == packageName);
             if (package == null) {
                 return null;
             }
-            return ((Net.DTO.Package) package)?.FromDTO();
+            return builds.ToArray();
         }
 
-        public IEnumerable<Package> FetchPackageList() {
-            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package) p).FromDTO()).ToArray().AsEnumerable();
+        public IEnumerable<Build> FetchPackageList() {
+            return BuildCollection.FindAll().Select(b => (Build)b).ToArray();
         }
 
-        public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
-            return PackageCollection.FindAll().Select(p => ((Net.DTO.Package) p).FromDTO()).ToArray().AsEnumerable();
+        public IEnumerable<Build> FetchPackageList(DateTime updatedAfter) {
+            return BuildCollection.FindAll().Select(b => (Build)b).ToArray();
         }
 
-        private Func<Net.DTO.Build, bool> CreatePackageFilter(
+        private Func<Build, bool> CreatePackageFilter(
             SemanticVersion version,
             CompatibilitySide side,
             Arch arch
             ) {
-            var dtoSide = side.ToDTO();
-            var dtoVersion = version.ToDTO();
-            var dtoArch = arch.ToDTO();
             return b =>
-                b.Version == dtoVersion
-                    && b.Side == dtoSide
-                    && b.Arch == dtoArch
+                b.Version == version
+                    && b.Side == side
+                    && b.Arch == arch
                 ;
         }
 
         private Package RegisterBuildSynchronous(Build build) {
-            var existingPackage = PackageCollection.FindOne(p => p.Name == build.PackageName);
+            var existingPackage = BuildCollection.FindOne(p => p.Name == build.PackageName);
             if (existingPackage == null) {
                 throw new KeyNotFoundException($"Participant package \"{build.PackageName}\" not yet registered");
             }
             var withEquivalentVersion = existingPackage.Builds.Where(b => b.Version.FromDTO() == build.Version);
             existingPackage.Builds.Add(build.ToDTO());
-            PackageCollection.Update(existingPackage);
-            return ((Net.DTO.Package) existingPackage).FromDTO();
+            BuildCollection.Update(existingPackage);
+            return ((Net.DTO.Package)existingPackage).FromDTO();
         }
 
         /// <summary>
@@ -93,18 +104,18 @@ namespace MPM.Data.Repository {
         }
 
         public Package RegisterPackage(String packageName, IEnumerable<Author> authors) {
-            var existingPackage = PackageCollection.FindOne(p => p.Name == packageName);
+            var existingPackage = BuildCollection.FindOne(p => p.Name == packageName);
             if (existingPackage != null) {
                 existingPackage.Authors = authors.Select(DTOTranslationX.ToDTO).ToList();
-                PackageCollection.Update(existingPackage);
+                BuildCollection.Update(existingPackage);
                 return existingPackage;
             }
-            var newPackage = new PackageRepositoryEntry {
+            var newPackage = new PackageRepositoryBuildEntry {
                 Name = packageName,
                 Authors = authors.Select(DTOTranslationX.ToDTO).ToList(),
                 Builds = Enumerable.Empty<Net.DTO.Build>().ToList(),
             };
-            PackageCollection.Insert(newPackage);
+            BuildCollection.Insert(newPackage);
             return newPackage;
         }
 
@@ -112,49 +123,31 @@ namespace MPM.Data.Repository {
             if (String.IsNullOrWhiteSpace(packageName)) {
                 throw new ArgumentException("Argument is null or whitespace", nameof(packageName));
             }
-            return PackageCollection.Delete(p => p.Name == packageName) > 0;
+            return BuildCollection.Delete(p => p.Name == packageName) > 0;
         }
 
-        public class PackageRepositoryEntry {
-            public PackageRepositoryEntry() {
+        public class PackageRepositoryBuildEntry {
+            public PackageRepositoryBuildEntry() {
             }
 
-            public PackageRepositoryEntry(Package package) {
-                this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
+            public PackageRepositoryBuildEntry(Build build) {
+                this.Build = build;
+                this.PackageName = Build.PackageName;
+                this.Version = this.Build.Version;
+                this.Side = this.Build.Side;
+                this.Arch = this.Build.Arch;
             }
 
             [BsonId]
-            public String Name { get; set; }
+            public string PackageName { get; set; }
 
             [BsonField]
-            public List<Net.DTO.Author> Authors { get; set; }
+            public Build @Build { get; set; }
 
-            [BsonField]
-            public List<Net.DTO.Build> Builds { get; set; }
+            public static implicit operator PackageRepositoryBuildEntry(Build build) => new PackageRepositoryBuildEntry(build);
 
-            [BsonField]
-            public DateTime? LastUpdated { get; set; } = DateTime.Now;
-
-            public static implicit operator PackageRepositoryEntry(Package package) {
-                return new PackageRepositoryEntry(package) { LastUpdated = DateTime.Now };
-            }
-
-            public static implicit operator Package(PackageRepositoryEntry entry) {
-                return new Package(
-                    entry.Name,
-                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
-                    );
-            }
-
-            public static implicit operator Net.DTO.Package(PackageRepositoryEntry entry) {
-                return new Net.DTO.Package {
-                    Name = entry.Name,
-                    Authors = entry.Authors,
-                    Builds = entry.Builds,
-                };
+            public static implicit operator Build(PackageRepositoryBuildEntry entry) {
+                return entry.@Build;
             }
         }
     }
