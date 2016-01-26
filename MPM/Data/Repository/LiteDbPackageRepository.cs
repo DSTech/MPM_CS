@@ -25,50 +25,52 @@ namespace MPM.Data.Repository {
             RegisterBsonWithJsonNet<CompatibilitySide>(mapper);
         }
 
-        private readonly LiteCollection<PackageRepositoryBuildEntry> BuildCollection;
+        private readonly LiteCollection<BuildEntry> BuildCollection;
 
-        public LiteDbPackageRepository(LiteCollection<PackageRepositoryBuildEntry> packageCollection) {
+        public LiteDbPackageRepository(LiteCollection<BuildEntry> packageCollection) {
             if ((this.BuildCollection = packageCollection) == null) {
                 throw new ArgumentNullException(nameof(packageCollection));
             }
         }
 
         public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
-            var package = BuildCollection.FindOne(p => p.Name == packageName);
-
-            var build = package?.Builds.FirstOrDefault(CreatePackageFilter(version, side, arch));
+            var build = BuildCollection.FindOne(p => p.PackageName == packageName
+                && p.ArchId == arch.Id
+                && p.SideString == side.ToString()
+                && p.VersionString == version.ToString());
             return build;
         }
 
         public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
-            var packageEntry = BuildCollection.FindOne(b => b.Name == packageName);
-            if (packageEntry == null) {
+            var buildEntries = BuildCollection.Find(b => b.PackageName == packageName);
+            if (buildEntries == null) {
                 return null;
             }
-            var package = packageEntry;
-            var builds = package.Builds
-                .Select(build => new { build, version = build.Version })
-                .Where(b => versionSpec.Satisfies(b.version))
-                .OrderByDescending(build => build.version)
-                .Select(b => b.build)
+            return buildEntries
+                .Select(b => new {
+                    @BuildEntry = b,
+                    @Version = SemanticVersion.Parse(b.VersionString)
+                })
+                .Where(bv => versionSpec.Satisfies(bv.@Version))
+                .OrderByDescending(bv => bv.@Version)
+                .Select(bv => bv.@BuildEntry.@Build)
                 .ToArray();
-            return builds;
         }
 
         public IEnumerable<Build> FetchPackageBuilds(string packageName) {
-            var builds = BuildCollection.FindOne(p => p.Name == packageName);
-            if (package == null) {
-                return null;
-            }
-            return builds.ToArray();
+            var builds = BuildCollection.Find(p => p.PackageName == packageName);
+            return builds
+                .OrderByDescending(b => SemanticVersion.Parse(b.VersionString))
+                .Select(b => b.Build)
+                .ToArray();
         }
 
         public IEnumerable<Build> FetchPackageList() {
-            return BuildCollection.FindAll().Select(b => (Build)b).ToArray();
+            return BuildCollection.FindAll().Select(b => b.Build).ToArray();
         }
 
         public IEnumerable<Build> FetchPackageList(DateTime updatedAfter) {
-            return BuildCollection.FindAll().Select(b => (Build)b).ToArray();
+            return BuildCollection.FindAll().Select(b => b.Build).ToArray();
         }
 
         private Func<Build, bool> CreatePackageFilter(
@@ -83,72 +85,58 @@ namespace MPM.Data.Repository {
                 ;
         }
 
-        private Package RegisterBuildSynchronous(Build build) {
-            var existingPackage = BuildCollection.FindOne(p => p.Name == build.PackageName);
-            if (existingPackage == null) {
-                throw new KeyNotFoundException($"Participant package \"{build.PackageName}\" not yet registered");
-            }
-            var withEquivalentVersion = existingPackage.Builds.Where(b => b.Version.FromDTO() == build.Version);
-            existingPackage.Builds.Add(build.ToDTO());
-            BuildCollection.Update(existingPackage);
-            return ((Net.DTO.Package)existingPackage).FromDTO();
-        }
-
         /// <summary>
         ///     Registers a build into the system, or updates it.
         /// </summary>
         /// <param name="build">The build to register.</param>
         /// <returns>The package into which the build was registered</returns>
-        public Package RegisterBuild(Build build) {
-            return RegisterBuildSynchronous(build);
-        }
-
-        public Package RegisterPackage(String packageName, IEnumerable<Author> authors) {
-            var existingPackage = BuildCollection.FindOne(p => p.Name == packageName);
-            if (existingPackage != null) {
-                existingPackage.Authors = authors.Select(DTOTranslationX.ToDTO).ToList();
-                BuildCollection.Update(existingPackage);
-                return existingPackage;
-            }
-            var newPackage = new PackageRepositoryBuildEntry {
-                Name = packageName,
-                Authors = authors.Select(DTOTranslationX.ToDTO).ToList(),
-                Builds = Enumerable.Empty<Net.DTO.Build>().ToList(),
-            };
-            BuildCollection.Insert(newPackage);
-            return newPackage;
+        public Build RegisterBuild(Build build) {
+            this.BuildCollection.Insert(build);
+            return build;
         }
 
         public bool DeletePackage(string packageName) {
             if (String.IsNullOrWhiteSpace(packageName)) {
                 throw new ArgumentException("Argument is null or whitespace", nameof(packageName));
             }
-            return BuildCollection.Delete(p => p.Name == packageName) > 0;
+            return BuildCollection.Delete(p => p.PackageName == packageName) > 0;
         }
 
-        public class PackageRepositoryBuildEntry {
-            public PackageRepositoryBuildEntry() {
+        public class BuildEntry {
+
+            public BuildEntry() {
             }
 
-            public PackageRepositoryBuildEntry(Build build) {
+            public BuildEntry(Build build) {
                 this.Build = build;
                 this.PackageName = Build.PackageName;
-                this.Version = this.Build.Version;
-                this.Side = this.Build.Side;
-                this.Arch = this.Build.Arch;
+                this.ArchId = this.Build.Arch.Id;
+                this.SideString = this.Build.Side.ToString();
+                this.VersionString = this.Build.Version.ToString();
+                this.Id = string.Join(",", this.PackageName, this.ArchId, this.SideString, this.VersionString);
             }
 
             [BsonId]
+            public string Id { get; set; }
+
+            [BsonIndex]
             public string PackageName { get; set; }
+
+            [BsonIndex]
+            public string ArchId { get; set; }
+
+            [BsonIndex]
+            public string SideString { get; set; }
+
+            [BsonIndex]
+            public string VersionString { get; set; }
 
             [BsonField]
             public Build @Build { get; set; }
 
-            public static implicit operator PackageRepositoryBuildEntry(Build build) => new PackageRepositoryBuildEntry(build);
+            public static implicit operator BuildEntry(Build build) => new BuildEntry(build);
 
-            public static implicit operator Build(PackageRepositoryBuildEntry entry) {
-                return entry.@Build;
-            }
+            public static implicit operator Build(BuildEntry entry) => entry.@Build;
         }
     }
 }

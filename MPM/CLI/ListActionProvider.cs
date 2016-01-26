@@ -30,9 +30,9 @@ namespace MPM.CLI {
             var packageList = repository.FetchPackageList();
 
             foreach (var _package in packageList) {
-                var package = repository.FetchPackage(_package.Name);
-                Console.WriteLine($"{package.Name} <{String.Join(", ", package.Authors)}>");
-                foreach (var build in package.Builds) {
+                var builds = repository.FetchPackageBuilds(_package.PackageName);
+                Console.WriteLine($"{_package.PackageName} <{String.Join(", ", _package.Authors)}>");
+                foreach (var build in builds) {
                     Console.WriteLine($"\t{(build.Arch)}#{build.Version} {build.GivenVersion}");
                 }
             }
