@@ -1,19 +1,18 @@
 using System;
-using semver.tools;
 
 namespace MPM.Types {
     public class InterfaceDependency : IEquatable<InterfaceDependency> {
         public InterfaceDependency() {
         }
 
-        public InterfaceDependency(string interfaceName, VersionSpec versionSpec, CompatibilitySide side) {
+        public InterfaceDependency(string interfaceName, SemVer.Range versionSpec, CompatibilitySide side) {
             this.InterfaceName = interfaceName;
             this.VersionSpec = versionSpec;
             this.Side = side;
         }
 
         public String InterfaceName { get; set; }
-        public VersionSpec @VersionSpec { get; set; }
+        public SemVer.Range @VersionSpec { get; set; }
         public CompatibilitySide Side { get; set; }
 
         #region Equality members

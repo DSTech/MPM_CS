@@ -6,14 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Cache;
 using Platform.VirtualFileSystem;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     public class ClaimFileOperation : IFileOperation {
         public ClaimFileOperation() {
         }
 
-        public ClaimFileOperation(string packageName, SemanticVersion packageVersion) {
+        public ClaimFileOperation(string packageName, SemVer.Version packageVersion) {
             this.PackageName = packageName;
             this.PackageVersion = packageVersion;
         }
@@ -22,7 +21,7 @@ namespace MPM.Core.Instances.Installation {
 
         public string PackageName { get; set; }
 
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
 
         public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
             //A no-op

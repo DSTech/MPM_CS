@@ -17,7 +17,6 @@ using MPM.Data.Repository;
 using MPM.Types;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
-using semver.tools;
 
 namespace MPM.CLI {
     public class CreatePackageActionProvider {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Types;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
     public interface IFileDeclaration {
@@ -15,7 +14,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
         /// <summary>
         ///     The version of the package which sourced this declaration.
         /// </summary>
-        SemanticVersion PackageVersion { get; }
+        SemVer.Version PackageVersion { get; }
 
         /// <summary>
         ///     The path of the file to be installed relative to the root of the package archive root.

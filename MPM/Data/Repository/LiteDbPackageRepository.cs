@@ -1,13 +1,8 @@
 using System;
 using System.Collections.Generic;
 using LiteDB;
-using MPM.Data.Repository;
 using MPM.Types;
-using MPM.Net;
-using semver.tools;
 using System.Linq;
-using System.Linq.Expressions;
-using MPM.Core.Dependency;
 using Newtonsoft.Json;
 
 namespace MPM.Data.Repository {
@@ -33,7 +28,7 @@ namespace MPM.Data.Repository {
             }
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
+        public Build FetchBuild(string packageName, SemVer.Version version, CompatibilitySide side, Arch arch) {
             var build = BuildCollection.FindOne(p => p.PackageName == packageName
                 && p.ArchId == arch.Id
                 && p.SideString == side.ToString()
@@ -41,7 +36,7 @@ namespace MPM.Data.Repository {
             return build;
         }
 
-        public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
+        public IEnumerable<Build> FetchBuilds(string packageName, SemVer.Range versionSpec) {
             var buildEntries = BuildCollection.Find(b => b.PackageName == packageName);
             if (buildEntries == null) {
                 return null;
@@ -49,9 +44,9 @@ namespace MPM.Data.Repository {
             return buildEntries
                 .Select(b => new {
                     @BuildEntry = b,
-                    @Version = SemanticVersion.Parse(b.VersionString)
+                    @Version = new SemVer.Version(b.VersionString, true)
                 })
-                .Where(bv => versionSpec.Satisfies(bv.@Version))
+                .Where(bv => versionSpec.IsSatisfied(bv.@Version))
                 .OrderByDescending(bv => bv.@Version)
                 .Select(bv => bv.@BuildEntry.@Build)
                 .ToArray();
@@ -60,7 +55,7 @@ namespace MPM.Data.Repository {
         public IEnumerable<Build> FetchPackageBuilds(string packageName) {
             var builds = BuildCollection.Find(p => p.PackageName == packageName);
             return builds
-                .OrderByDescending(b => SemanticVersion.Parse(b.VersionString))
+                .OrderByDescending(b => new SemVer.Version(b.VersionString, true))
                 .Select(b => b.Build)
                 .ToArray();
         }
@@ -74,7 +69,7 @@ namespace MPM.Data.Repository {
         }
 
         private Func<Build, bool> CreatePackageFilter(
-            SemanticVersion version,
+            SemVer.Version version,
             CompatibilitySide side,
             Arch arch
             ) {

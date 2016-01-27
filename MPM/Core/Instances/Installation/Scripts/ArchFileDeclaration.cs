@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
-using MPM.Extensions;
-using MPM.Net;
 using MPM.Types;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
     public class ArchFileDeclaration : IFileDeclaration {
         private IArchInstallationProcedure installationProcedure { get; set; }
         public string PackageName { get; set; }
 
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
 
         public string Description { get; set; }
 

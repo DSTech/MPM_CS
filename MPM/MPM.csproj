@@ -93,6 +93,18 @@
       <HintPath>..\packages\Dapper.1.50.0-beta5\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="FParsec, Version=1.0.0.0, Culture=neutral, PublicKeyToken=40ccfc0a09edbb5d, processorArchitecture=MSIL">
+      <HintPath>..\packages\FParsec.1.0.2\lib\net40-client\FParsec.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FParsecCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=40ccfc0a09edbb5d, processorArchitecture=MSIL">
+      <HintPath>..\packages\FParsec.1.0.2\lib\net40-client\FParsecCS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
@@ -217,8 +229,8 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
+    <Reference Include="SemVer, Version=0.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SemanticVersioning.0.6.2.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -381,8 +393,8 @@
     <Compile Include="Types\CompatibilitySide.cs" />
     <Compile Include="Types\Conflict.cs" />
     <Compile Include="Types\PackageDependency.cs" />
-    <Compile Include="VersionSpecConverter.cs" />
-    <Compile Include="SemanticVersionConverter.cs" />
+    <Compile Include="VersionRangeConverter.cs" />
+    <Compile Include="VersionConverter.cs" />
     <Compile Include="SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgX.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />

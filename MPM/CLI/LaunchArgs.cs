@@ -8,7 +8,6 @@ using Autofac;
 using MPM.Core;
 using MPM.Extensions;
 using PowerArgs;
-using semver.tools;
 
 namespace MPM.CLI {
     [ArgExceptionBehavior(ArgExceptionPolicy.StandardExceptionHandling)]

@@ -4,6 +4,6 @@ using MPM.Core.Protocols;
 
 namespace MPM.Net {
     public interface IArchResolver {
-        IArchInstallationProcedure EnsureCached(string archName, semver.tools.SemanticVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver);
+        IArchInstallationProcedure EnsureCached(string archName, SemVer.Version archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver);
     }
 }

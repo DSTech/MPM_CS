@@ -4,14 +4,13 @@ using System.Linq;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Protocols;
 using MPM.Types;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation.Scripts {
     public class SourcelessFileDeclaration : IFileDeclaration {
         public SourcelessType @Type { get; set; }
         public string PackageName { get; set; }
 
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
 
         public string Description { get; set; }
 

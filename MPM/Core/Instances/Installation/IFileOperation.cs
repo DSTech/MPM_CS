@@ -5,7 +5,6 @@ using System.Linq;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Cache;
 using Platform.VirtualFileSystem;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     /// <summary>
@@ -23,7 +22,7 @@ namespace MPM.Core.Instances.Installation {
         /// <summary>
         ///     Version of the package that created the operation.
         /// </summary>
-        SemanticVersion PackageVersion { get; }
+        SemVer.Version PackageVersion { get; }
 
         /// <summary>
         ///     Performs the operation upon the specified path within the given filesystem.

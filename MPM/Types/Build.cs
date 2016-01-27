@@ -4,7 +4,7 @@ using System.Linq;
 using MPM.Core.Instances.Info;
 using MPM.Extensions;
 using Newtonsoft.Json;
-using semver.tools;
+using SemVer;
 
 namespace MPM.Types {
     public class Build : IEquatable<Build> {
@@ -14,7 +14,7 @@ namespace MPM.Types {
         public Build(
             string packageName,
             IEnumerable<Author> authors,
-            SemanticVersion version,
+            SemVer.Version version,
             string givenVersion,
             Arch arch,
             CompatibilitySide side,
@@ -67,7 +67,7 @@ namespace MPM.Types {
 
         [JsonRequired]
         [JsonProperty("version")]
-        public SemanticVersion Version { get; set; }
+        public SemVer.Version Version { get; set; }
 
         [JsonProperty("givenVersion")]
         public String GivenVersion { get; set; } = "";

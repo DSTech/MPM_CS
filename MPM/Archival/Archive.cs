@@ -22,11 +22,11 @@ namespace MPM.Archival {
                 leadingHash = sha256.ComputeHash(contents);
             }
             var header = BitConverter.GetBytes(Convert.ToInt16(leadingHash.Length)).Concat(leadingHash);
-            return Enumerable.Concat(header, contents).ToArray();
+            return header.Concat(contents).ToArray();
         }
 
-        public static async Task<Archive> CreateArchive(string packageName, byte[] contents, uint? maxChunkSize = null) {
-            contents = await Task.Run(() => ApplyLeadingHash(contents));
+        public static Archive CreateArchive(string packageName, byte[] contents, uint? maxChunkSize = null) {
+            contents = ApplyLeadingHash(contents);
             RawChunk[] chunks;
             if (maxChunkSize.HasValue) {
                 chunks = contents
@@ -36,12 +36,12 @@ namespace MPM.Archival {
             } else {
                 chunks = new[] { new RawChunk(contents) };
             }
-            var chunkKeys = Enumerable.Concat(new[] { Encoding.UTF8.GetBytes(packageName) }, chunks.Select(chunk => chunk.Hash()).SkipLast(1));
+            var chunkKeys = new[] { Encoding.UTF8.GetBytes(packageName) }.Concat(chunks.SkipLast(1).Select(chunk => chunk.Hash()));
             var chunkKeyPairs = chunks.Zip(chunkKeys, (chunk, key) => new { chunk, key });
 
-            var encryptedChunks = chunkKeyPairs.Select((pair) => pair.chunk.Encrypt(pair.key));
+            var encryptedChunks = chunkKeyPairs.Select(pair => pair.chunk.Encrypt(pair.key));
 
-            return await Task.Run(() => new Archive(encryptedChunks)).ConfigureAwait(false);
+            return new Archive(encryptedChunks);
         }
 
         //Returns null if leading-hash doesn't match the body
@@ -61,15 +61,13 @@ namespace MPM.Archival {
             return body;
         }
 
-        public async Task<byte[]> Unpack(string packageName) {
+        public byte[] Unpack(string packageName) {
             if (chunks.Count == 0) {
                 throw new InvalidOperationException("No chunks to decrypt in archive");
             }
-            return await Task.Run(() => {
-                var unpacked = EnumerableEx.Concat(UnpackInternal(packageName)).ToArray();
-                var verifiedBody = VerifyLeadingHash(unpacked);
-                return verifiedBody;
-            });
+            var unpacked = UnpackInternal(packageName).Concat().ToArray();
+            var verifiedBody = VerifyLeadingHash(unpacked);
+            return verifiedBody;
         }
 
         private IEnumerable<IEnumerable<byte>> UnpackInternal(string packageName) {

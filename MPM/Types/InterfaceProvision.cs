@@ -1,18 +1,17 @@
 using System;
-using semver.tools;
 
 namespace MPM.Types {
     public class InterfaceProvision : IEquatable<InterfaceProvision> {
         public InterfaceProvision() {
         }
 
-        public InterfaceProvision(string interfaceName, SemanticVersion version) {
+        public InterfaceProvision(string interfaceName, SemVer.Version version) {
             this.InterfaceName = interfaceName;
             this.Version = version;
         }
 
         public String InterfaceName { get; set; }
-        public SemanticVersion Version { get; set; }
+        public SemVer.Version Version { get; set; }
 
         #region Equality members
 

@@ -6,7 +6,6 @@ using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Data.Repository;
 using MPM.Types;
-using semver.tools;
 
 namespace MPM.Core.Dependency {
     public static class PackageSpecExtensions {
@@ -33,7 +32,7 @@ namespace MPM.Core.Dependency {
                 && (
                     spec.Side == build.Side || build.Side == CompatibilitySide.Universal
                     )
-                && spec.VersionSpec.Satisfies(build.Version);
+                && spec.VersionSpec.IsSatisfied(build.Version);
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace MPM.Core.Dependency {
     public class PackageSpec : IEquatable<PackageSpec> {
         public String Name { get; set; }
         public Arch Arch { get; set; }
-        public VersionSpec @VersionSpec { get; set; }
+        public SemVer.Range @VersionSpec { get; set; }
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
         public bool Manual { get; set; } = false;
 
@@ -79,25 +78,8 @@ namespace MPM.Core.Dependency {
             return
                 (Name?.GetHashCode() ?? 0)
                     + (Arch?.GetHashCode() ?? 0)
-                    + (VersionSpec != null ? GetVersionSpecHashCode(VersionSpec) : 0)
+                    + (VersionSpec?.GetHashCode() ?? 0)
                     + Manual.GetHashCode();
-        }
-
-        private static int GetVersionSpecHashCode(IVersionSpec spec) {
-            return
-                unchecked(
-                    spec.IsMinInclusive.GetHashCode() +
-                        spec.IsMaxInclusive.GetHashCode() +
-                        spec.MinVersion.GetHashCode() +
-                        spec.MaxVersion.GetHashCode());
-        }
-
-        private bool VersionSpecsEqual(IVersionSpec first, IVersionSpec second) {
-            return
-                first.IsMinInclusive == second.IsMinInclusive &&
-                    first.IsMaxInclusive == second.IsMaxInclusive &&
-                    first.MinVersion.Equals(second.MinVersion) &&
-                    first.MaxVersion.Equals(second.MaxVersion);
         }
     }
 }

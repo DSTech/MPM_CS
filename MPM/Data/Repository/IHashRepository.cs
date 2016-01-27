@@ -33,7 +33,7 @@ namespace MPM.Data.Repository {
                 throw new ArgumentOutOfRangeException(nameof(hashes), "hash array contained no elements");
             }
             var hashRetrievers = hashRepository.Resolve(hashStrings);
-            var retrievers = hashes.Zip(hashRetrievers, (hash, retriever) => Tuple.Create(hash, retriever));
+            var retrievers = hashes.Zip(hashRetrievers, (hash, retriever) => Tuple.Create(hash, retriever)).ToArray();
             {
                 var failedResolutions = retrievers.Where(retr => retr.Item2 == null).ToArray();
                 if (failedResolutions.Length > 0) {
@@ -42,9 +42,7 @@ namespace MPM.Data.Repository {
                             "Could not resolve method of retreival for hashes:\n[\n{0}\n]",
                             String.Join(
                                 ",\n",
-                                failedResolutions.Select(
-                                    item => String.Format("\t\"{0}\"", item.Item1)
-                                    )
+                                failedResolutions.Select(item => $"\t\"{item.Item1}\"")
                                 )
                             ),
                         new AggregateException(
@@ -57,7 +55,7 @@ namespace MPM.Data.Repository {
             //WhenAll preserves order of provided tasks, so each value will be associated with its parent hash
             var retrievedHashes = (await Task.WhenAll(retrievers.Select(async retriever => await retriever.Item2.Retrieve())));
             var archive = new Archival.Archive(retrievedHashes.Select(retrievedHash => new Archival.EncryptedChunk(retrievedHash)));
-            return await archive.Unpack(packageName);
+            return archive.Unpack(packageName);
         }
     }
 

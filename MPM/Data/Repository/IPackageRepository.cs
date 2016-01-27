@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MPM.Types;
-using semver.tools;
 
 namespace MPM.Data.Repository {
     /// <summary>
@@ -41,7 +40,7 @@ namespace MPM.Data.Repository {
         ///     <paramref name="version" />. Null when no package within the specified constraints was found.
         ///     Builds must be returned in descending order of version, with side-specific returned before universal packages.
         /// </returns>
-        Build FetchBuild(String packageName, SemanticVersion version, CompatibilitySide side, Arch arch);
+        Build FetchBuild(String packageName, SemVer.Version version, CompatibilitySide side, Arch arch);
 
         /// <summary>
         ///     Looks up a package for any versions matching a specifier.
@@ -53,6 +52,6 @@ namespace MPM.Data.Repository {
         ///     given. Null when no package of the specified name was found.
         ///     Builds must be returned in descending order of version, with side-specific returned before universal packages.
         /// </returns>
-        IEnumerable<Build> FetchBuilds(String packageName, VersionSpec versionSpec);
+        IEnumerable<Build> FetchBuilds(String packageName, SemVer.Range versionSpec);
     }
 }

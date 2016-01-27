@@ -10,7 +10,6 @@ using ICSharpCode.SharpZipLib.Zip;
 using MPM.Archival;
 using MPM.Core.Instances.Cache;
 using Platform.VirtualFileSystem;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     /// <summary>
@@ -20,7 +19,7 @@ namespace MPM.Core.Instances.Installation {
         public ExtractFileOperation() {
         }
 
-        public ExtractFileOperation(string packageName, SemanticVersion packageVersion, string archiveCacheEntry, string sourcePath) {
+        public ExtractFileOperation(string packageName, SemVer.Version packageVersion, string archiveCacheEntry, string sourcePath) {
             this.PackageName = PackageName;
             this.PackageVersion = packageVersion;
             this.ArchiveCacheEntry = archiveCacheEntry;
@@ -35,7 +34,7 @@ namespace MPM.Core.Instances.Installation {
 
         public string PackageName { get; set; }
 
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
 
         public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
             var targetFile = fileSystem.ResolveFile(path);

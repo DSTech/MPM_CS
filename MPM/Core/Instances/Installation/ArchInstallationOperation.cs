@@ -1,25 +1,18 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MPM.Archival;
 using MPM.Core.Instances.Cache;
-using MPM.Core.Instances.Installation.Scripts;
 using MPM.Extensions;
-using Platform.VirtualFileSystem;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     public abstract class ArchInstallationOperation {
-        protected ArchInstallationOperation(string packageName, SemanticVersion packageVersion, ICacheManager cacheManager) {
+        protected ArchInstallationOperation(string packageName, SemVer.Version packageVersion, ICacheManager cacheManager) {
             this.PackageName = packageName;
             this.Cache = cacheManager;
         }
 
         public string PackageName { get; set; }
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
         public ICacheManager Cache { get; set; }
 
         public abstract IFileMap GenerateOperations();
@@ -31,7 +24,7 @@ namespace MPM.Core.Instances.Installation {
     public class ExtractArchInstallationOperation : ArchInstallationOperation {
         public ExtractArchInstallationOperation(
             string packageName,
-            SemanticVersion packageVersion,
+            SemVer.Version packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string sourcePath,
@@ -82,7 +75,7 @@ namespace MPM.Core.Instances.Installation {
     public class ExtractSingleArchInstallationOperation : ArchInstallationOperation {
         public ExtractSingleArchInstallationOperation(
             string packageName,
-            SemanticVersion packageVersion,
+            SemVer.Version packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string sourcePath,
@@ -107,7 +100,7 @@ namespace MPM.Core.Instances.Installation {
     public class CopyArchInstallationOperation : ArchInstallationOperation {
         public CopyArchInstallationOperation(
             string packageName,
-            SemanticVersion packageVersion,
+            SemVer.Version packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string targetPath

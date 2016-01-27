@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Extensions;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     struct SingleEntryFileMapEntry {
         public String Target { get; set; }
         public IFileOperation Operation { get; set; }
         public string PackageName { get; set; }
-        public SemanticVersion PackageVersion { get; set; }
+        public SemVer.Version PackageVersion { get; set; }
     }
 
     struct SingleEntryFileMapEnumerabilityTracker : IReadOnlyList<SingleEntryFileMapEntry>, IReadOnlyDictionary<String, IFileOperation>, IEnumerable<SingleEntryFileMapEntry> {
@@ -115,7 +114,7 @@ namespace MPM.Core.Instances.Installation {
             throw new NotSupportedException();
         }
 
-        public bool Unregister(string path, string packageName, SemanticVersion packageVersion) {
+        public bool Unregister(string path, string packageName, SemVer.Version packageVersion) {
             throw new NotSupportedException();
         }
 

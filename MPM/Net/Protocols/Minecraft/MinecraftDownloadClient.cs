@@ -10,7 +10,6 @@ using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.Types;
 using Newtonsoft.Json;
 using RestSharp;
-using semver.tools;
 
 namespace MPM.Net.Protocols.Minecraft {
     public static class MinecraftDownloadClientExtensions {

@@ -16,7 +16,6 @@ using MPM.Data;
 using MPM.Data.Repository;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
-using semver.tools;
 
 namespace MPM.CLI {
     public class ListActionProvider {

@@ -9,11 +9,10 @@ using MPM.Core.Protocols;
 using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.Types;
 using Nito.AsyncEx.Synchronous;
-using semver.tools;
 
 namespace MPM.Net.Protocols.Minecraft {
     public class MinecraftArchInstaller {
-        public IArchInstallationProcedure EnsureCached(SemanticVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
+        public IArchInstallationProcedure EnsureCached(SemVer.Version archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var mdc = new MinecraftDownloadClient();
             var versionDetails = mdc.FetchVersion(archVersion.ToString()).WaitAndUnwrapException();
             Console.WriteLine(versionDetails.Id);
@@ -39,7 +38,7 @@ namespace MPM.Net.Protocols.Minecraft {
         }
 
         private ArchInstallationOperation GenerateOp(
-            SemanticVersion archVersion,
+            SemVer.Version archVersion,
             LibrarySpec lib,
             string appliedNatives,
             string cacheEntryName,

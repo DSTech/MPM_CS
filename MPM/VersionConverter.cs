@@ -1,27 +1,27 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using semver.tools;
+using SemVer;
+using Version = SemVer.Version;
 
 namespace MPM {
-    public class VersionSpecConverter : JsonConverter {
+    public class VersionConverter : JsonConverter {
         public override bool CanRead {
             get { return true; }
         }
 
         public override bool CanConvert(Type objectType) {
-            return (objectType == typeof(VersionSpec));
+            return (objectType == typeof(Version));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-            var tok = JToken.Load(reader);
-            var tokStr = tok.ToString();
-            return VersionSpec.ParseNuGet(tokStr);
+            var val = reader.ReadAsString();
+            return new Version(val, true);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-            var val = (VersionSpec) value;
-            writer.WriteValue(val.ToStringNuGet());
+            var val = (Version)value;
+            writer.WriteValue(val.ToString());
         }
     }
 }

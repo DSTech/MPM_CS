@@ -2,10 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MPM.Extensions;
-using semver.tools;
 
 namespace MPM.Core.Instances.Installation {
     public class DictionaryFileMap : IFileMap {
@@ -64,7 +61,7 @@ namespace MPM.Core.Instances.Installation {
             return true;
         }
 
-        public bool Unregister(String path, string packageName, SemanticVersion packageVersion) {
+        public bool Unregister(String path, string packageName, SemVer.Version packageVersion) {
             if (!operations.ContainsKey(path)) {
                 return false;
             }
@@ -106,7 +103,7 @@ namespace MPM.Core.Instances.Installation {
         private struct DictionaryFileMapEntry {
             public IFileOperation Operation { get; set; }
             public string PackageName { get; set; }
-            public SemanticVersion PackageVersion { get; set; }
+            public SemVer.Version PackageVersion { get; set; }
         }
     }
 }

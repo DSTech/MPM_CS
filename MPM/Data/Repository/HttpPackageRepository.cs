@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using MPM.Extensions;
-using MPM.Net;
 using MPM.Types;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using semver.tools;
 
 namespace MPM.Data.Repository {
     public class HttpPackageRepository : IPackageRepository {
@@ -19,7 +15,7 @@ namespace MPM.Data.Repository {
             this.baseUri = baseUri;
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion version, CompatibilitySide side, Arch arch) {
+        public Build FetchBuild(string packageName, SemVer.Version version, CompatibilitySide side, Arch arch) {
             var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{side}/{packageName}/{version}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
@@ -30,10 +26,10 @@ namespace MPM.Data.Repository {
             return build;
         }
 
-        public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
+        public IEnumerable<Build> FetchBuilds(string packageName, SemVer.Range versionSpec) {
             var package = this.FetchPackageBuilds(packageName);
             var matchingBuilds = package
-                .Where(b => versionSpec.Satisfies(b.Version))
+                .Where(b => versionSpec.IsSatisfied(b.Version))
                 .ToArray();
             return matchingBuilds;
         }

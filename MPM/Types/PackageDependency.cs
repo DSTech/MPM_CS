@@ -1,16 +1,15 @@
 using System;
-using semver.tools;
 
 namespace MPM.Types {
     public class PackageDependency : IEquatable<PackageDependency> {
-        public PackageDependency(string packageName, VersionSpec versionSpec, CompatibilitySide side) {
+        public PackageDependency(string packageName, SemVer.Range versionSpec, CompatibilitySide side) {
             this.PackageName = packageName;
             this.VersionSpec = versionSpec;
             this.Side = side;
         }
 
         public String PackageName { get; set; }
-        public VersionSpec @VersionSpec { get; set; }
+        public SemVer.Range @VersionSpec { get; set; }
         public CompatibilitySide Side { get; set; }
 
         #region Equality members

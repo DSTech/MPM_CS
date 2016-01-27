@@ -9,14 +9,13 @@ using MPM.Net.Protocols.Minecraft;
 using Newtonsoft.Json;
 using Nito.AsyncEx.Synchronous;
 using PowerArgs;
-using semver.tools;
 
 namespace MPM {
     public class Program {
         public static void DemoArchInstallation() {
             var mai = new MetaArchInstaller();
             var fsCache = new FileSystemCacheManager("./cache");
-            var procedure = mai.EnsureCached("minecraft", SemanticVersion.ParseNuGet("1.8.8"), fsCache, null);
+            var procedure = mai.EnsureCached("minecraft", new SemVer.Version("1.8.8"), fsCache, null);
             var opMap = procedure.GenerateOperations();
             foreach (var target in opMap) {
                 foreach (var operation in target.Value) {
@@ -38,8 +37,8 @@ namespace MPM {
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters = new List<JsonConverter> {
-                    new SemanticVersionConverter(),
-                    new VersionSpecConverter(),
+                    new VersionConverter(),
+                    new VersionRangeConverter(),
                 },
             };
         }

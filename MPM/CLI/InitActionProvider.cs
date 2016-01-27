@@ -17,7 +17,6 @@ using MPM.Data.Repository;
 using MPM.Types;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
-using semver.tools;
 
 namespace MPM.CLI {
     public class InitActionProvider {
@@ -45,11 +44,11 @@ namespace MPM.CLI {
                 }
             }
             Console.WriteLine("Creating instance...");
-            SemanticVersion instanceArch;
+            SemVer.Version instanceArch;
             if (args.Arch == "latest") {
-                instanceArch = SemanticVersion.Parse("1.8.8");
+                instanceArch = new SemVer.Version("1.8.8", true);
             } else {
-                instanceArch = SemanticVersion.Parse(args.Arch);
+                instanceArch = new SemVer.Version(args.Arch, true);
             }
             InstanceSide instanceSide;
             switch (args.Side) {
@@ -66,7 +65,7 @@ namespace MPM.CLI {
             this.Init(factory, instanceArch, instanceSide, args.InstancePath).WaitAndUnwrapException();
         }
 
-        public Configuration GenerateArchConfiguration(SemanticVersion instanceArch, InstanceSide instanceSide) {
+        public Configuration GenerateArchConfiguration(SemVer.Version instanceArch, InstanceSide instanceSide) {
             CompatibilitySide packageSide;
             switch (instanceSide) {
                 case InstanceSide.Client:
@@ -85,12 +84,12 @@ namespace MPM.CLI {
                     Arch = new Arch(instanceArch.ToString()),
                     Manual = true,
                     Side = packageSide,
-                    VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.0"), true, SemanticVersion.Parse("9999.9999.9999"), true),
+                    VersionSpec = new SemVer.Range("*.*.*", true),
                 },
             });
         }
 
-        public async Task Init(IContainer factory, SemanticVersion instanceArch, InstanceSide instanceSide, string instancePath) {
+        public async Task Init(IContainer factory, SemVer.Version instanceArch, InstanceSide instanceSide, string instancePath) {
             using (var instance = new Instance(instancePath) {
                 Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
                 LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden
