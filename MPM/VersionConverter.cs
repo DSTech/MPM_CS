@@ -5,6 +5,7 @@ using SemVer;
 using Version = SemVer.Version;
 
 namespace MPM {
+    [JsonConverter(typeof(Version))]
     public class VersionConverter : JsonConverter {
         public override bool CanRead {
             get { return true; }
