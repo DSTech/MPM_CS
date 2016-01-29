@@ -18,6 +18,11 @@ namespace MPM.CLI {
         [ArgRegex(@"^.*[\\/]package.json$")]
         public FileInfo PackageSpecFile { get; set; }
 
+        [ArgDescription("The maximum length of a chunk, in bytes, into which the resulting package should be split.")]
+        [ArgDefaultValue(1024*1024*5)]
+        [ArgShortcut("-c"), ArgShortcut("--split"), ArgShortcut("--max-chunk-length")]
+        public uint MaximumChunkLength { get; set; }
+
         [ArgReviver]
         public static FileInfo ToFileInfo(string keyName, string filePath) {
             return new FileInfo(filePath, PathFormat.RelativePath);
