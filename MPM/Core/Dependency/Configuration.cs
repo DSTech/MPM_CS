@@ -4,28 +4,40 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using MPM.Extensions;
 using MPM.Types;
 
 namespace MPM.Core.Dependency {
     public static class ConfigurationExtensions {
         //Returns conflicts caused by particular builds
-        //LookupBuild should return a package with exactly one build
-        public static IEnumerable<Tuple<PackageSpec, Build, Conflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Package> lookupBuild) {
+        //LookupBuild should return a series of builds that match the package specification
+        [NotNull]
+        public static IEnumerable<Tuple<PackageSpec, Build, Conflict>> FindConflicts(this Configuration configuration, Func<PackageSpec, Build[]> lookupMatchingBuilds) {
+            if (configuration == null) {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+            if (lookupMatchingBuilds == null) {
+                throw new ArgumentNullException(nameof(lookupMatchingBuilds));
+            }
             foreach (var package in configuration.Packages) {
-                var packageDetails = lookupBuild?.Invoke(package);
-                if (packageDetails == null) {
+                var matchingBuilds = lookupMatchingBuilds(package).DenullArray();
+                if (matchingBuilds.Length == 0) {
                     throw new Exception("Package details could not be found");
                 }
-                Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Count == 1);
-                var build = packageDetails.Builds.First();
+                Debug.Assert(matchingBuilds.Length > 0);
+
+                var build = matchingBuilds
+                    .OrderByDescending(b => b.Version)
+                    .ThenByDescending(b => b.Side != CompatibilitySide.Universal)
+                    .First();
 
                 var conflicts = build.FindConflicts(
                     configuration
                         .Packages
-                        .Where(spec => spec.Name != packageDetails.Name)
+                        .Where(spec => spec.Name != build.PackageName)
                         .ToArray(),
-                    lookupBuild
+                    lookupMatchingBuilds
                     );
                 foreach (var conflict in conflicts) {
                     yield return Tuple.Create(package, build, conflict);
@@ -36,20 +48,27 @@ namespace MPM.Core.Dependency {
         //Returns any conflicts triggered by a particular set of packages interacting with the given package
         //LookupBuild should return a package with exactly one build
         //These interactions are one-way: other packages must check their conflicts with the source as well
-        public static IEnumerable<Conflict> FindConflicts(this Build build, PackageSpec[] otherPackageSpecs, Func<PackageSpec, Package> lookupBuild) {
-            var packages = otherPackageSpecs
+        public static IEnumerable<Conflict> FindConflicts([NotNull] this Build build, [NotNull] PackageSpec[] otherPackageSpecs, [NotNull] Func<PackageSpec, Build[]> lookupMatchingBuilds) {
+            if (otherPackageSpecs == null) {
+                throw new ArgumentNullException(nameof(otherPackageSpecs));
+            }
+            if (lookupMatchingBuilds == null) {
+                throw new ArgumentNullException(nameof(lookupMatchingBuilds));
+            }
+            var highestSpecs = otherPackageSpecs
                 .Select(spec => {
-                    var packageDetails = lookupBuild?.Invoke(spec);
-                    Debug.Assert(packageDetails.Builds != null && packageDetails.Builds.Count == 1);
-                    return packageDetails;
+                    var matchingBuilds = lookupMatchingBuilds(spec).DenullArray();
+                    Debug.Assert(matchingBuilds!= null && matchingBuilds.Length > 0);
+                    return matchingBuilds
+                        .OrderByDescending(b => b.Version)
+                        .ThenByDescending(b => b.Side != CompatibilitySide.Universal)
+                        .First();
                 })
                 .ToArray();
-            var packageNames = packages
-                .Select(b => b.Name)
+            var packageNames = highestSpecs
+                .Select(b => b.PackageName)
                 .ToArray();
-            var interfaceNames = packages
-                .FirstOrDefault()
-                .Builds
+            var interfaceNames = highestSpecs
                 .SelectMany(b => b.Interfaces)
                 .Select(b => b.InterfaceName)
                 .ToArray();
@@ -62,7 +81,8 @@ namespace MPM.Core.Dependency {
     }
 
     public class Configuration {
-        public Configuration(IEnumerable<PackageSpec> packageSpecifications, CompatibilitySide side = CompatibilitySide.Universal) {
+        public Configuration([NotNull] IEnumerable<PackageSpec> packageSpecifications, CompatibilitySide side = CompatibilitySide.Universal) {
+            if (packageSpecifications == null) { throw new ArgumentNullException(nameof(packageSpecifications)); }
             this.Packages = packageSpecifications.ToArray();
             this.Side = side;
         }

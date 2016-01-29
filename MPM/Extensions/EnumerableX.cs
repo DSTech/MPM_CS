@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace MPM.Extensions {
     public static class EnumerableX {
-        public static IEnumerable<T> Denull<T>(this IEnumerable<T> enumerable) => enumerable ?? Enumerable.Empty<T>();
+        [NotNull] public static IEnumerable<T> Denull<T>([CanBeNull] this IEnumerable<T> enumerable) => enumerable ?? Enumerable.Empty<T>();
+
+        [NotNull] public static T[] DenullArray<T>([CanBeNull] this IEnumerable<T> enumerable) => enumerable?.ToArray() ?? new T[0];
 
         public static IEnumerable<T> SubEnumerable<T>(this IEnumerable<T> enumerable, int startIndex) {
             if (enumerable == null) {

@@ -41,22 +41,7 @@ namespace MPM.Types {
             this.Installation = installation?.ToList();
         }
 
-        public Build Clone() {
-            return new Build(
-                this.PackageName,
-                this.Authors,
-                this.Version,
-                this.GivenVersion,
-                this.@Arch,
-                this.Side,
-                this.Interfaces,
-                this.Dependencies.Interfaces,
-                this.Dependencies.Packages,
-                this.Conflicts,
-                this.Hashes,
-                this.Installation
-                );
-        }
+        public Build Clone() => this.SerialClone();
 
         [JsonRequired]
         [JsonProperty("name")]

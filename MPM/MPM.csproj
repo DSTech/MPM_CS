@@ -85,6 +85,10 @@
       <HintPath>..\packages\IronPython.2.7.5\lib\Net45\IronPython.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=7.1.3000.2254, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\ReSharper.Annotations.7.1.3.130415\lib\net\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LiteDB, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
       <HintPath>..\packages\LiteDB.2.0.0-rc\lib\net40\LiteDB.dll</HintPath>
       <Private>True</Private>
@@ -293,6 +297,7 @@
     <Compile Include="Data\NaiveHttpHashRetriever.cs" />
     <Compile Include="Extensions\DateTimeX.cs" />
     <Compile Include="Extensions\EnumerableX.cs" />
+    <Compile Include="Extensions\SerialCloning.cs" />
     <Compile Include="Extensions\StackX.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\StringX.cs" />
@@ -329,7 +334,6 @@
     <Compile Include="Types\InstallationConflictResolution.cs" />
     <Compile Include="Types\InterfaceDependency.cs" />
     <Compile Include="Types\InterfaceProvision.cs" />
-    <Compile Include="Types\Package.cs" />
     <Compile Include="Types\CompatibilitySide.cs" />
     <Compile Include="Types\Conflict.cs" />
     <Compile Include="Types\PackageDependency.cs" />
