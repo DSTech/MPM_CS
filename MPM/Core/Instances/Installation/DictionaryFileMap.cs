@@ -61,7 +61,7 @@ namespace MPM.Core.Instances.Installation {
             return true;
         }
 
-        public bool Unregister(String path, string packageName, SemVer.Version packageVersion) {
+        public bool Unregister(String path, string packageName, MPM.Types.SemVersion packageVersion) {
             if (!operations.ContainsKey(path)) {
                 return false;
             }
@@ -103,7 +103,7 @@ namespace MPM.Core.Instances.Installation {
         private struct DictionaryFileMapEntry {
             public IFileOperation Operation { get; set; }
             public string PackageName { get; set; }
-            public SemVer.Version PackageVersion { get; set; }
+            public MPM.Types.SemVersion PackageVersion { get; set; }
         }
     }
 }

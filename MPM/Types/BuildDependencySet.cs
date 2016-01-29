@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public struct BuildDependencySet : IEquatable<BuildDependencySet> {
@@ -28,8 +29,10 @@ namespace MPM.Types {
 
         #endregion
 
+        [JsonProperty("interfaces")]
         public List<InterfaceDependency> Interfaces { get; set; }
 
+        [JsonProperty("packages")]
         public List<PackageDependency> Packages { get; set; }
     }
 }

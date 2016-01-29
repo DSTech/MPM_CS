@@ -22,7 +22,7 @@ namespace MPM.Core.Instances.Installation {
         /// <summary>
         ///     Version of the package that created the operation.
         /// </summary>
-        SemVer.Version PackageVersion { get; }
+        MPM.Types.SemVersion PackageVersion { get; }
 
         /// <summary>
         ///     Performs the operation upon the specified path within the given filesystem.

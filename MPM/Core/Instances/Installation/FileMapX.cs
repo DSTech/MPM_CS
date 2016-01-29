@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Installation {
-    public static class IFileMapExtensions {
+    public static class FileMapX {
         /// <summary>
         ///     Produces a list of operations that must be undertaken to produce the difference between one FileMap and another.
         /// </summary>

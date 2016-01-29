@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MPM.Core.Instances.Info;
+using MPM.Core.Instances.Installation.Scripts;
 using MPM.Extensions;
 using Newtonsoft.Json;
-using SemVer;
 
 namespace MPM.Types {
     public class Build : IEquatable<Build> {
@@ -14,7 +14,7 @@ namespace MPM.Types {
         public Build(
             string packageName,
             IEnumerable<Author> authors,
-            SemVer.Version version,
+            MPM.Types.SemVersion version,
             string givenVersion,
             Arch arch,
             CompatibilitySide side,
@@ -23,7 +23,7 @@ namespace MPM.Types {
             IEnumerable<PackageDependency> packageDependencies,
             IEnumerable<Conflict> conflicts,
             IEnumerable<Hash> hashes = null,
-            IEnumerable<ScriptFileDeclaration> installation = null
+            IEnumerable<IFileDeclaration> installation = null
             ) {
             this.PackageName = packageName;
             this.Authors = authors.ToList();
@@ -67,7 +67,7 @@ namespace MPM.Types {
 
         [JsonRequired]
         [JsonProperty("version")]
-        public SemVer.Version Version { get; set; }
+        public MPM.Types.SemVersion Version { get; set; }
 
         [JsonProperty("givenVersion")]
         public String GivenVersion { get; set; } = "";
@@ -76,23 +76,21 @@ namespace MPM.Types {
         [JsonProperty("arch")]
         public Arch @Arch { get; set; }
 
-        [JsonRequired]
         [JsonProperty("side")]
+        [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
 
-        [JsonRequired]
-        [JsonProperty("interfaces")]
+        [JsonProperty("interfaces", ItemTypeNameHandling = TypeNameHandling.All)]
         public List<InterfaceProvision> Interfaces { get; set; } = new List<InterfaceProvision>();
 
         [JsonRequired]
         [JsonProperty("dependencies", ObjectCreationHandling = ObjectCreationHandling.Replace)]
         public BuildDependencySet Dependencies { get; set; }
 
-        [JsonRequired]
         [JsonProperty("conflicts")]
-        public List<Conflict> Conflicts { get; set; }
+        public List<Conflict> Conflicts { get; set; } = new List<Conflict>();
 
-        [JsonProperty("hashes")]
+        [JsonProperty("hashes", NullValueHandling = NullValueHandling.Ignore)]
         public List<Hash> Hashes { get; set; }
 
         /// <summary>
@@ -101,8 +99,8 @@ namespace MPM.Types {
         /// <value>
         /// The operations contained within. May be null on package repositories, but must exist in "package.json" files.
         /// </value>
-        [JsonProperty("installation")]
-        public List<ScriptFileDeclaration> Installation { get; set; }
+        [JsonProperty("installation", NullValueHandling = NullValueHandling.Ignore)]
+        public List<IFileDeclaration> Installation { get; set; }
 
         #region Equality members
 

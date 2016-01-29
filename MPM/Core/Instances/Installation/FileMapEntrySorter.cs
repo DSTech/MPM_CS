@@ -15,8 +15,7 @@ namespace MPM.Core.Instances.Installation {
         }
 
         public IFileMap Sort(IReadOnlyDictionary<Build, IFileMap> packageMapping) {
-            IReadOnlyCollection<Build> sortedConfiguration = new DependencyResolver()
-                .SortBuilds(
+            IReadOnlyCollection<Build> sortedConfiguration = DependencyResolver.SortBuilds(
                     packageMapping.Select(
                         mapping => mapping.Key
                         )

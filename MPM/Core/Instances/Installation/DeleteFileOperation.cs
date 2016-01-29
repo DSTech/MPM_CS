@@ -12,7 +12,7 @@ namespace MPM.Core.Instances.Installation {
         public DeleteFileOperation() {
         }
 
-        public DeleteFileOperation(string packageName, SemVer.Version packageVersion) {
+        public DeleteFileOperation(string packageName, MPM.Types.SemVersion packageVersion) {
             this.PackageName = packageName;
             this.PackageVersion = packageVersion;
         }
@@ -21,7 +21,7 @@ namespace MPM.Core.Instances.Installation {
 
         public string PackageName { get; set; }
 
-        public SemVer.Version PackageVersion { get; set; }
+        public MPM.Types.SemVersion PackageVersion { get; set; }
 
         public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
             fileSystem.ResolveFile(path).Delete();

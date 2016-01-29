@@ -9,30 +9,20 @@ namespace MPM.Core.Instances.Info {
         public const string ArchSourcePrefix = "arch";
         public const string ArchProtocolPrefix = ArchSourcePrefix + ProtocolSeparator;
 
-        public static IFileDeclaration Parse(this ScriptFileDeclaration declaration, String packageName, SemVer.Version packageVersion) {
-            var targets = (declaration.Target != null ? new[] { declaration.Target } : declaration.Targets ?? new String[0]);
-            var hash = (declaration.Hash != null) ? Hash.Parse(declaration.Hash) : null;
+        public static IFileDeclaration Parse(this ScriptFileDeclaration declaration, String packageName, MPM.Types.SemVersion packageVersion) {
+            var targets = declaration.Targets ?? new string[0];
 
             //Determine what type of file declaration to create depending upon class members
             var source = declaration.Source;
             if (source == null) {
-                if (declaration.Type != null) {
-                    var sourcelessDecl = new SourcelessFileDeclaration() {
+                if (declaration.Type.HasValue) {
+                    var sourcelessDecl = new SourcelessFileDeclaration {
                         Description = declaration.Description,
                         PackageName = packageName,
                         PackageVersion = packageVersion,
                         Targets = targets,
+                        Type = declaration.Type.Value,
                     };
-                    switch (declaration.Type) {
-                        case "configuration":
-                            sourcelessDecl.Type = SourcelessType.Configuration;
-                            return sourcelessDecl;
-                        case "cache":
-                            sourcelessDecl.Type = SourcelessType.Cache;
-                            return sourcelessDecl;
-                        default:
-                            throw new NotSupportedException($"File declaration type {declaration.Type} not supported");
-                    }
                 }
             } else {
                 if (source.StartsWith(ArchProtocolPrefix)) {
@@ -51,7 +41,7 @@ namespace MPM.Core.Instances.Info {
                             PackageName = packageName,
                             PackageVersion = packageVersion,
                             Targets = targets,
-                            Hash = hash,
+                            Hash = declaration.Hash,
                             Source = declaration.Source,
                         };
                         return sourcedDecl;

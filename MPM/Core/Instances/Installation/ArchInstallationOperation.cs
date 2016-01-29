@@ -6,13 +6,13 @@ using MPM.Extensions;
 
 namespace MPM.Core.Instances.Installation {
     public abstract class ArchInstallationOperation {
-        protected ArchInstallationOperation(string packageName, SemVer.Version packageVersion, ICacheManager cacheManager) {
+        protected ArchInstallationOperation(string packageName, MPM.Types.SemVersion packageVersion, ICacheManager cacheManager) {
             this.PackageName = packageName;
             this.Cache = cacheManager;
         }
 
         public string PackageName { get; set; }
-        public SemVer.Version PackageVersion { get; set; }
+        public MPM.Types.SemVersion PackageVersion { get; set; }
         public ICacheManager Cache { get; set; }
 
         public abstract IFileMap GenerateOperations();
@@ -24,7 +24,7 @@ namespace MPM.Core.Instances.Installation {
     public class ExtractArchInstallationOperation : ArchInstallationOperation {
         public ExtractArchInstallationOperation(
             string packageName,
-            SemVer.Version packageVersion,
+            MPM.Types.SemVersion packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string sourcePath,
@@ -75,7 +75,7 @@ namespace MPM.Core.Instances.Installation {
     public class ExtractSingleArchInstallationOperation : ArchInstallationOperation {
         public ExtractSingleArchInstallationOperation(
             string packageName,
-            SemVer.Version packageVersion,
+            MPM.Types.SemVersion packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string sourcePath,
@@ -100,7 +100,7 @@ namespace MPM.Core.Instances.Installation {
     public class CopyArchInstallationOperation : ArchInstallationOperation {
         public CopyArchInstallationOperation(
             string packageName,
-            SemVer.Version packageVersion,
+            MPM.Types.SemVersion packageVersion,
             ICacheManager cacheManager,
             string cachedName,
             string targetPath

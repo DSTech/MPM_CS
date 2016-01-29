@@ -10,7 +10,6 @@ using MPM.Types;
 using MPM.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using semver.tools;
 using MPM.Data.Repository;
 
 namespace MPM.Data {

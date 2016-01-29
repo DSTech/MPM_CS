@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Data.Repository;
+using MPM.Extensions;
 using MPM.Types;
 using QuickGraph;
 using QuickGraph.Algorithms;
@@ -41,41 +42,27 @@ namespace MPM.Core.Dependency {
                 output.Clear();
                 output.AddRange(SortBuilds(unsortedOutput));
             }
-            Debug.Assert(output.Count == 0 || output.Count == output.Distinct(package => package.PackageName).Count());
+            Debug.Assert(output.Count == 0 || (output.Count == output.Distinct(b => b.PackageName).Count() && output.Select(o => o.PackageName).ToHashSet().SetEquals(output.Select(b => b.PackageName).Distinct().ToHashSet())));
             return new InstanceConfiguration(output);
         }
 
-        public IReadOnlyCollection<Build> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+        public IReadOnlyCollection<Build> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
             var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
             var namedBuilds = repository.LookupSpec(packageSpec).ToArray();
-            Build[] result;
-            switch (resolutionMode) {
-                case ResolutionMode.Highest:
-                    result = namedBuilds
-                        .Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
-                        .OrderByDescending(nb => nb.Version)
-                        .ThenByDescending(nb => nb.Side == packageSide)
-                        .ToArray();
-                    break;
-                case ResolutionMode.HighestStable:
-                    result = namedBuilds
-                        .Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
-                        .OrderByDescending(nb => nb.Version)
-                        .ThenByDescending(nb => nb.Side == packageSide)
-                        .ToArray();
-                    break;
-                default:
-                    throw new NotSupportedException($"{nameof(ResolutionMode)} \"{resolutionMode}\" is unsupported by {this.GetType().Name}");
-            }
+            var result = namedBuilds
+                .Where(nb => (nb.Side == packageSide || nb.Side == CompatibilitySide.Universal) && constraintsArr.All(constraint => constraint.Allows(nb)))
+                .OrderByDescending(nb => nb.Version)
+                .ThenByDescending(nb => nb.Side == packageSide)
+                .ToArray();
             if (result.Length == 0) {
                 throw new DependencyException("Could not resolve package, no matching packages found.", packageSpec);
             }
             return result;
         }
 
-        public IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest) {
+        public IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
             var dependencyConstraints = constraints as DependencyConstraint[] ?? constraints.ToArray();
-            var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, dependencyConstraints, resolutionMode);
+            var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, dependencyConstraints);
             Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");
             foreach (var possibleBuild in possibleBuilds) {
                 var output = new List<Build>();
@@ -88,7 +75,7 @@ namespace MPM.Core.Dependency {
                     }
                     IReadOnlyCollection<Build> resolvedDeps;
                     try {
-                        resolvedDeps = ResolveRecursive(depSpec, repository, packageSide, dependencyConstraints, resolutionMode);
+                        resolvedDeps = ResolveRecursive(depSpec, repository, packageSide, dependencyConstraints);
                         Debug.Assert(resolvedDeps != null, "Recursive resolution may not return null");
                     } catch (DependencyException) {
                         goto nextBuild;
@@ -107,7 +94,7 @@ namespace MPM.Core.Dependency {
         /// </summary>
         /// <param name="builds">The builds to sort. All dependencies must be present or the input to ensure the proper ordering.</param>
         /// <returns>A sorted array of builds, with the least-dependent first</returns>
-        public IEnumerable<Build> SortBuilds(IEnumerable<Build> builds) {
+        public static IEnumerable<Build> SortBuilds(IEnumerable<Build> builds) {
             var buildMap = builds.Distinct(b => b.PackageName).ToArray();
 
             var adjGraph = new AdjacencyGraph<int, Edge<int>>(false);
@@ -123,14 +110,14 @@ namespace MPM.Core.Dependency {
                     );
             }
             var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(adjGraph.ToArrayAdjacencyGraph());
-            var onBackEdge = new EdgeAction<int, Edge<int>>(edge => {
+            var removeBackEdge = new EdgeAction<int, Edge<int>>(edge => {
                 adjGraph.RemoveEdge(edge);
             });
             try {
-                dfs.BackEdge += onBackEdge;
+                dfs.BackEdge += removeBackEdge;
                 dfs.Compute();
             } finally {
-                dfs.BackEdge -= onBackEdge;
+                dfs.BackEdge -= removeBackEdge;
             }
 
             var results = adjGraph

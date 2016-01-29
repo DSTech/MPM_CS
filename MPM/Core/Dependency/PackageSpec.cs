@@ -54,7 +54,7 @@ namespace MPM.Core.Dependency {
     public class PackageSpec : IEquatable<PackageSpec> {
         public String Name { get; set; }
         public Arch Arch { get; set; }
-        public SemVer.Range @VersionSpec { get; set; }
+        public MPM.Types.SemRange @VersionSpec { get; set; }
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
         public bool Manual { get; set; } = false;
 

@@ -10,7 +10,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
         private string packageCachedName { get; set; }
         public string PackageName { get; set; }
 
-        public SemVer.Version PackageVersion { get; set; }
+        public MPM.Types.SemVersion PackageVersion { get; set; }
 
         public string Description { get; set; }
 

@@ -9,7 +9,7 @@ using MPM.Data.Repository;
 using MPM.Types;
 
 namespace MPM.Core.Dependency {
-    public static class IResolverExtensions {
+    public static class ResolverExtensions {
     }
 
     public interface IDependencyResolver {
@@ -39,16 +39,12 @@ namespace MPM.Core.Dependency {
         ///     information for resolution.
         /// </param>
         /// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
-        /// <param name="resolutionMode">
-        ///     Specifier declaring which behavior the resolver should follow when attempting to find
-        ///     qualifying builds
-        /// </param>
         /// <exception cref="DependencyException">Thrown if no qualifying build can be found</exception>
         /// <returns>
         ///     A set of builds satisfying the spec, qualifying with all constraints, resolved with the specified behavior,
         ///     ordered from most to least prefered
         /// </returns>
-        IReadOnlyCollection<Build> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide side = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+        IReadOnlyCollection<Build> ResolveDependency(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide side = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null);
 
         /// <summary>
         ///     A variant of ResolveDependency which should implement additional constraints on each cycle until a dependency tree
@@ -71,15 +67,11 @@ namespace MPM.Core.Dependency {
         ///     dependencies are to be counted
         /// </param>
         /// <param name="constraints">An enumerable of constraints requiring fulfillment in order to produce a result</param>
-        /// <param name="resolutionMode">
-        ///     Specifier declaring which behavior the resolver should follow when attempting to find
-        ///     qualifying builds
-        /// </param>
         /// <exception cref="DependencyException">Thrown if no qualifying dependency tree can be found</exception>
         /// <returns>
         ///     A topologically-ordered array of dependencies on successful resolution back to root.
         ///     Null if resolution fails.
         /// </returns>
-        IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null, ResolutionMode resolutionMode = ResolutionMode.Highest);
+        IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository packageRepository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null);
     }
 }

@@ -44,11 +44,11 @@ namespace MPM.CLI {
                 }
             }
             Console.WriteLine("Creating instance...");
-            SemVer.Version instanceArch;
+            MPM.Types.SemVersion instanceArch;
             if (args.Arch == "latest") {
-                instanceArch = new SemVer.Version("1.8.8", true);
+                instanceArch = new MPM.Types.SemVersion("1.8.8", true);
             } else {
-                instanceArch = new SemVer.Version(args.Arch, true);
+                instanceArch = new MPM.Types.SemVersion(args.Arch, true);
             }
             InstanceSide instanceSide;
             switch (args.Side) {
@@ -65,7 +65,7 @@ namespace MPM.CLI {
             this.Init(factory, instanceArch, instanceSide, args.InstancePath).WaitAndUnwrapException();
         }
 
-        public Configuration GenerateArchConfiguration(SemVer.Version instanceArch, InstanceSide instanceSide) {
+        public Configuration GenerateArchConfiguration(MPM.Types.SemVersion instanceArch, InstanceSide instanceSide) {
             CompatibilitySide packageSide;
             switch (instanceSide) {
                 case InstanceSide.Client:
@@ -84,12 +84,12 @@ namespace MPM.CLI {
                     Arch = new Arch(instanceArch.ToString()),
                     Manual = true,
                     Side = packageSide,
-                    VersionSpec = new SemVer.Range("*.*.*", true),
+                    VersionSpec = new MPM.Types.SemRange("*.*.*", true),
                 },
             });
         }
 
-        public async Task Init(IContainer factory, SemVer.Version instanceArch, InstanceSide instanceSide, string instancePath) {
+        public async Task Init(IContainer factory, MPM.Types.SemVersion instanceArch, InstanceSide instanceSide, string instancePath) {
             using (var instance = new Instance(instancePath) {
                 Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
                 LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden

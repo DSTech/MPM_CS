@@ -15,7 +15,7 @@ namespace MPM.Data.Repository {
             this.baseUri = baseUri;
         }
 
-        public Build FetchBuild(string packageName, SemVer.Version version, CompatibilitySide side, Arch arch) {
+        public Build FetchBuild(string packageName, MPM.Types.SemVersion version, CompatibilitySide side, Arch arch) {
             var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{side}/{packageName}/{version}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
@@ -26,7 +26,7 @@ namespace MPM.Data.Repository {
             return build;
         }
 
-        public IEnumerable<Build> FetchBuilds(string packageName, SemVer.Range versionSpec) {
+        public IEnumerable<Build> FetchBuilds(string packageName, MPM.Types.SemRange versionSpec) {
             var package = this.FetchPackageBuilds(packageName);
             var matchingBuilds = package
                 .Where(b => versionSpec.IsSatisfied(b.Version))

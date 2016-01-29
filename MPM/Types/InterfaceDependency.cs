@@ -1,19 +1,26 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public class InterfaceDependency : IEquatable<InterfaceDependency> {
         public InterfaceDependency() {
         }
 
-        public InterfaceDependency(string interfaceName, SemVer.Range versionSpec, CompatibilitySide side) {
+        public InterfaceDependency(string interfaceName, MPM.Types.SemRange versionSpec, CompatibilitySide side) {
             this.InterfaceName = interfaceName;
             this.VersionSpec = versionSpec;
             this.Side = side;
         }
 
+        [JsonRequired]
+        [JsonProperty("name")]
         public String InterfaceName { get; set; }
-        public SemVer.Range @VersionSpec { get; set; }
-        public CompatibilitySide Side { get; set; }
+        [JsonRequired]
+        [JsonProperty("version")]
+        public MPM.Types.SemRange VersionSpec { get; set; }
+
+        [JsonProperty("interfaces", NullValueHandling = NullValueHandling.Ignore)]
+        public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
 
         #region Equality members
 

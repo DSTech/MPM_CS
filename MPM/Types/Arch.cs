@@ -1,6 +1,8 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
+    [JsonConverter(typeof(MPM.Util.Json.ArchConverter))]
     public class Arch : IEquatable<Arch> {
         public Arch() {
         }

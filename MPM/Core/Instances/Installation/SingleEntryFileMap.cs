@@ -11,7 +11,7 @@ namespace MPM.Core.Instances.Installation {
         public String Target { get; set; }
         public IFileOperation Operation { get; set; }
         public string PackageName { get; set; }
-        public SemVer.Version PackageVersion { get; set; }
+        public MPM.Types.SemVersion PackageVersion { get; set; }
     }
 
     struct SingleEntryFileMapEnumerabilityTracker : IReadOnlyList<SingleEntryFileMapEntry>, IReadOnlyDictionary<String, IFileOperation>, IEnumerable<SingleEntryFileMapEntry> {
@@ -114,7 +114,7 @@ namespace MPM.Core.Instances.Installation {
             throw new NotSupportedException();
         }
 
-        public bool Unregister(string path, string packageName, SemVer.Version packageVersion) {
+        public bool Unregister(string path, string packageName, MPM.Types.SemVersion packageVersion) {
             throw new NotSupportedException();
         }
 

@@ -5,13 +5,13 @@ namespace MPM.Types {
         public InterfaceProvision() {
         }
 
-        public InterfaceProvision(string interfaceName, SemVer.Version version) {
+        public InterfaceProvision(string interfaceName, MPM.Types.SemVersion version) {
             this.InterfaceName = interfaceName;
             this.Version = version;
         }
 
         public String InterfaceName { get; set; }
-        public SemVer.Version Version { get; set; }
+        public MPM.Types.SemVersion Version { get; set; }
 
         #region Equality members
 

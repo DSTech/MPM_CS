@@ -10,7 +10,7 @@ namespace MPM.Core.Instances.Installation {
     public interface IFileMap : IReadOnlyDictionary<String, IReadOnlyCollection<IFileOperation>> {
         void Register(String path, IFileOperation operation);
 
-        bool Unregister(String path, string packageName, SemVer.Version packageVersion);
+        bool Unregister(String path, string packageName, MPM.Types.SemVersion packageVersion);
 
         bool UnregisterPackage(string packageName);
 

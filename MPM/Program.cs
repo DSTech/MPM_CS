@@ -11,11 +11,11 @@ using Nito.AsyncEx.Synchronous;
 using PowerArgs;
 
 namespace MPM {
-    public class Program {
+    public static class Program {
         public static void DemoArchInstallation() {
             var mai = new MetaArchInstaller();
             var fsCache = new FileSystemCacheManager("./cache");
-            var procedure = mai.EnsureCached("minecraft", new SemVer.Version("1.8.8"), fsCache, null);
+            var procedure = mai.EnsureCached("minecraft", new MPM.Types.SemVersion("1.8.8"), fsCache, null);
             var opMap = procedure.GenerateOperations();
             foreach (var target in opMap) {
                 foreach (var operation in target.Value) {
@@ -27,9 +27,14 @@ namespace MPM {
 
         public static void Main(string[] args) {
             SetupJson();
-            using (var factory = new CLIFactory().GenerateResolver()) {
-                //DemoArchInstallation(); return;
-                ProcessCommandLine(factory, args);
+            try {
+                using (var factory = new CLIFactory().GenerateResolver()) {
+                    //DemoArchInstallation(); return;
+                    ProcessCommandLine(factory, args);
+                }
+            } catch (NotImplementedException e) {
+                Console.Error.WriteLine("\n{0}", e);
+                return;
             }
         }
 
@@ -37,8 +42,8 @@ namespace MPM {
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters = new List<JsonConverter> {
-                    new VersionConverter(),
-                    new VersionRangeConverter(),
+                    new Util.Json.VersionConverter(),
+                    new Util.Json.VersionRangeConverter(),
                 },
             };
         }

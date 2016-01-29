@@ -5,6 +5,7 @@ using MPM.Core.Protocols;
 using MPM.Types;
 
 namespace MPM.Core.Instances.Installation.Scripts {
+    [Newtonsoft.Json.JsonConverter(typeof(MPM.Util.Json.FileDeclarationConverter))]
     public interface IFileDeclaration {
         /// <summary>
         ///     The name of the package that sourced this declaration.
@@ -14,7 +15,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
         /// <summary>
         ///     The version of the package which sourced this declaration.
         /// </summary>
-        SemVer.Version PackageVersion { get; }
+        MPM.Types.SemVersion PackageVersion { get; }
 
         /// <summary>
         ///     The path of the file to be installed relative to the root of the package archive root.

@@ -38,8 +38,10 @@ namespace MPM.Extensions {
             return enumerable.Skip(startIndex).Take(count);
         }
 
-        public static IReadOnlyCollection<T> Solidify<T>(this IEnumerable<T> enumerable) {
-            return new SolidifyingReadOnlyCollection<T>(enumerable);
-        }
+        public static IReadOnlyCollection<T> Solidify<T>(this IEnumerable<T> enumerable) => new Util.SolidifyingReadOnlyCollection<T>(enumerable);
+
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable) => new HashSet<T>(enumerable);
+
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T> comparer) => new HashSet<T>(enumerable, comparer);
     }
 }

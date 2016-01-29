@@ -19,7 +19,7 @@ namespace MPM.Core.Instances.Installation {
         public ExtractFileOperation() {
         }
 
-        public ExtractFileOperation(string packageName, SemVer.Version packageVersion, string archiveCacheEntry, string sourcePath) {
+        public ExtractFileOperation(string packageName, MPM.Types.SemVersion packageVersion, string archiveCacheEntry, string sourcePath) {
             this.PackageName = PackageName;
             this.PackageVersion = packageVersion;
             this.ArchiveCacheEntry = archiveCacheEntry;
@@ -34,7 +34,7 @@ namespace MPM.Core.Instances.Installation {
 
         public string PackageName { get; set; }
 
-        public SemVer.Version PackageVersion { get; set; }
+        public MPM.Types.SemVersion PackageVersion { get; set; }
 
         public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
             var targetFile = fileSystem.ResolveFile(path);
