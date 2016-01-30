@@ -121,6 +121,10 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json.Schema, Version=2.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Schema.2.0.2\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\net45\Nito.AsyncEx.dll</HintPath>
       <Private>True</Private>
@@ -207,6 +211,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Archival\HashingForwarderStream.cs" />
+    <Compile Include="Archival\RawChunk.cs" />
     <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\CLIProtocolResolver.cs" />
     <Compile Include="CLI\CreatePackageArgs.cs" />
@@ -300,6 +306,7 @@
     <Compile Include="Extensions\SerialCloning.cs" />
     <Compile Include="Extensions\StackX.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />
+    <Compile Include="Extensions\BinaryReaderX.cs" />
     <Compile Include="Extensions\StringX.cs" />
     <Compile Include="Extensions\StreamX.cs" />
     <Compile Include="JsonSerializer.cs" />
@@ -347,7 +354,7 @@
     <Compile Include="Util\SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgX.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
-    <Compile Include="Archival\ArchiveChunk.cs" />
+    <Compile Include="Archival\EncryptedChunk.cs" />
     <Compile Include="Archival\Archive.cs" />
     <Compile Include="Extensions\PackageConflictX.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\LibraryExtractSpec.cs" />

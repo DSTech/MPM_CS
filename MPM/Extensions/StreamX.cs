@@ -58,5 +58,7 @@ namespace MPM.Extensions {
                 await stream.CopyToAsync(destination: destination);
             }
         }
+
+        public static void Write(this Stream stream, byte[] byteArray) => stream.Write(byteArray, 0, byteArray.Length);
     }
 }
