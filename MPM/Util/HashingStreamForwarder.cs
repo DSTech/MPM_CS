@@ -1,21 +1,27 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using MPM.Types;
 
-namespace MPM.Archival {
-    public class HashingForwarderStream : Stream {
+namespace MPM.Util {
+    public class HashingStreamForwarder : Stream {
         private readonly Stream _outputStream;
         private readonly bool _ownsOutputStream;
         private readonly HashAlgorithm _hashAlgorithm;
 
-        public HashingForwarderStream(Stream outputStream, bool ownsStream = true) {
+        public HashingStreamForwarder(Stream outputStream, bool ownsStream = true) {
             this._outputStream = outputStream;
             this._ownsOutputStream = ownsStream;
             this._hashAlgorithm = new SHA256Managed();
             this._hashAlgorithm.Initialize();
         }
 
-        public byte[] HashBytes => this._hashAlgorithm.Hash;
+        public Hash GetHash() {
+            this._hashAlgorithm.TransformFinalBlock(new byte[0], 0, 0);
+            return new Hash(this._hashAlgorithm.Hash);
+        }
+
+        public byte[] GetHashBytes() => GetHash().Checksum;
 
         #region Overrides of Stream
 
@@ -32,15 +38,15 @@ namespace MPM.Archival {
         }
 
         public override long Seek(long offset, SeekOrigin origin) {
-            throw new NotSupportedException($"{nameof(HashingForwarderStream)} does not support anything but writing to the wrapped stream");
+            throw new NotSupportedException($"{nameof(HashingStreamForwarder)} does not support anything but writing to the wrapped stream");
         }
 
         public override void SetLength(long value) {
-            throw new NotSupportedException($"{nameof(HashingForwarderStream)} does not support anything but writing to the wrapped stream");
+            throw new NotSupportedException($"{nameof(HashingStreamForwarder)} does not support anything but writing to the wrapped stream");
         }
 
         public override int Read(byte[] buffer, int offset, int count) {
-            throw new NotSupportedException($"{nameof(HashingForwarderStream)} does not support anything but writing to the wrapped stream");
+            throw new NotSupportedException($"{nameof(HashingStreamForwarder)} does not support anything but writing to the wrapped stream");
         }
 
         public override void Write(byte[] buffer, int offset, int count) {
@@ -57,7 +63,7 @@ namespace MPM.Archival {
                 return this._outputStream.Position;
             }
             set {
-                throw new NotSupportedException($"{nameof(HashingForwarderStream)} does not support anything but writing to the wrapped stream");
+                throw new NotSupportedException($"{nameof(HashingStreamForwarder)} does not support anything but writing to the wrapped stream");
             }
         }
 

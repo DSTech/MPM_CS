@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using MPM.Types;
+using MPM.Util;
 
 namespace MPM.Data.Repository {
     public static class IHashRepositoryExtensions {
@@ -54,8 +56,12 @@ namespace MPM.Data.Repository {
             //TODO: Switch to TPL Dataflow as described in https://msdn.microsoft.com/en-us/library/hh228603.aspx for parallelism control to prevent flooding
             //WhenAll preserves order of provided tasks, so each value will be associated with its parent hash
             var retrievedHashes = (await Task.WhenAll(retrievers.Select(async retriever => await retriever.Item2.Retrieve())));
-            var archive = new Archival.Archive(retrievedHashes.Select(retrievedHash => new Archival.EncryptedChunk(retrievedHash)));
-            return archive.Unpack(packageName);
+
+            using (var unpackedContent = new MemoryStream()) {
+                Archival.Archive.Unpack(new ConcatStream(retrievedHashes.Select(hashContent => new MemoryStream(hashContent, false))), packageName, unpackedContent);
+                unpackedContent.Seek(0, SeekOrigin.Begin);
+                return unpackedContent.ToArray();
+            }
         }
     }
 

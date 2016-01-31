@@ -3,6 +3,7 @@ using System.Linq;
 using MPM.Archival;
 using MPM.Core.Instances.Cache;
 using MPM.Extensions;
+using MPM.Util;
 
 namespace MPM.Core.Instances.Installation {
     public abstract class ArchInstallationOperation {

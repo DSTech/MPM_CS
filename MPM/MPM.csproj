@@ -211,8 +211,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Archival\HashingForwarderStream.cs" />
-    <Compile Include="Archival\RawChunk.cs" />
+    <Compile Include="Util\HashingStreamForwarder.cs" />
     <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\CLIProtocolResolver.cs" />
     <Compile Include="CLI\CreatePackageArgs.cs" />
@@ -282,8 +281,8 @@
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessType.cs" />
-    <Compile Include="Archival\StreamingZipFetcher.cs" />
-    <Compile Include="Archival\SeekingZipFetcher.cs" />
+    <Compile Include="Util\StreamingZipFetcher.cs" />
+    <Compile Include="Util\SeekingZipFetcher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
     <Compile Include="Core\Profiles\IProfileManager.cs" />
     <Compile Include="Core\Profiles\IProfileWriter.cs" />
@@ -346,6 +345,9 @@
     <Compile Include="Types\PackageDependency.cs" />
     <Compile Include="Types\SemVersion.cs" />
     <Compile Include="Types\SemRange.cs" />
+    <Compile Include="Util\Base64.cs" />
+    <Compile Include="Util\ReadOnlyStream.cs" />
+    <Compile Include="Util\ConcatStream.cs" />
     <Compile Include="Util\Json\HashConverter.cs" />
     <Compile Include="Util\Json\FileDeclarationConverter.cs" />
     <Compile Include="Util\Json\ArchConverter.cs" />
@@ -354,7 +356,6 @@
     <Compile Include="Util\SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgX.cs" />
     <Compile Include="CLI\LaunchArgs.cs" />
-    <Compile Include="Archival\EncryptedChunk.cs" />
     <Compile Include="Archival\Archive.cs" />
     <Compile Include="Extensions\PackageConflictX.cs" />
     <Compile Include="Net\Protocols\Minecraft\DTO\LibraryExtractSpec.cs" />

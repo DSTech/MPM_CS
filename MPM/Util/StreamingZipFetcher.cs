@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
 using MPM.Extensions;
 
-namespace MPM.Archival {
+namespace MPM.Util {
     public sealed class StreamingZipFetcher : IDisposable {
         private readonly ZipInputStream zipInputStream;
 

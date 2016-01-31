@@ -25,6 +25,7 @@ using MemoryStream = System.IO.MemoryStream;
 using DirectoryNotFoundException = System.IO.DirectoryNotFoundException;
 using FileNotFoundException = System.IO.FileNotFoundException;
 using MPM.Extensions;
+using MPM.Util;
 
 namespace MPM.CLI {
     public class CreatePackageActionProvider {
@@ -36,6 +37,9 @@ namespace MPM.CLI {
 
             var build = JsonConvert.DeserializeObject<Build>(File.ReadAllText(args.PackageSpecFile.FullName));
 
+            var packageName = $"{build.PackageName}_{build.Version}_{build.Side}";
+
+            Console.WriteLine($"{build.PackageName} ({build.Version}:{build.Side})=>");
             Console.WriteLine(build);
             Console.WriteLine(JsonConvert.SerializeObject(build, Formatting.Indented));
 
@@ -44,66 +48,85 @@ namespace MPM.CLI {
                 file.Delete();
             }
 
-            //TODO: Change to MemoryStream and chunkify afterward
-            using (var memStr = new MemoryStream()) {
-                using (var zipStream = new ICSharpCode.SharpZipLib.Zip.ZipOutputStream(memStr) { IsStreamOwner = false }) {
-
-                    Console.WriteLine("Packing file {0} as \"package.json\"", args.PackageSpecFile.FullName);
-                    {
-                        zipStream.PutNextEntry(new ZipEntry("package.json"));
-                        var deserializedBuild = JsonConvert.DeserializeObject<Build>(File.ReadAllText(args.PackageSpecFile.FullName));
-                        var reserializedBuild = JsonConvert.SerializeObject(deserializedBuild, typeof(Build), Formatting.Indented, new JsonSerializerSettings());
-                        var reserializedBuildBytes = Encoding.UTF8.GetBytes(reserializedBuild);
-                        zipStream.Write(reserializedBuildBytes, 0, reserializedBuildBytes.Length);
-                        zipStream.CloseEntry();
-                    }
-                    foreach (var decl in build.Installation) {
-                        var sourced = decl as SourcedFileDeclaration;
-                        if (sourced == null) {
-                            continue;
-                        }
-                        var sourcePath = Path.Combine(args.PackageDirectory.FullName, sourced.Source);
-                        if (!File.Exists(sourcePath)) {
-                            Console.WriteLine("Failed to find file {0}", sourcePath);
-                            continue;
-                        }
-                        Console.WriteLine("Packing file {0}", sourcePath);
-                        {
-                            zipStream.PutNextEntry(new ZipEntry(sourced.Source));
-                            {
-                                File.OpenRead(sourced.Source).CopyToAndClose(zipStream);
-                            }
-                            zipStream.CloseEntry();
-                        }
-                    }
+            using (var archiveContent = new MemoryStream()) {
+                using (var zipContent = new MemoryStream()) {
+                    Console.WriteLine("Adding source files...");
+                    AddSourcesToZip(args, build, outputStream: zipContent);
+                    zipContent.Seek(0, System.IO.SeekOrigin.Begin);
+                    Console.WriteLine("Building archive...");
+                    Archival.Archive.Create(zipContent, build.PackageName, archiveContent, leaveSourceOpen: true);
                 }
-                memStr.Seek(0, System.IO.SeekOrigin.Begin);
-                //TODO: Chunkify and add hashes to an outer package.json without installation script
-                Console.WriteLine("Building archive...");
-                var archive = Archival.Archive.CreateArchive(
-                    build.PackageName,
-                    memStr.ToArray(),
-                    args.MaximumChunkLength
-                    );
+                archiveContent.Seek(0, System.IO.SeekOrigin.Begin);
                 var hashes = new List<Hash>();
-
-                foreach (var chunkAndHash in archive.Select(c => new { Hash = new Hash("sha256", c.Hash()), Contents = c.ToArray() })) {
-                    //TODO: Convert Archive Chunks to use MPM.Types.Hash
-                    var illegalChars = Path.GetInvalidFileNameChars();
-                    var targetName = chunkAndHash.Hash.ToString();
-                    foreach (var illegalChar in illegalChars) {
-                        targetName = targetName.Replace(illegalChar, '_');
+                //TODO: Replace following with chunkification
+                {
+                    Hash fileHash;
+                    var targetChunkPath = Path.Combine(outputDir.FullName, $"{packageName}.mpmp");
+                    Console.WriteLine("Writing chunk {0}...", targetChunkPath);
+                    using (var hashfileStream = new HashingStreamForwarder(File.OpenWrite(targetChunkPath))) {
+                        archiveContent.CopyTo(hashfileStream);
+                        fileHash = hashfileStream.GetHash();
                     }
-                    var targetChunkPath = Path.Combine(outputDir.FullName, targetName);
-                    Console.WriteLine("Writing chunk {0} with hash {1}...", targetChunkPath, chunkAndHash.Hash);
-                    File.WriteAllBytes(targetChunkPath, chunkAndHash.Contents);
-                    hashes.Add(chunkAndHash.Hash);
+                    Console.WriteLine("\tHash: {0}", fileHash.ToString());
                 }
+
+                //TODO: add hashes to an outer package.json without installation script
+
+
+                //foreach (var chunkAndHash in archive.Select(c => new { Hash = new Hash("sha256", c.Hash()), Contents = c.ToArray() })) {
+                //    //TODO: Convert Archive Chunks to use MPM.Types.Hash
+                //    var illegalChars = Path.GetInvalidFileNameChars();
+                //    var targetName = chunkAndHash.Hash.ToString();
+                //    foreach (var illegalChar in illegalChars) {
+                //        targetName = targetName.Replace(illegalChar, '_');
+                //    }
+                //    var targetChunkPath = Path.Combine(outputDir.FullName, targetName);
+                //    Console.WriteLine("Writing chunk {0} with hash {1}...", targetChunkPath, chunkAndHash.Hash);
+                //    File.WriteAllBytes(targetChunkPath, chunkAndHash.Contents);
+                //    hashes.Add(chunkAndHash.Hash);
+                //}
 
                 var buildExternal = build.Clone();
                 buildExternal.Hashes = hashes;
-                var targetPackageJsonExternal = Path.Combine(outputDir.FullName, $"{build.PackageName}_{build.Version}_{build.Side}.json");
+                var targetPackageJsonExternal = Path.Combine(outputDir.FullName, $"{packageName}.json");
                 File.WriteAllText(targetPackageJsonExternal, JsonConvert.SerializeObject(buildExternal, typeof(Build), Formatting.Indented, new JsonSerializerSettings()));
+            }
+        }
+
+        private static void AddSourcesToZip(CreatePackageArgs args, Build build, MemoryStream outputStream) {
+            using (var zipStream = new ICSharpCode.SharpZipLib.Zip.ZipOutputStream(outputStream) { IsStreamOwner = false }) {
+                zipStream.SetLevel(9);
+                Console.WriteLine("Packing file {0} as \"package.json\"", args.PackageSpecFile.FullName);
+                {
+                    zipStream.PutNextEntry(new ZipEntry("package.json"));
+                    {
+                        var deserializedBuild = JsonConvert.DeserializeObject<Build>(File.ReadAllText(args.PackageSpecFile.FullName));
+                        deserializedBuild.Hashes = null;
+                        var reserializedBuild = JsonConvert.SerializeObject(deserializedBuild, typeof(Build), Formatting.Indented, new JsonSerializerSettings());
+                        zipStream.Write(Encoding.UTF8.GetBytes(reserializedBuild));
+                    }
+                    zipStream.CloseEntry();
+                }
+                foreach (var decl in build.Installation) {
+                    var sourced = decl as SourcedFileDeclaration;
+                    if (sourced == null) {
+                        continue;
+                    }
+                    //Consider protocol sources here, and disregard
+                    var sourcePath = Path.Combine(args.PackageDirectory.FullName, sourced.Source);
+                    if (!File.Exists(sourcePath)) {
+                        Console.WriteLine("Failed to find file {0}", sourcePath);
+                        continue;
+                    }
+                    Console.WriteLine("Packing file {0}", sourcePath);
+                    {
+                        zipStream.PutNextEntry(new ZipEntry(sourced.Source));
+                        {
+                            File.OpenRead(sourced.Source).CopyToAndClose(zipStream);
+                        }
+                        zipStream.CloseEntry();
+                    }
+                }
             }
         }
     }

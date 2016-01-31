@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using Microsoft.Scripting.Utils;
+using MPM.Util;
 
 namespace MPM.Types {
     public class Hash {
@@ -21,23 +24,19 @@ namespace MPM.Types {
 
         public static Hash Parse(string hashString) {
             var lowerHashString = hashString.ToLower().Trim();
-
             var algChecksumPair = lowerHashString.Split(new[] { ':' }, 2);//Destructuring for C# 7 please?
-
             if (algChecksumPair.Length == 2) {
                 var algorithm = algChecksumPair[0];
-                var checksum = Convert.FromBase64String(algChecksumPair[1]);
-
+                var checksum = Base64.GetBytesUnknown(algChecksumPair[1]);
                 return new Hash(algorithm, checksum);
             } else {
-                var checksum = Convert.FromBase64String(algChecksumPair[0]);
-
+                var checksum = Base64.GetBytesUnknown(algChecksumPair[0]);
                 return new Hash(checksum);
             }
         }
 
         public override string ToString() {
-            return $"{Algorithm}:{Convert.ToBase64String(Checksum)}";
+            return $"{Algorithm}:{Base64.GetSafeString(Checksum)}";
         }
     }
 }

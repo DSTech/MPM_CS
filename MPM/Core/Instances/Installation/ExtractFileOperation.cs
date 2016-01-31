@@ -9,6 +9,7 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using MPM.Archival;
 using MPM.Core.Instances.Cache;
+using MPM.Util;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {

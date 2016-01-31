@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using MPM.Util;
 
 namespace MPM.Extensions {
     public static class StreamX {
@@ -60,5 +62,36 @@ namespace MPM.Extensions {
         }
 
         public static void Write(this Stream stream, byte[] byteArray) => stream.Write(byteArray, 0, byteArray.Length);
+
+        public static ReadOnlyStream ToReadOnly(this Stream stream) => new ReadOnlyStream(stream);
+
+        public static ReadOnlyStream ToReadOnly(this Stream stream, bool leaveOpen) => new ReadOnlyStream(stream, leaveOpen);
+
+        public static void SeekToStart(this Stream stream) => stream.Seek(0, SeekOrigin.Begin);
+
+        public static byte[] ToArrayFromStart(this MemoryStream memoryStream) {
+            memoryStream.SeekToStart();
+            return memoryStream.ToArray();
+        }
+
+        public static byte[] ToArray(this Stream stream) {
+            var asMemStr = stream as MemoryStream;
+            if (asMemStr != null) {
+                return asMemStr.ToArray();
+            }
+            using (var memStr = new MemoryStream()) {
+                stream.CopyTo(memStr);
+                return memStr.ToArrayFromStart();
+            }
+        }
+
+        public static byte[] ToArrayFromStart(this Stream stream) {
+            if (!stream.CanSeek) {
+                throw new ArgumentException("Does not support seeking", nameof(stream));
+            }
+            stream.SeekToStart();
+            return stream.ToArray();
+        }
+
     }
 }
