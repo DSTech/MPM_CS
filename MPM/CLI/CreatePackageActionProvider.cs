@@ -70,23 +70,6 @@ namespace MPM.CLI {
                     hashes.Add(fileHash);
                 }
 
-                //TODO: add hashes to an outer package.json without installation script
-
-
-
-                //foreach (var chunkAndHash in archive.Select(c => new { Hash = new Hash("sha256", c.Hash()), Contents = c.ToArray() })) {
-                //    //TODO: Convert Archive Chunks to use MPM.Types.Hash
-                //    var illegalChars = Path.GetInvalidFileNameChars();
-                //    var targetName = chunkAndHash.Hash.ToString();
-                //    foreach (var illegalChar in illegalChars) {
-                //        targetName = targetName.Replace(illegalChar, '_');
-                //    }
-                //    var targetChunkPath = Path.Combine(outputDir.FullName, targetName);
-                //    Console.WriteLine("Writing chunk {0} with hash {1}...", targetChunkPath, chunkAndHash.Hash);
-                //    File.WriteAllBytes(targetChunkPath, chunkAndHash.Contents);
-                //    hashes.Add(chunkAndHash.Hash);
-                //}
-
                 var buildExternal = build.Clone();
                 buildExternal.Hashes = hashes;
                 buildExternal.Installation = null;
