@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Alphaleonis.Win32.Filesystem;
 using Autofac;
 using ICSharpCode.SharpZipLib.Zip;
 using MPM.ActionProviders;
@@ -21,11 +21,10 @@ using MPM.Types;
 using Newtonsoft.Json;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
-using MemoryStream = System.IO.MemoryStream;
-using DirectoryNotFoundException = System.IO.DirectoryNotFoundException;
-using FileNotFoundException = System.IO.FileNotFoundException;
 using MPM.Extensions;
 using MPM.Util;
+using File = Alphaleonis.Win32.Filesystem.File;
+using Path = Alphaleonis.Win32.Filesystem.Path;
 
 namespace MPM.CLI {
     public class CreatePackageActionProvider {
@@ -68,9 +67,11 @@ namespace MPM.CLI {
                         fileHash = hashfileStream.GetHash();
                     }
                     Console.WriteLine("\tHash: {0}", fileHash.ToString());
+                    hashes.Add(fileHash);
                 }
 
                 //TODO: add hashes to an outer package.json without installation script
+
 
 
                 //foreach (var chunkAndHash in archive.Select(c => new { Hash = new Hash("sha256", c.Hash()), Contents = c.ToArray() })) {
@@ -88,12 +89,13 @@ namespace MPM.CLI {
 
                 var buildExternal = build.Clone();
                 buildExternal.Hashes = hashes;
+                buildExternal.Installation = null;
                 var targetPackageJsonExternal = Path.Combine(outputDir.FullName, $"{packageName}.json");
                 File.WriteAllText(targetPackageJsonExternal, JsonConvert.SerializeObject(buildExternal, typeof(Build), Formatting.Indented, new JsonSerializerSettings()));
             }
         }
 
-        private static void AddSourcesToZip(CreatePackageArgs args, Build build, MemoryStream outputStream) {
+        private static void AddSourcesToZip(CreatePackageArgs args, Build build, Stream outputStream) {
             using (var zipStream = new ICSharpCode.SharpZipLib.Zip.ZipOutputStream(outputStream) { IsStreamOwner = false }) {
                 zipStream.SetLevel(9);
                 Console.WriteLine("Packing file {0} as \"package.json\"", args.PackageSpecFile.FullName);
