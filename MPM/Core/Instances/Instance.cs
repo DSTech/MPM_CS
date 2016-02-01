@@ -11,6 +11,7 @@ using LiteDB;
 using MPM.Core.Dependency;
 using MPM.Core.Instances.Installation;
 using MPM.Data;
+using MPM.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
@@ -26,7 +27,7 @@ namespace MPM.Core.Instances {
         private const string PackageName = "packages";
         private const string PackageCacheName = "packagecache";
 
-        public Instance(String location) {
+        public Instance(DirectoryInfo location) {
             this.Location = location;
             var cb = new ContainerBuilder();
 
@@ -35,10 +36,10 @@ namespace MPM.Core.Instances {
                 .SingleInstance()
                 .Named<LiteDatabase>("InstanceDb");
 
-            cb.Register<IFileSystem>(ctxt => FileSystemManager.Default.ResolveDirectory(Location).CreateView())
+            cb.Register<IFileSystem>(ctxt => FileSystemManager.Default.ResolveDirectory(Location.FullName).CreateView())
                 .As<IFileSystem>()
                 .SingleInstance()
-                .Named<IFileSystem>("InstanceProfiles");
+                .Named<IFileSystem>("InstanceFileSystem");
 
             cb.Register<IMetaDataManager>(ctxt => new LiteDbMetaDataManager(ctxt.Resolve<LiteDatabase>().GetCollection<LiteDbMetaDataManager.MetaDataEntry>(MetaName)))
                 .As<IMetaDataManager>()
@@ -49,9 +50,9 @@ namespace MPM.Core.Instances {
         }
 
         public IContainer Factory { get; private set; }
-        public String Location { get; set; }
-        public String MpmDirectory => Directory.CreateDirectory(Path.Combine(Location, MpmDirectoryName)).FullName;
-        public String DbPath => Path.Combine(MpmDirectory, $"{DbName}.litedb");
+        public DirectoryInfo Location { get; set; }
+        public DirectoryInfo MpmDirectory => Location.CreateSubdirectory(MpmDirectoryName);
+        public FileInfo DbPath => MpmDirectory.SubFile($"{DbName}.litedb");
 
         public String Name {
             get { return FetchDbMeta().Get<String>("name"); }
@@ -91,7 +92,7 @@ namespace MPM.Core.Instances {
 
         public ILauncher CreateLauncher() {
             var ctor = LauncherType.GetConstructor(new Type[0]);
-            return (ILauncher) ctor.Invoke(new object[0]);
+            return (ILauncher)ctor.Invoke(new object[0]);
         }
 
         protected void Dispose(bool disposing) {

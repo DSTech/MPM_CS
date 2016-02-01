@@ -1,18 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
+using MPM.Extensions;
 
 namespace MPM.Core.Instances.Cache {
     //TODO: Replace standard filesystem usage with Platform.VirtualFileSystem
     public class FileSystemCacheManager : ICacheManager {
-        public FileSystemCacheManager(string cachePath) {
-            this.cachePath = cachePath;
-            Directory.CreateDirectory(cachePath);
+        public FileSystemCacheManager(string cachePath)
+            : this(new DirectoryInfo(cachePath)) {
         }
 
-        private IEnumerable<string> cacheEntryPaths => Directory.GetFiles(cachePath);
-        private string cachePath { get; }
+        public FileSystemCacheManager(DirectoryInfo cacheDirectory) {
+            this.cacheDirectory = cacheDirectory;
+            if (!cacheDirectory.Exists) {
+                cacheDirectory.Create();
+            }
+        }
+
+        private IEnumerable<FileInfo> cacheEntryPaths => cacheDirectory.GetFiles();
+
+        private DirectoryInfo cacheDirectory { get; }
 
         public IEnumerable<ICacheEntry> Entries {
             get {
@@ -24,15 +34,15 @@ namespace MPM.Core.Instances.Cache {
 
         public void Clear() {
             foreach (var cachePathEntry in cacheEntryPaths) {
-                File.Delete(cachePathEntry);
+                File.Delete(cachePathEntry.FullName);
             }
         }
 
-        public bool Contains(string cacheEntryName) => File.Exists(Path.Combine(cachePath, cacheEntryName));
+        public bool Contains(string cacheEntryName) => File.Exists(Path.Combine(cacheDirectory.FullName, cacheEntryName));
 
         public void Delete(string cacheEntryName) {
             ValidateEntryPath(cacheEntryName);
-            File.Delete(Path.Combine(cachePath, cacheEntryName));
+            File.Delete(Path.Combine(cacheDirectory.FullName, cacheEntryName));
         }
 
         public ICacheEntry Fetch(string cacheEntryName) {
@@ -40,31 +50,35 @@ namespace MPM.Core.Instances.Cache {
             if (!Contains(cacheEntryName)) {
                 return null;
             }
-            return new CacheEntry(Path.Combine(cachePath, cacheEntryName));
+            return new CacheEntry(cacheDirectory.SubFile(cacheEntryName));
         }
 
         public void Store(string cacheEntryName, byte[] entryData) {
             ValidateEntryPath(cacheEntryName);
-            var itemPath = Path.Combine(cachePath, cacheEntryName);
-            Directory.CreateDirectory(Path.GetDirectoryName(itemPath));
-            File.WriteAllBytes(itemPath, entryData);
+            var item = cacheDirectory.SubFile(cacheEntryName);
+            Debug.Assert(item.Directory != null, "item.Directory != null");
+            if (!item.Directory.Exists) {
+                item.Directory.Create();
+            }
+            Directory.CreateDirectory(item.DirectoryName);
+            File.WriteAllBytes(item.FullName, entryData);
         }
 
-        private void ValidateEntryPath(string cacheEntryName) {
+        private static void ValidateEntryPath([NotNull] string cacheEntryName) {
             if (cacheEntryName.Contains("..") || cacheEntryName.Contains(":/") || cacheEntryName.StartsWith("/")) {
                 throw new InvalidOperationException("No parent directory access allowed.");
             }
         }
 
         private class CacheEntry : ICacheEntry {
-            private string cachePath;
+            private FileInfo cacheFile;
 
-            public CacheEntry(string cachePath) {
-                this.cachePath = cachePath;
+            public CacheEntry(FileInfo cacheFile) {
+                this.cacheFile = cacheFile;
             }
 
             public Stream FetchStream() {
-                return File.OpenRead(cachePath);
+                return File.OpenRead(cacheFile.FullName);
             }
         }
     }

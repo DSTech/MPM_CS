@@ -211,6 +211,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Instances\Cache\ICacheReader.cs" />
+    <Compile Include="Core\Instances\Cache\ICacheWriter.cs" />
+    <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
+    <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Util\HashingStreamForwarder.cs" />
     <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\CLIProtocolResolver.cs" />
@@ -263,8 +267,6 @@
     <Compile Include="Core\Instances\Cache\ICacheEntryExtensions.cs" />
     <Compile Include="Core\Instances\Cache\ICacheEntry.cs" />
     <Compile Include="Core\Instances\Cache\ICacheManager.cs" />
-    <Compile Include="Core\Instances\Cache\ICacheWriter.cs" />
-    <Compile Include="Core\Instances\Cache\ICacheReader.cs" />
     <Compile Include="Core\Instances\Installation\ClaimFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\ExtractFileOperation.cs" />
     <Compile Include="Core\Instances\Installation\DeleteFileOperation.cs" />

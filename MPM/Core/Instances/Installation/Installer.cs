@@ -95,7 +95,7 @@ namespace MPM.Core.Instances.Installation {
         /// </summary>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public async Task Install(InstanceConfiguration configuration) {
+        public void Install(InstanceConfiguration configuration) {
             var fileMap = configuration.GenerateFileMap();
             foreach (var opTarget in fileMap) {
                 var target = opTarget.Key;
@@ -103,7 +103,6 @@ namespace MPM.Core.Instances.Installation {
                     operation.Perform(fileSystem, target, cacheManager);
                 }
             }
-            await Task.Yield();
             throw new NotImplementedException();
         }
 
@@ -113,8 +112,7 @@ namespace MPM.Core.Instances.Installation {
         /// <param name="oldConfiguration"></param>
         /// <param name="newConfiguration"></param>
         /// <returns></returns>
-        public async Task Install(InstanceConfiguration oldConfiguration, InstanceConfiguration newConfiguration) {
-            await Task.Yield();
+        public void Install(InstanceConfiguration oldConfiguration, InstanceConfiguration newConfiguration) {
             throw new NotImplementedException();
         }
     }

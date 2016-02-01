@@ -21,14 +21,15 @@ using Nito.AsyncEx.Synchronous;
 namespace MPM.CLI {
     public class InitActionProvider {
         public void Provide(IContainer factory, InitArgs args) {
-            Console.WriteLine($"Initializing instance at path:\n\t{Path.GetFullPath(args.InstancePath)}");
-            if (!Directory.Exists(args.InstancePath)) {
+            var instanceDir = args.InstanceDirectory;
+            Console.WriteLine($"Initializing instance at:\n\t{instanceDir}");
+            if (!instanceDir.Exists) {
                 Console.WriteLine("Directory did not exist. Creating...");
-                Directory.CreateDirectory(args.InstancePath);
+                instanceDir.Create();
             } else {
                 Console.WriteLine("Directory exists...");
                 var dirEmpty = true;
-                foreach (var fsEntry in Directory.EnumerateFileSystemEntries(args.InstancePath)) {
+                foreach (var fsEntry in instanceDir.EnumerateFileSystemInfos()) {
                     dirEmpty = false;
                     break;
                 }
@@ -44,28 +45,10 @@ namespace MPM.CLI {
                 }
             }
             Console.WriteLine("Creating instance...");
-            MPM.Types.SemVersion instanceArch;
-            if (args.Arch == "latest") {
-                instanceArch = new MPM.Types.SemVersion("1.8.8", true);
-            } else {
-                instanceArch = new MPM.Types.SemVersion(args.Arch, true);
-            }
-            InstanceSide instanceSide;
-            switch (args.Side) {
-                case "client":
-                    instanceSide = InstanceSide.Client;
-                    break;
-                case "server":
-                    instanceSide = InstanceSide.Server;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(instanceSide));
-            }
-
-            this.Init(factory, instanceArch, instanceSide, args.InstancePath).WaitAndUnwrapException();
+            this.Init(factory, args.Arch, args.Side, args.InstanceDirectory);
         }
 
-        public Configuration GenerateArchConfiguration(MPM.Types.SemVersion instanceArch, InstanceSide instanceSide) {
+        private static Configuration GenerateArchConfiguration(MPM.Types.SemVersion instanceArch, InstanceSide instanceSide) {
             CompatibilitySide packageSide;
             switch (instanceSide) {
                 case InstanceSide.Client:
@@ -77,7 +60,6 @@ namespace MPM.CLI {
                 default:
                     throw new NotSupportedException();
             }
-            ;
             return new Configuration(new[] {
                 new PackageSpec {
                     Name = "minecraft",
@@ -89,10 +71,10 @@ namespace MPM.CLI {
             });
         }
 
-        public async Task Init(IContainer factory, MPM.Types.SemVersion instanceArch, InstanceSide instanceSide, string instancePath) {
-            using (var instance = new Instance(instancePath) {
+        public void Init(IContainer factory, MPM.Types.SemVersion instanceArch, InstanceSide instanceSide, DirectoryInfo instanceDirectory) {
+            using (var instance = new Instance(instanceDirectory) {
                 Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
-                LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide, instanceArch and able to be overridden
+                LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide/instanceArch and able to be overridden
                 Configuration = InstanceConfiguration.Empty,
             }) {
                 //TODO: Install arch pseudopackage
@@ -118,9 +100,11 @@ namespace MPM.CLI {
                         continue;
                     }
                     Console.WriteLine($"Downloading package {package.PackageName} to cache...");
-                    var packageArchive = await hashRepository.RetrieveArchive(package.PackageName, package.Hashes);
+                    var packageArchive = hashRepository.RetrieveArchive(package.PackageName, package.Hashes).WaitAndUnwrapException();
                     cacheManager.Store(cacheEntryName, packageArchive);
                 }
+
+                //TODO: Reevaluate this
 
                 var installer = new Installer(
                     instance,
@@ -130,7 +114,7 @@ namespace MPM.CLI {
                     factory.Resolve<IProtocolResolver>()
                     );
 
-                await installer.Install(resolvedArchConfiguration);
+                installer.Install(resolvedArchConfiguration);
 
                 //var cacheManager = factory.Resolve<ICacheManager>();
                 //var protocolResolver = factory.Resolve<IProtocolResolver>();

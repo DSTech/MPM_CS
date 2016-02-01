@@ -51,11 +51,11 @@ namespace MPM.CLI {
                 using (var zipContent = new MemoryStream()) {
                     Console.WriteLine("Adding source files...");
                     AddSourcesToZip(args, build, outputStream: zipContent);
-                    zipContent.Seek(0, System.IO.SeekOrigin.Begin);
+                    zipContent.SeekToStart();
                     Console.WriteLine("Building archive...");
                     Archival.Archive.Create(zipContent, build.PackageName, archiveContent, leaveSourceOpen: true);
                 }
-                archiveContent.Seek(0, System.IO.SeekOrigin.Begin);
+                archiveContent.SeekToStart();
                 var hashes = new List<Hash>();
                 //TODO: Replace following with chunkification
                 {
@@ -70,11 +70,13 @@ namespace MPM.CLI {
                     hashes.Add(fileHash);
                 }
 
-                var buildExternal = build.Clone();
-                buildExternal.Hashes = hashes;
-                buildExternal.Installation = null;
-                var targetPackageJsonExternal = Path.Combine(outputDir.FullName, $"{packageName}.json");
-                File.WriteAllText(targetPackageJsonExternal, JsonConvert.SerializeObject(buildExternal, typeof(Build), Formatting.Indented, new JsonSerializerSettings()));
+                {
+                    var buildExternal = build.Clone();
+                    buildExternal.Hashes = hashes;
+                    buildExternal.Installation = null;
+                    var targetExternalPackagePath = Path.Combine(outputDir.FullName, $"{packageName}.json");
+                    File.WriteAllText(targetExternalPackagePath, JsonConvert.SerializeObject(buildExternal, typeof(Build), Formatting.Indented, new JsonSerializerSettings()));
+                }
             }
         }
 
@@ -97,7 +99,7 @@ namespace MPM.CLI {
                     if (sourced == null) {
                         continue;
                     }
-                    //Consider protocol sources here, and disregard
+                    //TODO: Consider protocol sources here, and disregard
                     var sourcePath = Path.Combine(args.PackageDirectory.FullName, sourced.Source);
                     if (!File.Exists(sourcePath)) {
                         Console.WriteLine("Failed to find file {0}", sourcePath);

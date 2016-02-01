@@ -24,7 +24,7 @@ namespace MPM.CLI {
         public uint MaximumChunkLength { get; set; }
 
         [ArgReviver]
-        public static FileInfo ToFileInfo(string keyName, string filePath) {
+        public static FileInfo ReviveFileInfo(string keyName, string filePath) {
             return new FileInfo(filePath, PathFormat.RelativePath);
         }
     }
