@@ -42,8 +42,17 @@ namespace MPM.CLI {
         }
 
         [ArgReviver]
-        public static MPM.Types.SemVersion ReviveSemVersion(string paramName, string versionString) {
+        public static MPM.Types.SemVersion ReviveArchString(string paramName, string versionString) {
+            versionString = versionString.Trim();
+            if (versionString == "latest") {
+                return GetLatestMinecraftArch();
+            }
             return new MPM.Types.SemVersion(versionString, true);
+        }
+
+        private static MPM.Types.SemVersion GetLatestMinecraftArch() {
+            //TODO: Implement
+            return new Types.SemVersion(1, 8, 9);
         }
 
         #endregion

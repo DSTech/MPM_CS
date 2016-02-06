@@ -4,10 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using MPM.Data;
 using MPM.Extensions;
 
 namespace MPM.Core.Instances.Cache {
-    //TODO: Replace standard filesystem usage with Platform.VirtualFileSystem
+    //FUTURE: Replace standard filesystem usage with Platform.VirtualFileSystem
     public class FileSystemCacheManager : ICacheManager {
         public FileSystemCacheManager(string cachePath)
             : this(new DirectoryInfo(cachePath)) {
@@ -52,6 +53,10 @@ namespace MPM.Core.Instances.Cache {
             }
             return new CacheEntry(cacheDirectory.SubFile(cacheEntryName));
         }
+
+        private static ICacheNamingConventionProvider _namingProvider = new StandardCacheNamingProvider();
+
+        public ICacheNamingConventionProvider NamingProvider => _namingProvider;
 
         public void Store(string cacheEntryName, byte[] entryData) {
             ValidateEntryPath(cacheEntryName);

@@ -61,7 +61,7 @@ namespace MPM.Core.Dependency {
         }
 
         public IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
-            var dependencyConstraints = constraints as DependencyConstraint[] ?? constraints.ToArray();
+            var dependencyConstraints = constraints as DependencyConstraint[] ?? constraints?.ToArray() ?? new DependencyConstraint[0];
             var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, dependencyConstraints);
             Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");
             foreach (var possibleBuild in possibleBuilds) {

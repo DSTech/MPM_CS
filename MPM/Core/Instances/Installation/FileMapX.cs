@@ -14,7 +14,6 @@ namespace MPM.Core.Instances.Installation {
         /// <param name="destination"></param>
         /// <returns></returns>
         public static IEnumerable<Tuple<String, IFileOperation[]>> Difference(this IFileMap currentMap, IFileMap destination) {
-            //TODO: Update to fit the new IFileOperation
             var currentUris = currentMap.Keys.ToArray();
             var destinationUris = destination.Keys.ToArray();
 
@@ -25,7 +24,7 @@ namespace MPM.Core.Instances.Installation {
             var deletionOperations = new List<Tuple<String, IFileOperation[]>>(deleted.Length);
             //Create deletions for removed paths.
             foreach (var deletionPath in deleted) {
-                deletionOperations.Add(new Tuple<String, IFileOperation[]>(deletionPath, new[] {
+                deletionOperations.Add(new Tuple<String, IFileOperation[]>(deletionPath, new IFileOperation[] {
                     new DeleteFileOperation(),
                 }));
             }
@@ -35,12 +34,9 @@ namespace MPM.Core.Instances.Installation {
             foreach (var modificationPath in modified) {
                 modificationOperations.Add(new Tuple<String, IFileOperation[]>(
                     modificationPath,
-                    Enumerable.Concat(
-                        new[] {
-                            new DeleteFileOperation(),
-                        },
-                        destination[modificationPath]
-                        ).ToArray()
+                        new[] { new DeleteFileOperation() }
+                            .Concat(destination[modificationPath])
+                            .ToArray()
                     ));
             }
 

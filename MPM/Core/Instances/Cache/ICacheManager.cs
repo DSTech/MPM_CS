@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Cache {
     public interface ICacheManager : ICacheReader, ICacheWriter {
+        ICacheNamingConventionProvider NamingProvider { get; }
     }
 }

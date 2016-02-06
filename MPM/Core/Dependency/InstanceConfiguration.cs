@@ -5,11 +5,14 @@ using MPM.Types;
 
 namespace MPM.Core.Dependency {
     public class InstanceConfiguration {
-        public InstanceConfiguration(IEnumerable<Build> packages) {
-            this.Packages = packages.ToArray();
+        public InstanceConfiguration() {
         }
 
-        public static InstanceConfiguration Empty { get; } = new InstanceConfiguration(Enumerable.Empty<Build>());
-        public IReadOnlyCollection<Build> Packages { get; }
+        public InstanceConfiguration(IEnumerable<Build> packages) {
+            this.Packages = packages.ToList();
+        }
+
+        public static InstanceConfiguration Empty { get; } = new InstanceConfiguration();
+        public List<Build> Packages { get; set; } = new List<Build>();
     }
 }

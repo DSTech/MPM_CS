@@ -53,7 +53,6 @@ namespace MPM.Data.Repository {
                         );//Outputs a json-esque array to allow easy export by a user alongside an aggregate containing a more easily computer-understandable output
                 }
             }
-            //TODO: Switch to TPL Dataflow as described in https://msdn.microsoft.com/en-us/library/hh228603.aspx for parallelism control to prevent flooding
             //WhenAll preserves order of provided tasks, so each value will be associated with its parent hash
             var retrievedHashes = (await Task.WhenAll(retrievers.Select(async retriever => await retriever.Item2.Retrieve())));
 

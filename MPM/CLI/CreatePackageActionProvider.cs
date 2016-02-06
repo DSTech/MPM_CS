@@ -60,7 +60,7 @@ namespace MPM.CLI {
                 //TODO: Replace following with chunkification
                 {
                     Hash fileHash;
-                    var targetChunkPath = Path.Combine(outputDir.FullName, $"{packageName}.mpmp");
+                    var targetChunkPath = Path.Combine(outputDir.FullName, $"{packageName}.mpk");
                     Console.WriteLine("Writing chunk {0}...", targetChunkPath);
                     using (var hashfileStream = new HashingStreamForwarder(File.OpenWrite(targetChunkPath))) {
                         archiveContent.CopyTo(hashfileStream);
@@ -74,8 +74,16 @@ namespace MPM.CLI {
                     var buildExternal = build.Clone();
                     buildExternal.Hashes = hashes;
                     buildExternal.Installation = null;
-                    var targetExternalPackagePath = Path.Combine(outputDir.FullName, $"{packageName}.json");
-                    File.WriteAllText(targetExternalPackagePath, JsonConvert.SerializeObject(buildExternal, typeof(Build), Formatting.Indented, new JsonSerializerSettings()));
+                    var targetExternalPackageFile = outputDir.SubFile($"{packageName}.json");
+                    File.WriteAllText(
+                        targetExternalPackageFile.FullName,
+                        JsonConvert.SerializeObject(
+                            buildExternal,
+                            typeof(Build),
+                            Formatting.Indented,
+                            new JsonSerializerSettings()
+                        )
+                    );
                 }
             }
         }
@@ -100,17 +108,15 @@ namespace MPM.CLI {
                         continue;
                     }
                     //TODO: Consider protocol sources here, and disregard
-                    var sourcePath = Path.Combine(args.PackageDirectory.FullName, sourced.Source);
-                    if (!File.Exists(sourcePath)) {
-                        Console.WriteLine("Failed to find file {0}", sourcePath);
+                    var sourcePath = args.PackageDirectory.SubFile(sourced.Source);
+                    if (!sourcePath.Exists) {
+                        Console.WriteLine("Failed to find file {0}", sourcePath.FullName);
                         continue;
                     }
-                    Console.WriteLine("Packing file {0}", sourcePath);
+                    Console.WriteLine("Packing file {0}", sourcePath.FullName);
                     {
                         zipStream.PutNextEntry(new ZipEntry(sourced.Source));
-                        {
-                            File.OpenRead(sourced.Source).CopyToAndClose(zipStream);
-                        }
+                        File.OpenRead(sourcePath.FullName).CopyToAndClose(zipStream);
                         zipStream.CloseEntry();
                     }
                 }

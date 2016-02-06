@@ -11,6 +11,7 @@ using MPM.Core.Protocols;
 using MPM.Data;
 using MPM.Data.Repository;
 using MPM.Types;
+using Nito.AsyncEx.Synchronous;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
@@ -32,88 +33,58 @@ namespace MPM.Core.Instances.Installation {
         }
 
         /// <summary>
-        ///     Adds a package to an instance's configuration, then performs necessary filesystem modifications the package
-        ///     requests.
-        /// </summary>
-        /// <param name="build"></param>
-        /// <returns></returns>
-        /// <exception cref="KeyNotFoundException">Thrown when a package could not be resolved to an archive or retrieved.</exception>
-        /// <exception cref="Exception">
-        ///     Thrown when a package fails to resolve or install. All existing changes will be reverted
-        ///     before throwing.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">Thrown when a version of the specified package is already installed.</exception>
-        /// <exception cref="FormatException">Thrown when the retrieved archive was invalid.</exception>
-        public async Task<InstanceConfiguration> Install(Build build) {
-            await Task.Yield();
-            //TODO: Persist the package-data for the NamedBuild being installed
-            //TODO: Error if any builds of the same package are already installed
-            /*var archiveContents = await hashRepository.RetrieveArchive(build.Name, build.Hashes);
-			var archiveVFS = ArchiveFileSystem.FromData(archiveContents);
-			PackageInfoParser packageInfo;
-			{
-				string packageJson;
-				try {
-					using (var packageJsonReader = new StreamReader(archiveVFS.Resolve(new Uri("package.json")).OpenRead())) {
-						packageJson = packageJsonReader.ReadToEnd();
-					}
-				} catch {
-					throw new InstallationException("Failed to read package.json from package");
-				}
-				try {
-					packageInfo = new PackageInfoParser(packageJson);
-				} catch (FormatException e) {
-					throw new InstallationException("Package info was of incorrect format", e);
-				}
-			}
-			IEnumerable<IInstallationOperation> installationScript;
-			try {
-				installationScript = packageInfo.InstallationScript;
-			} catch (FormatException e) {
-				throw new InstallationException("Installation script was of incorrect format", e);
-			}
-			var backup = fileIndex.Save();
-			try {
-				foreach (var installationOperation in installationScript) {
-					//TODO: Index should store origin of the file (Essentially the file declaration) and the name of the package the installation instruction came from
-					fileIndex.Update(build.Name, installationOperation);
-				}
-			} catch (Exception) {
-				fileIndex.Restore(backup);
-				throw new InstallationException();
-			}
-			var delta = fileIndex.CalculateDelta(fileSystem);
-			//TODO: Clear non-config changes to filesystem
-			//if !fileSystem.Consider(delta)://TODO: Implement a simulation of operations to internally determine consistancy with state
-			//	throw new InstallationException();
-			fileSystem.Apply(delta);*/
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         ///     Installs a configuration afresh, ignoring pre-existing files.
         /// </summary>
         /// <param name="configuration"></param>
         /// <returns></returns>
         public void Install(InstanceConfiguration configuration) {
-            var fileMap = configuration.GenerateFileMap();
+            //Download all packages if not cached
+            foreach (var package in configuration.Packages) {
+                var cacheEntryName = cacheManager.NamingProvider.GetNameForPackageArchive(package);
+                if (cacheManager.Contains(cacheEntryName)) {
+                    Console.WriteLine($"Package {package.PackageName} already cached.");
+                    continue;
+                }
+                Console.WriteLine($"Downloading package {package.PackageName} to cache...");
+                if (package.Hashes == null || package.Hashes.Count == 0) {
+                    throw new Exception("Package contained no hashes to download");
+                }
+                var packageArchive = hashRepository.RetrieveArchive(package.PackageName, package.Hashes).WaitAndUnwrapException();
+                cacheManager.Store(cacheEntryName, packageArchive);
+            }
+
+            //Cache unarchived packages if they are not already extracted
+            var packageExtractor = new MPM.Archival.PackageExtractor(cacheManager);
+            foreach (var package in configuration.Packages) {
+                if (package.Installation != null && package.Installation.Count > 0) {
+                    continue;
+                }
+                packageExtractor.ExtractToCacheIfNotExists(package);
+            }
+
+            //Load installation scripts from embedded package.json files in downloaded packages
+            //TODO: load installation scripts
+
+            //Generate operation listings for installation
+            var fileMap = configuration.GenerateFileMap(cacheManager, protocolResolver);
             foreach (var opTarget in fileMap) {
                 var target = opTarget.Key;
                 foreach (var operation in opTarget.Value) {
                     operation.Perform(fileSystem, target, cacheManager);
                 }
             }
-            throw new NotImplementedException();
-        }
 
-        /// <summary>
-        ///     Installs a new configuration, removing files left from the old configuration and overwriting changed ones
-        /// </summary>
-        /// <param name="oldConfiguration"></param>
-        /// <param name="newConfiguration"></param>
-        /// <returns></returns>
-        public void Install(InstanceConfiguration oldConfiguration, InstanceConfiguration newConfiguration) {
-            throw new NotImplementedException();
+            //Perform operations in order
+            foreach (var entrySet in fileMap) {
+                var entry = entrySet.Value.LastOrDefault();
+                if (entry == null) {
+                    continue;
+                }
+                entry.Perform(fileSystem, entrySet.Key, cacheManager);
+            }
         }
     }
+}
+
+namespace MPM.Archival {
 }

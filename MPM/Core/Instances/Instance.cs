@@ -20,9 +20,7 @@ using Platform.VirtualFileSystem.Providers.Local;
 namespace MPM.Core.Instances {
     public class Instance : ICancelable {
         private const string MpmDirectoryName = ".mpm";
-        private const string DbDirectory = "db";
-        private const string DbName = "db";
-        private const string ConfigurationName = "configuration";
+        private const string ConfigurationMetaKey = "configuration";
         private const string MetaName = "meta";
         private const string PackageName = "packages";
         private const string PackageCacheName = "packagecache";
@@ -52,7 +50,7 @@ namespace MPM.Core.Instances {
         public IContainer Factory { get; private set; }
         public DirectoryInfo Location { get; set; }
         public DirectoryInfo MpmDirectory => Location.CreateSubdirectory(MpmDirectoryName);
-        public FileInfo DbPath => MpmDirectory.SubFile($"{DbName}.litedb");
+        public FileInfo DbPath => MpmDirectory.SubFile($"instance.litedb");
 
         public String Name {
             get { return FetchDbMeta().Get<String>("name"); }
@@ -66,10 +64,10 @@ namespace MPM.Core.Instances {
 
         public InstanceConfiguration @Configuration {
             get {
-                var conf = FetchDbMeta().Get<InstanceConfiguration>(ConfigurationName);
+                var conf = FetchDbMeta().Get<InstanceConfiguration>(ConfigurationMetaKey);
                 return conf ?? InstanceConfiguration.Empty;
             }
-            set { FetchDbMeta().Set<InstanceConfiguration>(ConfigurationName, value); }
+            set { FetchDbMeta().Set<InstanceConfiguration>(ConfigurationMetaKey, value); }
         }
 
         public bool IsDisposed { get; private set; }

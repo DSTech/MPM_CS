@@ -16,10 +16,11 @@ namespace MPM.Net.Protocols.Minecraft.Types {
         ///     Checks the filter against the specified platform's OS version
         /// </summary>
         /// <param name="platform">The platform to check the filter against</param>
+        /// <param name="x64">Is <paramref name="platform"/> 64-bit?</param>
         /// <returns>Whether or not the filter applies to the specified platform</returns>
         public override bool Applies(PlatformID platform, bool x64 = true) {
             //See http://wiki.vg/Game_Files#Libraries
-            //TODO: OS versions are unaccounted for, for now. They are not part of the MPM specification.
+            //FUTURE: OS versions are unaccounted for, for now. They are not part of the MPM specification.
             return true;
         }
     }

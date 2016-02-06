@@ -32,7 +32,7 @@ namespace MPM {
                     //DemoArchInstallation(); return;
                     ProcessCommandLine(factory, args);
                 }
-            } catch (NotImplementedException e) {
+            } catch (Exception e) when (!Debugger.IsAttached) {
                 Console.Error.WriteLine("\n{0}", e);
                 return;
             }

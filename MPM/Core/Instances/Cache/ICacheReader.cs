@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MPM.Core.Instances.Cache {
     public interface ICacheReader {
+
         IEnumerable<ICacheEntry> Entries { get; }
 
         bool Contains(string cacheEntryName);

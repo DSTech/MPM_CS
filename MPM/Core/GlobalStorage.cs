@@ -13,14 +13,15 @@ using MPM.Core.Profiles;
 using MPM.Data;
 using Newtonsoft.Json;
 using Autofac;
+using MPM.Extensions;
 
 namespace MPM.Core {
     /// <summary>
     ///     Should:
-    ///     Provide:
-    ///     Root Meta Database: <see cref="IUntypedKeyValueStore{String}" />
-    ///     Profile Store: <see cref="Func{Guid, IProfile}" />
-    ///     Global Cache: <see cref="Func{ICacheManager}" />
+    ///         Provide:
+    ///         Root Meta Database: <see cref="IMetaDataManager" />
+    ///         Profile Store: <see cref="Func{Guid, IProfile}" />
+    ///         Global Cache: <see cref="Func{ICacheManager}" />
     /// </summary>
     public class GlobalStorage : ICancelable {
         private const string CacheName = "cache";
@@ -32,12 +33,12 @@ namespace MPM.Core {
         public GlobalStorage() {
             var cb = new ContainerBuilder();
 
-            cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath}; journal=false"))
+            cb.Register<LiteDatabase>(ctxt => new LiteDatabase($"filename={DbPath.FullName}; journal=false"))
                 .AsSelf()
                 .SingleInstance()
                 .Named<LiteDatabase>("GlobalDb");
 
-            cb.Register<ICacheManager>(ctxt => new FileSystemCacheManager(CachePath))
+            cb.Register<ICacheManager>(ctxt => new FileSystemCacheManager(CacheDirectory))
                 .As<ICacheManager>()
                 .SingleInstance()
                 .Named<ICacheManager>("GlobalCache");
@@ -55,13 +56,13 @@ namespace MPM.Core {
             this.Factory = cb.Build();
         }
 
-        public string CachePath => Directory.CreateDirectory(Path.Combine(HomePath, CacheName)).FullName;
+        public DirectoryInfo CacheDirectory => HomeDirectory.CreateSubdirectory(CacheName);
 
-        public string DbPath => Path.Combine(HomePath, $"{DbName}.litedb");
+        public FileInfo DbPath => HomeDirectory.SubFile($"{DbName}.litedb");
         private IContainer Factory { get; set; }
 
-        private String HomePath =>
-            Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), MpmDirName)).FullName;
+        private DirectoryInfo HomeDirectory =>
+            new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)).CreateSubdirectory(MpmDirName);
 
         public bool IsDisposed { get; private set; }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using MPM.Core.Instances.Info;
 using MPM.Data;
 using MPM.Data.Repository;
@@ -28,7 +29,7 @@ namespace MPM.Core.Dependency {
         /// <returns></returns>
         public static bool Satisfies(this PackageSpec spec, Build build) {
             return spec.Name == build.PackageName
-                //&& spec.Arch == build.Arch//TODO: Add ARCH to the API
+                && spec.Arch == build.Arch
                 && (
                     spec.Side == build.Side || build.Side == CompatibilitySide.Universal
                     )
@@ -43,7 +44,7 @@ namespace MPM.Core.Dependency {
         /// <param name="packageSpec">Specification to look up</param>
         /// <returns>Builds in descending order of version</returns>
         /// <remarks>Should be converted to return IQueryable to allow optimized behavior with constraint lookup</remarks>
-        public static IEnumerable<Build> LookupSpec(this IPackageRepository repository, PackageSpec packageSpec) {
+        public static IEnumerable<Build> LookupSpec([NotNull] this IPackageRepository repository, PackageSpec packageSpec) {
             var builds = repository.FetchBuilds(packageSpec.Name, packageSpec.VersionSpec).ToArray();
             return builds
                 .Where(packageSpec.Satisfies)

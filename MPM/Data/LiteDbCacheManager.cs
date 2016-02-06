@@ -44,6 +44,11 @@ namespace MPM.Data {
             return new LiteDbCacheEntry(this, fileEntry.Id);
         }
 
+
+        private static ICacheNamingConventionProvider _namingProvider = new StandardCacheNamingProvider();
+
+        public ICacheNamingConventionProvider NamingProvider => _namingProvider;
+
         public void Store(string cacheEntryName, byte[] entryData) {
             using (var uploadStream = new MemoryStream(entryData, false)) {
                 Db.FileStorage.Upload(new LiteFileInfo(cacheEntryName, cacheEntryName), uploadStream);

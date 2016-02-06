@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Info;
 using MPM.Core.Instances.Installation;
+using MPM.Core.Protocols;
 using MPM.Extensions;
 using MPM.Types;
 
@@ -55,8 +57,17 @@ namespace MPM.Core.Dependency {
             }
         }
 
-        public static IFileMap GenerateFileMap(this InstanceConfiguration instanceConfiguration) {
-            throw new NotImplementedException();
+        public static IFileMap GenerateFileMap(this InstanceConfiguration instanceConfigurationWithInstallation, ICacheManager cache, IProtocolResolver protocolResolver) {
+            foreach (var package in instanceConfigurationWithInstallation.Packages) {
+                var nameForArchive = cache.NamingProvider.GetNameForPackageArchive(package);
+                foreach (var step in package.Installation) {
+                    step.EnsureCached(nameForArchive, cache, protocolResolver);
+                }
+            }
+            var operations = instanceConfigurationWithInstallation.Packages
+                .Select(package => package.Installation)
+                .SelectMany(steps => steps.Select(step => step.GenerateOperations()));
+            return FileMap.AsMergedFileMap(operations);
         }
     }
 }

@@ -90,35 +90,19 @@ namespace MPM.CLI {
 
                 var cacheManager = factory.Resolve<ICacheManager>();
                 var hashRepository = factory.Resolve<IHashRepository>();
+                var protocolResolver = factory.Resolve<IProtocolResolver>();
 
                 instance.Configuration = resolvedArchConfiguration;
-
-                foreach (var package in resolvedArchConfiguration.Packages) {
-                    var cacheEntryName = $"package/{package.PackageName}_{package.Version}_{package.Arch}_{package.Side}";
-                    if (cacheManager.Contains(cacheEntryName)) {
-                        Console.WriteLine($"Package {package.PackageName} already cached.");
-                        continue;
-                    }
-                    Console.WriteLine($"Downloading package {package.PackageName} to cache...");
-                    var packageArchive = hashRepository.RetrieveArchive(package.PackageName, package.Hashes).WaitAndUnwrapException();
-                    cacheManager.Store(cacheEntryName, packageArchive);
-                }
-
-                //TODO: Reevaluate this
-
+                
                 var installer = new Installer(
                     instance,
                     repository,
-                    factory.Resolve<IHashRepository>(),
+                    hashRepository,
                     cacheManager,
-                    factory.Resolve<IProtocolResolver>()
+                    protocolResolver
                     );
 
-                installer.Install(resolvedArchConfiguration);
-
-                //var cacheManager = factory.Resolve<ICacheManager>();
-                //var protocolResolver = factory.Resolve<IProtocolResolver>();
-                throw new NotImplementedException();
+                installer.Install(instance.Configuration);
             }
         }
     }

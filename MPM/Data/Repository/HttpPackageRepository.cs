@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using JetBrains.Annotations;
 using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
@@ -15,11 +16,15 @@ namespace MPM.Data.Repository {
             this.baseUri = baseUri;
         }
 
+        [CanBeNull]
         public Build FetchBuild(string packageName, MPM.Types.SemVersion version, CompatibilitySide side, Arch arch) {
             var req = WebRequest.CreateHttp(new Uri(baseUri, $"/packages/{arch}/{side}/{packageName}/{version}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream()?.ReadToEndAndClose();
+            }
+            if (responseData == null) {
+                return null;
             }
             var build = JsonConvert.DeserializeObject<Build>(Encoding.UTF8.GetString(responseData));
             build.PackageName = build.PackageName ?? packageName;

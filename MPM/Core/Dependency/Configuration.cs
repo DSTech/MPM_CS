@@ -81,14 +81,17 @@ namespace MPM.Core.Dependency {
     }
 
     public class Configuration {
+        public Configuration() {
+        }
+
         public Configuration([NotNull] IEnumerable<PackageSpec> packageSpecifications, CompatibilitySide side = CompatibilitySide.Universal) {
             if (packageSpecifications == null) { throw new ArgumentNullException(nameof(packageSpecifications)); }
-            this.Packages = packageSpecifications.ToArray();
+            this.Packages = packageSpecifications.ToList();
             this.Side = side;
         }
 
-        public IReadOnlyCollection<PackageSpec> Packages { get; }
-        public CompatibilitySide Side { get; }
+        public List<PackageSpec> Packages { get; set; } = new List<PackageSpec>();
+        public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
 
         public static Configuration Empty { get; } = new Configuration(Enumerable.Empty<PackageSpec>());
     }
