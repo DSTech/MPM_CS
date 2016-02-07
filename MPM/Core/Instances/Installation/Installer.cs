@@ -10,7 +10,10 @@ using MPM.Core.Instances.Info;
 using MPM.Core.Protocols;
 using MPM.Data;
 using MPM.Data.Repository;
+using MPM.Extensions;
 using MPM.Types;
+using MPM.Util;
+using Newtonsoft.Json;
 using Nito.AsyncEx.Synchronous;
 using Platform.VirtualFileSystem;
 
@@ -33,11 +36,13 @@ namespace MPM.Core.Instances.Installation {
         }
 
         /// <summary>
-        ///     Installs a configuration afresh, ignoring pre-existing files.
+        ///     Installs a configuration afresh, ignoring pre-existing files. Updates the <paramref name="configuration"/> field.
         /// </summary>
         /// <param name="configuration"></param>
         /// <returns></returns>
         public void Install(InstanceConfiguration configuration) {
+            configuration = configuration.SerialClone();
+
             //Download all packages if not cached
             foreach (var package in configuration.Packages) {
                 var cacheEntryName = cacheManager.NamingProvider.GetNameForPackageArchive(package);
@@ -53,17 +58,20 @@ namespace MPM.Core.Instances.Installation {
                 cacheManager.Store(cacheEntryName, packageArchive);
             }
 
-            //Cache unarchived packages if they are not already extracted
             var packageExtractor = new MPM.Archival.PackageExtractor(cacheManager);
             foreach (var package in configuration.Packages) {
                 if (package.Installation != null && package.Installation.Count > 0) {
                     continue;
                 }
-                packageExtractor.ExtractToCacheIfNotExists(package);
-            }
 
-            //Load installation scripts from embedded package.json files in downloaded packages
-            //TODO: load installation scripts
+                //Cache unarchived packages if they are not already extracted
+                var entry = packageExtractor.ExtractToCacheIfNotExists(package);
+
+                //Load installation scripts from embedded package.json files in downloaded packages
+                using (var zip = new StreamingZipFetcher(entry.FetchStream())) {
+                    package.Installation = JsonConvert.DeserializeObject<Build>(Encoding.UTF8.GetString(zip.FetchFile("package.json"))).Installation;
+                }
+            }
 
             //Generate operation listings for installation
             var fileMap = configuration.GenerateFileMap(cacheManager, protocolResolver);
@@ -80,11 +88,11 @@ namespace MPM.Core.Instances.Installation {
                 if (entry == null) {
                     continue;
                 }
+                Console.WriteLine($"\t{entry}");
                 entry.Perform(fileSystem, entrySet.Key, cacheManager);
             }
+
+            instance.Configuration = configuration;
         }
     }
-}
-
-namespace MPM.Archival {
 }

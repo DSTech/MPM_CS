@@ -28,11 +28,7 @@ namespace MPM.CLI {
                 instanceDir.Create();
             } else {
                 Console.WriteLine("Directory exists...");
-                var dirEmpty = true;
-                foreach (var fsEntry in instanceDir.EnumerateFileSystemInfos()) {
-                    dirEmpty = false;
-                    break;
-                }
+                var dirEmpty = instanceDir.EnumerateFileSystemInfos().IsEmpty();
                 if (!dirEmpty) {
                     if (!args.ForceNonEmptyInstancePath) {
                         Console.WriteLine("Directory was not empty; Use --force to override.");
@@ -77,7 +73,6 @@ namespace MPM.CLI {
                 LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide/instanceArch and able to be overridden
                 Configuration = InstanceConfiguration.Empty,
             }) {
-                //TODO: Install arch pseudopackage
                 var resolver = factory.Resolve<IDependencyResolver>();
                 var repository = factory.Resolve<IPackageRepository>();
 
@@ -102,7 +97,7 @@ namespace MPM.CLI {
                     protocolResolver
                     );
 
-                installer.Install(instance.Configuration);
+                installer.Install(resolvedArchConfiguration);
             }
         }
     }
