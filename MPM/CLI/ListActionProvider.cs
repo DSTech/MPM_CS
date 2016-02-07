@@ -26,12 +26,16 @@ namespace MPM.CLI {
         public void List(IContainer factory) {
             var repository = factory.Resolve<IPackageRepository>();
 
-            var packageList = repository.FetchPackageList();
+            var packageList = repository.FetchBuilds()
+                .OrderBy(b => b.PackageName)
+                .ThenByDescending(b => b.Version)
+                .GroupBy(b => b.PackageName)
+                .ToArray();
 
             foreach (var _package in packageList) {
-                var builds = repository.FetchPackageBuilds(_package.PackageName);
-                Console.WriteLine($"{_package.PackageName} <{String.Join(", ", _package.Authors)}>");
-                foreach (var build in builds) {
+                var first = _package.First();
+                Console.WriteLine($"{first.PackageName} <{String.Join(", ", first.Authors)}>");
+                foreach (var build in _package) {
                     Console.WriteLine($"\t{(build.Arch)}#{build.Version} {build.GivenVersion}");
                 }
             }

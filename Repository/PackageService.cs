@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using MPM.Data.Repository;
 using MPM.Extensions;
 using MPM.Net;
-using MPM.Net.DTO.Repository.Packages;
+using MPM.Types;
+using Newtonsoft.Json;
 using NServiceKit.Common.Extensions;
 using NServiceKit.Common.Web;
 using NServiceKit.ServiceInterface;
+using Repository.Types.Packages;
 
 namespace Repository {
     public class PackageService : Service {
@@ -16,65 +19,59 @@ namespace Repository {
         public LiteDbPackageRepository Repository { get; set; }
 
         public object Get(BuildListRequest request) {
-            List<MPM.Net.DTO.Build> retVal;
-            //return request.Ids.IsEmpty()
-            //    ? Repository.GetAll()
-            //    : Repository.GetByIds(request.Ids);
-            request.PackageNames = request.PackageNames.Denull().ToArray();
-            if (request.PackageNames.Length == 0) {
-                var packageList = this.Repository.FetchPackageList();
-                retVal = packageList.SelectMany(p => p.Builds).Select(b => b.ToDTO()).ToList();
-                return retVal;
+            IEnumerable<Build> buildList;
+            if (request.UpdatedAfter.HasValue) {
+                buildList = this.Repository.FetchBuilds(request.UpdatedAfter.Value);
+            } else {
+                buildList = this.Repository.FetchBuilds();
             }
-            retVal = request.PackageNames
-                .Select(name => this.Get(new BuildRequest(name)))
-                .Cast<MPM.Types.Build>()
-                .Select(t => t.ToDTO())
-                .ToList();
-            return retVal;
+            return (List<MPM.Types.Build>)buildList
+                    .OrderByDescending(b => b.Arch)
+                    .ThenByDescending(b => b.Version)
+                    .ThenByDescending(b => b.Side != MPM.Types.CompatibilitySide.Universal)
+                    .Take(200)
+                    .ToList();
         }
 
-        private object Get(BuildRequest request) {
-            if (request.PackageName.IsNullOrWhiteSpace()) {
-                return null;
-            }
-            var pkg = this.Repository.FetchPackage(request.PackageName);
-            var builds = pkg?.Builds;
-            return (List<MPM.Net.DTO.Build>) builds.Denull().Select(b => b.ToDTO()).ToList();
-        }
-
-        public object Post(BuildSubmission newBuild) {
-            var buildInfo = newBuild?.BuildInfo?.FromDTO();
+        public object Post(BuildSubmission submission) {
+            var body = Request.GetRawBody();
+            var buildInfo = JsonConvert.DeserializeObject<Build>(body);
             if (buildInfo == null) {
                 return null;
             }
             if (buildInfo.PackageName.IsNullOrWhiteSpace()) {
-                if (newBuild.PackageName.IsNullOrWhiteSpace()) {
-                    return null;
-                }
-                buildInfo.PackageName = newBuild.PackageName;
+                return null;
             }
-            var pkg = this.Repository.FetchPackage(newBuild.PackageName);
-            if (pkg == null) {
-                pkg = this.Repository.RegisterPackage(newBuild.BuildInfo.Package, buildInfo.Authors);
+            var existingBuilds = this.Repository.FetchBuilds()
+                .Where(buildInfo.IdentityMatch)
+                .ToArray()
+                ;
+            if (existingBuilds.Length >= 1) {
+                return this.Repository.UpdateBuild(buildInfo);
+            } else {
+                return this.Repository.RegisterBuild(buildInfo);
             }
-            buildInfo.PackageName = pkg.Name;
-            return this.Repository.RegisterBuild(buildInfo);
         }
 
         public object Put(BuildSubmission newBuild) {
-            var buildInfo = newBuild?.BuildInfo?.FromDTO();
+            var body = Request.GetRawBody();
+            var buildInfo = JsonConvert.DeserializeObject<Build>(body);
             if (buildInfo == null) {
                 return null;
             }
             return Repository.RegisterBuild(buildInfo);
         }
 
-        public void Delete(BuildRequest request) {
-            if (request.PackageName.IsEmpty()) {
-                throw HttpError.NotFound("No package specified to delete.");
+        public object Delete(BuildDeletionRequest request) {
+            var body = Request.GetRawBody();
+            var buildInfo = JsonConvert.DeserializeObject<Build>(body);
+            if (buildInfo == null) {
+                return null;
             }
-            Repository.DeletePackage(request.PackageName);
+            if (buildInfo == null) {
+                throw HttpError.NotFound("No build specified to delete.");
+            }
+            return this.Repository.DeleteBuild(buildInfo);
         }
     }
 }

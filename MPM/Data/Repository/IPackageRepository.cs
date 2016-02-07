@@ -10,40 +10,6 @@ namespace MPM.Data.Repository {
     /// </summary>
     public interface IPackageRepository {
         /// <summary>
-        ///     Fetches a list of all packages, but is not required to return any particular data (eg. authors) for each package.
-        ///     Should be used to find packages for which further information may be looked up via
-        ///     <see cref="FetchPackageBuilds(string)" /> or <see cref="FetchBuild" />.
-        /// </summary>
-        /// <returns>0 to multiple <see cref="Build" /> instances containing, at minimum, the name of the package(s) to which they belong.</returns>
-        [NotNull] IEnumerable<Build> FetchPackageList();
-
-        /// <summary>
-        ///     Similar to <see cref="FetchPackageList()" />, this fetches only packages which have changed since the specified
-        ///     <paramref name="updatedAfter" /> time.
-        ///     May contain more packages than strictly those updated after the specified time, depending on the repository's
-        ///     server-side implementation.
-        /// </summary>
-        /// <param name="updatedAfter"></param>
-        /// <returns>Multiple <see cref="Build" /> instances containing, at minimum, the name of the package to which they participate.</returns>
-        [NotNull] IEnumerable<Build> FetchPackageList(DateTime updatedAfter);
-
-        [CanBeNull] IEnumerable<Build> FetchPackageBuilds([NotNull] string packageName);
-
-        /// <summary>
-        ///     Looks up a particular build of a package.
-        /// </summary>
-        /// <param name="packageName"></param>
-        /// <param name="version"></param>
-        /// <param name="side"></param>
-        /// <param name="arch"></param>
-        /// <returns>
-        ///     A <see cref="Build" /> instance matching the specified <paramref name="packageName" /> and
-        ///     <paramref name="version" />. Null when no package within the specified constraints was found.
-        ///     Builds must be returned in descending order of version, with side-specific returned before universal packages.
-        /// </returns>
-        [CanBeNull] Build FetchBuild([NotNull] string packageName, [NotNull] MPM.Types.SemVersion version, CompatibilitySide side, [NotNull] Arch arch);
-
-        /// <summary>
         ///     Looks up a package for any versions matching a specifier.
         /// </summary>
         /// <param name="packageName">Name of the package to look up</param>
@@ -53,6 +19,8 @@ namespace MPM.Data.Repository {
         ///     given. Null when no package of the specified name was found.
         ///     Builds must be returned in descending order of version, with side-specific returned before universal packages.
         /// </returns>
-        [CanBeNull] IEnumerable<Build> FetchBuilds([NotNull] string packageName, [NotNull] MPM.Types.SemRange versionSpec);
+        [CanBeNull] IEnumerable<Build> FetchBuilds();
+
+        [CanBeNull] IEnumerable<Build> FetchBuilds([NotNull] DateTime updatedAfter);
     }
 }

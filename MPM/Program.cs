@@ -41,10 +41,6 @@ namespace MPM {
         public static void SetupJson() {
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings {
                 TypeNameHandling = TypeNameHandling.Auto,
-                Converters = new List<JsonConverter> {
-                    new Util.Json.VersionConverter(),
-                    new Util.Json.VersionRangeConverter(),
-                },
             };
         }
 

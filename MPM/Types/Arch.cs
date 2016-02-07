@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace MPM.Types {
     [JsonConverter(typeof(MPM.Util.Json.ArchConverter))]
-    public class Arch : IEquatable<Arch> {
+    public class Arch : IEquatable<Arch>, IComparable<Arch> {
         public Arch() {
         }
 
@@ -19,6 +19,10 @@ namespace MPM.Types {
             if (ReferenceEquals(null, other)) { return false; }
             if (ReferenceEquals(this, other)) { return true; }
             return string.Equals(this.Id, other.Id);
+        }
+
+        public int CompareTo(Arch other) {
+            return string.CompareOrdinal(this.Id, other.Id);
         }
 
         public override bool Equals(object obj) {

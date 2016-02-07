@@ -45,9 +45,11 @@ namespace MPM.Core.Dependency {
         /// <returns>Builds in descending order of version</returns>
         /// <remarks>Should be converted to return IQueryable to allow optimized behavior with constraint lookup</remarks>
         public static IEnumerable<Build> LookupSpec([NotNull] this IPackageRepository repository, PackageSpec packageSpec) {
-            var builds = repository.FetchBuilds(packageSpec.Name, packageSpec.VersionSpec).ToArray();
+            var builds = repository.FetchBuilds().ToArray();
             return builds
                 .Where(packageSpec.Satisfies)
+                .OrderByDescending(b => b.Version)
+                .ThenByDescending(b => b.Side != CompatibilitySide.Universal)
                 .ToArray();
         }
     }

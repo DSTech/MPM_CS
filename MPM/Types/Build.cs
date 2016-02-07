@@ -87,6 +87,20 @@ namespace MPM.Types {
         [JsonProperty("installation", NullValueHandling = NullValueHandling.Ignore)]
         public List<IFileDeclaration> Installation { get; set; }
 
+        public bool IdentityMatch(Build other) => true
+            && other != null
+            && this.PackageName == other.PackageName
+            && this.Arch == other.Arch
+            && this.Version == other.Version
+            && this.Side == other.Side
+            ;
+
+        public string ToIdentifierString() {
+            return Build.ToIdentifierString(this);
+        }
+
+        public static string ToIdentifierString(Build build) => $"{build.PackageName}_{build.Arch}_{build.Version}_{build.Side}";
+
         #region Equality members
 
         public bool Equals(Build other) {
@@ -119,7 +133,7 @@ namespace MPM.Types {
                 hashCode = (hashCode * 397) ^ (this.Version?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (this.GivenVersion != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(this.GivenVersion) : 0);
                 hashCode = (hashCode * 397) ^ (this.Arch?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (int) this.Side;
+                hashCode = (hashCode * 397) ^ (int)this.Side;
                 hashCode = (hashCode * 397) ^ (this.Interfaces?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (this.Dependencies.GetHashCode());
                 hashCode = (hashCode * 397) ^ (this.Conflicts?.GetHashCode() ?? 0);

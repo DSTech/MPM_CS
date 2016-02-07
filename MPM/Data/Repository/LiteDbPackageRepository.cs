@@ -8,12 +8,14 @@ using Newtonsoft.Json;
 namespace MPM.Data.Repository {
     public class LiteDbPackageRepository : IPackageRepository {
         private static readonly BsonMapper mapper = new BsonMapper();
+
         private static void RegisterBsonWithJsonNet<T>(BsonMapper mapper) {
             mapper.RegisterType<T>(
                 (T t) => JsonConvert.SerializeObject(t, typeof(T), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }),
                 (BsonValue jsonT) => JsonConvert.DeserializeObject<T>(jsonT, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto })
                 );
         }
+
         static LiteDbPackageRepository() {
             RegisterBsonWithJsonNet<Build>(mapper);
             RegisterBsonWithJsonNet<Arch>(mapper);
@@ -28,56 +30,16 @@ namespace MPM.Data.Repository {
             }
         }
 
-        public Build FetchBuild(string packageName, MPM.Types.SemVersion version, CompatibilitySide side, Arch arch) {
-            var build = BuildCollection.FindOne(p => p.PackageName == packageName
-                && p.ArchId == arch.Id
-                && p.SideString == side.ToString()
-                && p.VersionString == version.ToString());
-            return build;
+        public IEnumerable<Build> FetchBuilds() {
+            return BuildCollection.FindAll().Select(b => b.Build).OrderByDescending(b => b.Version).ToArray();
         }
 
-        public IEnumerable<Build> FetchBuilds(string packageName, MPM.Types.SemRange versionSpec) {
-            var buildEntries = BuildCollection.Find(b => b.PackageName == packageName);
-            if (buildEntries == null) {
-                return null;
-            }
-            return buildEntries
-                .Select(b => new {
-                    @BuildEntry = b,
-                    @Version = new MPM.Types.SemVersion(b.VersionString, true)
-                })
-                .Where(bv => versionSpec.IsSatisfied(bv.@Version))
-                .OrderByDescending(bv => bv.@Version)
-                .Select(bv => bv.@BuildEntry.@Build)
-                .ToArray();
-        }
-
-        public IEnumerable<Build> FetchPackageBuilds(string packageName) {
-            var builds = BuildCollection.Find(p => p.PackageName == packageName);
-            return builds
-                .OrderByDescending(b => new MPM.Types.SemVersion(b.VersionString, true))
+        public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
+            return BuildCollection
+                .FindAll()
+                .Where(b => b.LastUpdated >= updatedAfter)
                 .Select(b => b.Build)
                 .ToArray();
-        }
-
-        public IEnumerable<Build> FetchPackageList() {
-            return BuildCollection.FindAll().Select(b => b.Build).ToArray();
-        }
-
-        public IEnumerable<Build> FetchPackageList(DateTime updatedAfter) {
-            return BuildCollection.FindAll().Select(b => b.Build).ToArray();
-        }
-
-        private Func<Build, bool> CreatePackageFilter(
-            MPM.Types.SemVersion version,
-            CompatibilitySide side,
-            Arch arch
-            ) {
-            return b =>
-                b.Version == version
-                    && b.Side == side
-                    && b.Arch == arch
-                ;
         }
 
         /// <summary>
@@ -90,11 +52,21 @@ namespace MPM.Data.Repository {
             return build;
         }
 
-        public bool DeletePackage(string packageName) {
-            if (String.IsNullOrWhiteSpace(packageName)) {
-                throw new ArgumentException("Argument is null or whitespace", nameof(packageName));
+        public Build UpdateBuild(Build build) {
+            this.BuildCollection.Update(build);
+            return build;
+        }
+
+        public Build DeleteBuild(Build build) {
+            var idString = build.ToIdentifierString();
+            var found = this.BuildCollection.FindById(idString);
+            if (found == null) {
+                return null;
             }
-            return BuildCollection.Delete(p => p.PackageName == packageName) > 0;
+            if (!this.BuildCollection.Delete(idString)) {
+                return found;
+            }
+            return found.Build;
         }
 
         public class BuildEntry {
@@ -104,30 +76,24 @@ namespace MPM.Data.Repository {
 
             public BuildEntry(Build build) {
                 this.Build = build;
-                this.PackageName = Build.PackageName;
-                this.ArchId = this.Build.Arch.Id;
-                this.SideString = this.Build.Side.ToString();
-                this.VersionString = this.Build.Version.ToString();
-                this.Id = string.Join(",", this.PackageName, this.ArchId, this.SideString, this.VersionString);
+                this.LastUpdated = DateTime.UtcNow;
+                this.Id = build.ToIdentifierString();
             }
 
             [BsonId]
             public string Id { get; set; }
 
-            [BsonIndex]
-            public string PackageName { get; set; }
-
-            [BsonIndex]
-            public string ArchId { get; set; }
-
-            [BsonIndex]
-            public string SideString { get; set; }
-
-            [BsonIndex]
-            public string VersionString { get; set; }
+            [BsonIgnore]
+            public Build @Build {
+                get { return BuildJson == null ? null : JsonConvert.DeserializeObject<Build>(BuildJson); }
+                set { BuildJson = JsonConvert.SerializeObject(value); }
+            }
 
             [BsonField]
-            public Build @Build { get; set; }
+            public string BuildJson { get; set; }
+
+            [BsonField]
+            public DateTime LastUpdated { get; set; } = DateTime.MinValue.AddSeconds(1);
 
             public static implicit operator BuildEntry(Build build) => new BuildEntry(build);
 

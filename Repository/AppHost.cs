@@ -23,7 +23,7 @@ namespace Repository {
             var hashDbPath = Path.Combine(dataDir, "hashes.ldb");
             var liteDbPackages = new LiteDatabase($"filename={packageDbPath}; journal=false");
             var liteDbHashes = new LiteDatabase($"filename={hashDbPath}; journal=false");
-            container.Register<LiteDbPackageRepository>(new LiteDbPackageRepository(liteDbPackages.GetCollection<LiteDbPackageRepository.PackageRepositoryEntry>("Packages")));
+            container.Register<LiteDbPackageRepository>(new LiteDbPackageRepository(liteDbPackages.GetCollection<LiteDbPackageRepository.BuildEntry>("Builds")));
             container.Register<IPackageRepository>(container.Resolve<LiteDbPackageRepository>());
             container.Register<LiteDbHashRepository>(new LiteDbHashRepository(liteDbHashes.FileStorage));
             container.Register<IHashRepository>(container.Resolve<LiteDbHashRepository>());
