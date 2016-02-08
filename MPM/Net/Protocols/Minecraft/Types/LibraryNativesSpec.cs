@@ -74,8 +74,8 @@ namespace MPM.Net.Protocols.Minecraft.Types {
                 default:
                     throw new NotSupportedException();
             }
-            if (platformStr.Contains("${platform}")) {
-                return platformStr.Replace("${platform}", (x64 ? "64" : "32"));
+            if (platformStr.Contains("${arch}")) {
+                return platformStr.Replace("${arch}", (x64 ? "64" : "32"));
             }
             return platformStr;
         }

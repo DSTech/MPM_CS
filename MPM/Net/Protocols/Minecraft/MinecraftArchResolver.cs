@@ -17,10 +17,17 @@ namespace MPM.Net.Protocols.Minecraft {
             var versionDetails = mdc.FetchVersion(archVersion.ToString()).WaitAndUnwrapException();
             Console.WriteLine(versionDetails.Id);
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.Applies(Environment.OSVersion.Platform));
+            
+            //TODO: Revise how packages load and utilize operations
+
+            //TODO: Download client or server jar as needed by the arch side (How do I get "Side" down here?)
+
+            //TODO: Download assets
+
             var operations = new List<ArchInstallationOperation>();
             foreach (var lib in libsToInstall) {
                 var appliedNatives = lib.ApplyNatives(Environment.OSVersion.Platform);//TODO: Stop this from having -${arch} ending if it is universal!
-                var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{"_" + appliedNatives ?? "_u"}";
+                var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{(appliedNatives != null ? "_" + appliedNatives : "_universal")}";
                 var cacheOp = GenerateOp(archVersion, lib, appliedNatives, cacheEntryName, cacheManager);
                 operations.Add(cacheOp);
                 if (cacheManager.Contains(cacheEntryName)) {
