@@ -15,6 +15,7 @@ using MPM.Core.Protocols;
 using MPM.Data;
 using MPM.Data.Repository;
 using MPM.Types;
+using MPM.Util;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 
@@ -22,12 +23,13 @@ namespace MPM.CLI {
     public class InitActionProvider {
         public void Provide(IContainer factory, InitArgs args) {
             var instanceDir = args.InstanceDirectory;
-            Console.WriteLine($"Initializing instance at:\n\t{instanceDir}");
+            using (ConsoleColorZone.Success)
+                Console.WriteLine($"Initializing instance at:\n\t{instanceDir.FullName}");
             if (!instanceDir.Exists) {
                 Console.WriteLine("Directory did not exist. Creating...");
                 instanceDir.Create();
             } else {
-                Console.WriteLine("Directory exists...");
+                using (ConsoleColorZone.Info) Console.WriteLine("Directory exists...");
                 var dirEmpty = instanceDir.EnumerateFileSystemInfos().IsEmpty();
                 if (!dirEmpty) {
                     if (!args.ForceNonEmptyInstancePath) {
@@ -80,7 +82,25 @@ namespace MPM.CLI {
                 var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide);
 
                 Console.WriteLine("Attempting to resolve packages...");
-                var resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
+                InstanceConfiguration resolvedArchConfiguration;
+                try {
+                    resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
+                } catch (DependencyException e) {
+                    using (ConsoleColorZone.Error) {
+                        var inner = e.InnerException;
+                        if (inner != null) {
+                            Console.WriteLine("Error: {0}", inner.Message);
+                            var depinner = inner as DependencyException;
+                            if (depinner != null) {
+                                Console.WriteLine("Details:");
+                                Console.WriteLine("\t{0}", depinner.PackageSpec);
+                            }
+                        } else {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
+                    return;
+                }
                 Console.WriteLine("Configuration resolved.");
 
                 var cacheManager = factory.Resolve<ICacheManager>();

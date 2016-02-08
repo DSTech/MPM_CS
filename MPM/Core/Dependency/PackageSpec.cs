@@ -84,5 +84,8 @@ namespace MPM.Core.Dependency {
                     + (VersionSpec?.GetHashCode() ?? 0)
                     + Manual.GetHashCode();
         }
+        public override string ToString() {
+            return $"Specification: \"{Name}\" for {Arch} with version {VersionSpec} for side {Side} (MANUAL:{Manual})";
+        }
     }
 }

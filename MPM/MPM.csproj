@@ -234,6 +234,7 @@
     <Compile Include="Data\StandardCacheNamingProvider.cs" />
     <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
+    <Compile Include="Util\ConsoleColorZone.cs" />
     <Compile Include="Util\HashingStreamForwarder.cs" />
     <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\CLIProtocolResolver.cs" />
