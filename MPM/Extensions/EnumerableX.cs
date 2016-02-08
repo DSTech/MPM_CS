@@ -9,6 +9,8 @@ namespace MPM.Extensions {
 
         [NotNull] public static T[] DenullArray<T>([CanBeNull] this IEnumerable<T> enumerable) => enumerable?.ToArray() ?? new T[0];
 
+        [NotNull] public static List<T> DenullList<T>([CanBeNull] this IEnumerable<T> enumerable) => enumerable?.ToList() ?? new List<T>();
+
         public static IEnumerable<T> SubEnumerable<T>(this IEnumerable<T> enumerable, int startIndex) {
             if (enumerable == null) {
                 return null;

@@ -9,13 +9,12 @@ using MPM.Core.Protocols;
 
 namespace MPM.Net.Protocols.Minecraft {
     public class MetaArchInstaller : IArchResolver {
-        public IArchInstallationProcedure EnsureCached(string packageName, MPM.Types.SemVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
-            //TODO: Handle packageName / archVersion sanely
-            switch (packageName.Split('_').FirstOrDefault()) {
+        public IArchInstallationProcedure EnsureCached(string packageName, MPM.Types.Arch archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
+            switch (packageName) {
                 case "minecraft":
-                    return new MinecraftArchInstaller().EnsureCached(new MPM.Types.SemVersion(packageName.Split('_').Skip(1).First()), cacheManager, protocolResolver);
+                    return new MinecraftArchInstaller().EnsureCached(archVersion, cacheManager, protocolResolver);
                 default:
-                    throw new NotSupportedException();
+                    throw new NotSupportedException($"Arch {packageName} @ {archVersion} is not supported by this version.");
             }
         }
     }

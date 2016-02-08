@@ -10,12 +10,14 @@ namespace MPM.Core.Instances.Installation.Scripts {
         /// <summary>
         ///     The name of the package that sourced this declaration.
         /// </summary>
-        String PackageName { get; }
+        String PackageName { get; set; }
 
         /// <summary>
         ///     The version of the package which sourced this declaration.
         /// </summary>
-        MPM.Types.SemVersion PackageVersion { get; }
+        MPM.Types.SemVersion PackageVersion { get; set; }
+
+        MPM.Types.Arch PackageArch { get; set; }
 
         /// <summary>
         ///     The path of the file to be installed relative to the root of the package archive root.

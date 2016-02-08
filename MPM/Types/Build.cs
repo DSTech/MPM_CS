@@ -31,12 +31,12 @@ namespace MPM.Types {
             this.GivenVersion = givenVersion;
             this.Arch = arch;
             this.Side = side;
-            this.Interfaces = interfaceProvisions.Denull().ToList();
+            this.Interfaces = interfaceProvisions.DenullList();
             this.Dependencies = new BuildDependencySet {
-                Interfaces = interfaceDependencies.Denull().ToList(),
-                Packages = packageDependencies.Denull().ToList(),
+                Interfaces = interfaceDependencies.DenullList(),
+                Packages = packageDependencies.DenullList(),
             };
-            this.Conflicts = conflicts.Denull().ToList();
+            this.Conflicts = conflicts.DenullList();
             this.Hashes = hashes?.ToList();
             this.Installation = installation?.ToList();
         }
@@ -85,7 +85,24 @@ namespace MPM.Types {
         /// The operations contained within. May be null on package repositories, but must exist in "package.json" files.
         /// </value>
         [JsonProperty("installation", NullValueHandling = NullValueHandling.Ignore)]
-        public List<IFileDeclaration> Installation { get; set; }
+        public List<IFileDeclaration> Installation {
+            get {
+                if (_installation == null) {
+                    return null;
+                }
+                foreach (var op in _installation) {
+                    op.PackageName = PackageName;
+                    op.PackageVersion = Version;
+                    op.PackageArch = Arch;
+                }
+                return _installation;
+            }
+            set {
+                _installation = value;
+            }
+        }
+
+        private List<IFileDeclaration> _installation = null;
 
         public bool IdentityMatch(Build other) => true
             && other != null

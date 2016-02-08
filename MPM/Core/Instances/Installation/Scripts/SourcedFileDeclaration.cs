@@ -9,6 +9,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
     public class SourcedFileDeclaration : IFileDeclaration {
         private string packageCachedName { get; set; }
         public string PackageName { get; set; }
+        public Arch PackageArch { get; set; }
 
         public MPM.Types.SemVersion PackageVersion { get; set; }
 

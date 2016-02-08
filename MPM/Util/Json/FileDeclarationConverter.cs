@@ -5,7 +5,6 @@ using MPM.Core.Instances.Installation.Scripts;
 using Newtonsoft.Json;
 
 namespace MPM.Util.Json {
-    [JsonConverter(typeof(IFileDeclaration))]
     public class FileDeclarationConverter : JsonConverter {
         public override bool CanRead {
             get { return true; }

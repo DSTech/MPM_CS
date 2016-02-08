@@ -14,7 +14,7 @@ namespace MPM.Net.Protocols.Minecraft {
     public class MinecraftArchInstaller {
         public IArchInstallationProcedure EnsureCached(MPM.Types.SemVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var mdc = new MinecraftDownloadClient();
-            var versionDetails = mdc.FetchVersion(archVersion.ToString()).WaitAndUnwrapException();
+            var versionDetails = mdc.FetchVersion(archVersion.ToString());
             Console.WriteLine(versionDetails.Id);
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.Applies(Environment.OSVersion.Platform));
             

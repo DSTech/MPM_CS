@@ -8,13 +8,25 @@ namespace MPM.Types {
         }
 
         public Arch(string archId) {
+            this.Id = new SemVersion(archId, true);
+        }
+
+        public Arch(SemVersion archId) {
             this.Id = archId;
         }
 
-        public string Id { get; set; }
+        public SemVersion Id { get; set; }
 
         public override string ToString() {
-            return Id;
+            return Id.ToString();
+        }
+
+        public static implicit operator SemVersion(Arch arch) {
+            return arch.Id;
+        }
+
+        public static implicit operator Arch(SemVersion version) {
+            return new Arch(version);
         }
 
         #region Equality members
@@ -22,11 +34,11 @@ namespace MPM.Types {
         public bool Equals(Arch other) {
             if (ReferenceEquals(null, other)) { return false; }
             if (ReferenceEquals(this, other)) { return true; }
-            return string.Equals(this.Id, other.Id);
+            return this.Id == other.Id;
         }
 
         public int CompareTo(Arch other) {
-            return string.CompareOrdinal(this.Id, other.Id);
+            return this.Id.CompareTo(other.Id);
         }
 
         public override bool Equals(object obj) {

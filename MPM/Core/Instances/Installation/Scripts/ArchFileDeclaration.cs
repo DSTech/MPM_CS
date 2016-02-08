@@ -8,7 +8,10 @@ using MPM.Types;
 namespace MPM.Core.Instances.Installation.Scripts {
     public class ArchFileDeclaration : IFileDeclaration {
         private IArchInstallationProcedure installationProcedure { get; set; }
+
         public string PackageName { get; set; }
+
+        public Arch PackageArch { get; set; }
 
         public MPM.Types.SemVersion PackageVersion { get; set; }
 
@@ -24,7 +27,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
         public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var archResolver = protocolResolver.GetArchResolver();
-            this.installationProcedure = archResolver.EnsureCached(ArchName, PackageVersion, cacheManager, protocolResolver);
+            this.installationProcedure = archResolver.EnsureCached(ArchName, PackageArch, cacheManager, protocolResolver);
         }
 
         public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() => installationProcedure.GenerateOperations();

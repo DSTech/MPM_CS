@@ -19,7 +19,7 @@ namespace MPM.Util.Json {
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
             var val = (Arch)value;
-            writer.WriteValue(val.Id.ToString());
+            serializer.Serialize(writer, val?.Id);
         }
     }
 }

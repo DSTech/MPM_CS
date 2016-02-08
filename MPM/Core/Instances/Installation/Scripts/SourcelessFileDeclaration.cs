@@ -8,9 +8,12 @@ using MPM.Types;
 namespace MPM.Core.Instances.Installation.Scripts {
     public class SourcelessFileDeclaration : IFileDeclaration {
         public SourcelessType @Type { get; set; }
+
         public string PackageName { get; set; }
 
         public MPM.Types.SemVersion PackageVersion { get; set; }
+
+        public Arch PackageArch { get; set; }
 
         public string Description { get; set; }
 

@@ -10,15 +10,17 @@ namespace MPM.Data {
         public string GetNameForPackageArchive(string packageName, string packageArchId, SemVersion packageVersion, CompatibilitySide packageSide) {
             return $"package/{BaseNameForPackage(packageName, packageArchId, packageVersion, packageSide)}.mpk";
         }
+
         public string GetNameForPackageArchive(Build package) {
-            return GetNameForPackageArchive(package.PackageName, package.Arch.Id, package.Version, package.Side);
+            return GetNameForPackageArchive(package.PackageName, package.Arch.ToString(), package.Version, package.Side);
         }
 
         public string GetNameForPackageUnarchived(string packageName, string packageArchId, SemVersion packageVersion, CompatibilitySide packageSide) {
             return $"unpacked/{BaseNameForPackage(packageName, packageArchId, packageVersion, packageSide)}.zip";
         }
+
         public string GetNameForPackageUnarchived(Build package) {
-            return GetNameForPackageUnarchived(package.PackageName, package.Arch.Id, package.Version, package.Side);
+            return GetNameForPackageUnarchived(package.PackageName, package.Arch.ToString(), package.Version, package.Side);
         }
     }
 }
