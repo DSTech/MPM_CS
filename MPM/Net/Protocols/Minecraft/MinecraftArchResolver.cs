@@ -19,7 +19,7 @@ namespace MPM.Net.Protocols.Minecraft {
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.Applies(Environment.OSVersion.Platform));
             var operations = new List<ArchInstallationOperation>();
             foreach (var lib in libsToInstall) {
-                var appliedNatives = lib.ApplyNatives(Environment.OSVersion.Platform);
+                var appliedNatives = lib.ApplyNatives(Environment.OSVersion.Platform);//TODO: Stop this from having -${arch} ending if it is universal!
                 var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{"_" + appliedNatives ?? "_u"}";
                 var cacheOp = GenerateOp(archVersion, lib, appliedNatives, cacheEntryName, cacheManager);
                 operations.Add(cacheOp);

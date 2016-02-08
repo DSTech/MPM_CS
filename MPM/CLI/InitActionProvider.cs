@@ -103,7 +103,8 @@ namespace MPM.CLI {
                 }
                 Console.WriteLine("Configuration resolved.");
 
-                var cacheManager = factory.Resolve<ICacheManager>();
+                var globalStorage = factory.Resolve<GlobalStorage>();
+                var cacheManager = globalStorage.FetchGlobalCache();
                 var hashRepository = factory.Resolve<IHashRepository>();
                 var protocolResolver = factory.Resolve<IProtocolResolver>();
 

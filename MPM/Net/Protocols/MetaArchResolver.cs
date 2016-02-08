@@ -10,9 +10,10 @@ using MPM.Core.Protocols;
 namespace MPM.Net.Protocols.Minecraft {
     public class MetaArchInstaller : IArchResolver {
         public IArchInstallationProcedure EnsureCached(string packageName, MPM.Types.SemVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
-            switch (packageName) {
+            //TODO: Handle packageName / archVersion sanely
+            switch (packageName.Split('_').FirstOrDefault()) {
                 case "minecraft":
-                    return new MinecraftArchInstaller().EnsureCached(archVersion, cacheManager, protocolResolver);
+                    return new MinecraftArchInstaller().EnsureCached(new MPM.Types.SemVersion(packageName.Split('_').Skip(1).First()), cacheManager, protocolResolver);
                 default:
                     throw new NotSupportedException();
             }

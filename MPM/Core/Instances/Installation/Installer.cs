@@ -52,7 +52,7 @@ namespace MPM.Core.Instances.Installation {
                 }
                 Console.WriteLine($"Downloading package {package.PackageName} to cache...");
                 if (package.Hashes == null || package.Hashes.Count == 0) {
-                    throw new Exception("Package contained no hashes to download");
+                    break;
                 }
                 var packageArchive = hashRepository.RetrieveArchive(package.PackageName, package.Hashes).WaitAndUnwrapException();
                 cacheManager.Store(cacheEntryName, packageArchive);
