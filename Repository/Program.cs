@@ -25,6 +25,7 @@ namespace Repository {
                     UserName = "admin",
                 }, adminPassword);
                 userRepository.SaveUserAuth(newUser);
+                Console.WriteLine("Admin account added from settings.");
             }
             var port = appSettings.Get<int>("port", 3000);
             using (var host = new AppHost()) {
@@ -39,6 +40,7 @@ namespace Repository {
                 {
                     host.Init();
                     host.Start($"http://*:{port}/");
+                    Console.WriteLine($"Listening on port {port}.");
                     Console.WriteLine("Press Q to exit.");
                     var shouldExit = false;
                     do {
