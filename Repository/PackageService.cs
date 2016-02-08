@@ -33,6 +33,7 @@ namespace Repository {
                     .ToList();
         }
 
+        [Authenticate]
         public object Post(BuildSubmission submission) {
             var body = Request.GetRawBody();
             var buildInfo = JsonConvert.DeserializeObject<Build>(body);
@@ -53,21 +54,21 @@ namespace Repository {
             }
         }
 
-        public object Put(BuildSubmission newBuild) {
-            var body = Request.GetRawBody();
-            var buildInfo = JsonConvert.DeserializeObject<Build>(body);
-            if (buildInfo == null) {
-                return null;
-            }
-            return Repository.RegisterBuild(buildInfo);
-        }
-
+        [Authenticate]
         public object Delete(BuildDeletionRequest request) {
             var body = Request.GetRawBody();
-            var buildInfo = JsonConvert.DeserializeObject<Build>(body);
-            if (buildInfo == null) {
-                return null;
-            }
+            var anonObj = new {
+                name = (String)null,
+                version = (SemVersion)null,
+                arch = (Arch)null,
+                side = (CompatibilitySide)default(CompatibilitySide),
+            };
+            var pseudoBuild = JsonConvert.DeserializeAnonymousType(body, anonObj);
+            var buildInfo = new Build();
+            buildInfo.PackageName = pseudoBuild.name;
+            buildInfo.Arch = pseudoBuild.arch;
+            buildInfo.Version = pseudoBuild.version;
+            buildInfo.Side = pseudoBuild.side;
             if (buildInfo == null) {
                 throw HttpError.NotFound("No build specified to delete.");
             }

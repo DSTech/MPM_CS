@@ -5,6 +5,7 @@ using MPM.Types;
 using Newtonsoft.Json;
 using NServiceKit;
 using NServiceKit.ServiceHost;
+using NServiceKit.ServiceInterface;
 using NServiceKit.Text;
 
 namespace Repository.Types.Packages {
@@ -34,6 +35,7 @@ namespace Repository.Types.Packages {
 
         private static bool _isSetup = false;
     }
+
     [Route("/builds", "GET")]
     public class BuildListRequest : IReturn<List<Build>> {
         static BuildListRequest() {
@@ -44,13 +46,12 @@ namespace Repository.Types.Packages {
     }
 
     [Route("/builds", "POST")]
-    [Route("/builds", "PUT")]
     public class BuildSubmission : IReturn<Build> {
         static BuildSubmission() {
             JsonSetup.Setup();
         }
     }
-
+    
     [Route("/builds", "DELETE")]
     public class BuildDeletionRequest : IReturn<Build> {
         static BuildDeletionRequest() {
