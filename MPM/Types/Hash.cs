@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using Microsoft.Scripting.Utils;
 using MPM.Util;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
+    [JsonConverter(typeof(Util.Json.HashConverter))]
     public class Hash {
         public Hash() {
         }
