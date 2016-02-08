@@ -20,6 +20,9 @@ namespace Repository {
             LogManager.LogFactory = new NServiceKit.Logging.Support.Logging.ConsoleLogFactory();
             var userRepository = new InMemoryAuthRepository();
             var adminPassword = appSettings.GetString("adminPassword");
+            if (args.Length >= 1) {
+                adminPassword = args[0];
+            }
             if (adminPassword != null) {
                 var newUser = userRepository.CreateUserAuth(new UserAuth {
                     UserName = "admin",
@@ -28,9 +31,6 @@ namespace Repository {
                 Console.WriteLine("Admin account added from settings.");
             }
             var port = appSettings.Get<int>("port", 3000);
-            if (args.Length >= 1) {
-                adminPassword = args[0];
-            }
             if (args.Length >= 2) {
                 port = Int32.Parse(args[1]);
             }
