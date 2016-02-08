@@ -31,7 +31,8 @@ namespace MPM.Core.Instances.Info {
                         Description = declaration.Description,
                         PackageName = packageName,
                         PackageVersion = packageVersion,
-                        Source = sourceArchName,
+                        Source = source,
+                        ArchName = sourceArchName,
                     };
                     return archDecl;
                 } else {

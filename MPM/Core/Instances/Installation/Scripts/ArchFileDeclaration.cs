@@ -18,11 +18,13 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
         public string Source { get; set; }
 
+        public string ArchName { get; set; }
+
         public IReadOnlyCollection<string> Targets => new string[0];
 
         public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var archResolver = protocolResolver.GetArchResolver();
-            this.installationProcedure = archResolver.EnsureCached(Source, PackageVersion, cacheManager, protocolResolver);
+            this.installationProcedure = archResolver.EnsureCached(ArchName, PackageVersion, cacheManager, protocolResolver);
         }
 
         public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() => installationProcedure.GenerateOperations();
