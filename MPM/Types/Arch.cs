@@ -13,6 +13,10 @@ namespace MPM.Types {
 
         public string Id { get; set; }
 
+        public override string ToString() {
+            return Id;
+        }
+
         #region Equality members
 
         public bool Equals(Arch other) {

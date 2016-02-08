@@ -34,6 +34,14 @@ namespace MPM.Data.Repository {
             return BuildCollection.FindAll().Select(b => b.Build).OrderByDescending(b => b.Version).ToArray();
         }
 
+        public Build FetchBuild(string buildIdentity) {
+            return BuildCollection.FindById(buildIdentity);
+        }
+
+        public Build FetchBuild(Build build) {
+            return BuildCollection.FindById(build.ToIdentifierString());
+        }
+
         public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
             return BuildCollection
                 .FindAll()
@@ -97,7 +105,7 @@ namespace MPM.Data.Repository {
 
             public static implicit operator BuildEntry(Build build) => new BuildEntry(build);
 
-            public static implicit operator Build(BuildEntry entry) => entry.@Build;
+            public static implicit operator Build(BuildEntry entry) => entry?.@Build;
         }
     }
 }

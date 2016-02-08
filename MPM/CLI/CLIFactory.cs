@@ -42,10 +42,17 @@ namespace MPM.CLI {
         }
 
         private void RegisterPackageRepository(ref ContainerBuilder cb) {
-            cb.Register<IPackageRepository>(ctxt => {
+            cb.Register<HttpPackageRepository>(ctxt => {
                 var meta = ctxt.Resolve<GlobalStorage>().FetchMetaDataManager();//Use to fetch custom package repositories
                 var packageRepositoryUri = new Uri(meta.Get<String>("packageRepositoryUri") ?? "http://dst.dessix.net:8950/");
                 return new HttpPackageRepository(packageRepositoryUri);
+            }).SingleInstance();
+            cb.Register<IPackageRepository>(ctxt => {
+                var globalStorage = ctxt.Resolve<GlobalStorage>();
+                var meta = globalStorage.FetchMetaDataManager();
+                var remote = ctxt.Resolve<HttpPackageRepository>();
+                var local = new LiteDbPackageRepository(globalStorage.FetchDataStore().GetCollection<LiteDbPackageRepository.BuildEntry>("BuildCache"));
+                return new LiteDbPackageRepositoryCache(local, meta, remote);
             }).SingleInstance();
         }
 

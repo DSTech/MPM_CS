@@ -36,7 +36,7 @@ namespace MPM.CLI {
                 var first = _package.First();
                 Console.WriteLine($"{first.PackageName} <{String.Join(", ", first.Authors)}>");
                 foreach (var build in _package) {
-                    Console.WriteLine($"\t{(build.Arch)}#{build.Version} {build.GivenVersion}");
+                    Console.WriteLine($"\tA:{(build.Arch)} #{build.Version} - \"{build.GivenVersion}\"");
                 }
             }
         }

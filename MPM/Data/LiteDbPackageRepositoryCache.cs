@@ -17,7 +17,7 @@ namespace MPM.Data {
         private const string SyncInfoMetaName = "syncInfo";
         private readonly IMetaDataManager metaDb;
 
-        private readonly LiteCollection<PackageEntry> Packages;
+        private readonly LiteDbPackageRepository Builds;
         private readonly IPackageRepository repository;
 
 
@@ -27,124 +27,70 @@ namespace MPM.Data {
         /// </param>
         /// <param name="metaDb">Metadata Manager</param>
         /// <param name="repository">The repository that will be cached</param>
-        public LiteDbPackageRepositoryCache(LiteCollection<PackageEntry> packages, IMetaDataManager metaDb, IPackageRepository repository) {
-            if ((this.Packages = packages) == null) {
-                throw new ArgumentNullException(nameof(packages));
+        public LiteDbPackageRepositoryCache(LiteDbPackageRepository packageRepo, IMetaDataManager metaDb, IPackageRepository repository) {
+            if ((this.Builds = packageRepo) == null) {
+                throw new ArgumentNullException(nameof(packageRepo));
             }
             this.metaDb = metaDb;
             this.repository = repository;
         }
 
-        public Build FetchBuild(string packageName, SemanticVersion fetchVersion, CompatibilitySide fetchSide, Arch fetchArch) {
-            var builds = this.FetchBuilds(packageName, new VersionSpec(fetchVersion));
-            var build = builds
-                .Where(b => true
-                    && b.Version == fetchVersion
-                    && b.Arch == fetchArch
-                    && (b.Side == fetchSide || b.Side == CompatibilitySide.Universal))
-                .OrderByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
-                .FirstOrDefault();
-            return build;
+        #region Implementation of IPackageRepository
+
+        public IEnumerable<Build> FetchBuilds() {
+            Sync();
+            return Builds.FetchBuilds();
         }
 
-        public IEnumerable<Build> FetchBuilds(string packageName, VersionSpec versionSpec) {
-            var package = this.FetchPackage(packageName);
-            var builds = package
-                .Builds
-                .Where(b => versionSpec.Satisfies(b.Version))
-                .OrderByDescending(b => b.Version)//Prefer higher versions
-                .ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
-                .ToArray();
-            return builds;
+        public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
+            Sync();
+            return Builds.FetchBuilds(updatedAfter);
         }
 
-        public Package FetchPackage(string packageName) {
-            var package = (Package) Packages.FindById(packageName);
-            if (package == null) {
-                return null;
+        private DateTime GetLastSynced() {
+            string lastSynced;
+            lock (this) {
+                lastSynced = metaDb.Get<string>("lastSynced");
             }
-            var builds = package
-                .Builds
-                .OrderByDescending(b => b.Version)//Prefer higher versions
-                .ThenByDescending(b => b.Side != CompatibilitySide.Universal)//Prefer side-specific
-                .ToArray();
-
-            return new Package(package.Name, package.Authors, builds);
+            if (lastSynced == null) {
+                return DateTime.MinValue;
+            }
+            return JsonConvert.DeserializeObject<DateTime>(lastSynced);
         }
 
-        public IEnumerable<Package> FetchPackageList() {
-            return Packages.FindAll().Cast<Package>().ToArray();
-        }
-
-        public IEnumerable<Package> FetchPackageList(DateTime updatedAfter) {
-            return this.FetchPackageList();//Completely disregard updatedAfter constraint, as is allowed by the specification
+        private void SetLastSynced(DateTime lastSynced) {
+            lock (this) {
+                metaDb.Set("lastSynced", JsonConvert.SerializeObject(lastSynced));
+            }
         }
 
         public void Sync() {
-            var syncInfo = metaDb.Get<SyncInfo>(SyncInfoMetaName);
-            DateTime? lastUpdatedTime = syncInfo.LastUpdated;
-            IEnumerable<Package> packageListToSync;
-            if (lastUpdatedTime.HasValue) {
-                packageListToSync = repository.FetchPackageList(lastUpdatedTime.Value);
+            var lastSynced = GetLastSynced();
+            if (lastSynced > DateTime.UtcNow.AddMinutes(-1.0)) {
+                return;
+            }
+            Console.Write("Package cache older than one minute- ");
+            SetLastSynced(DateTime.UtcNow);
+            IEnumerable<Build> builds;
+            if (lastSynced == DateTime.MinValue) {
+                Console.WriteLine("Updating via full fetch...");
+                builds = repository.FetchBuilds();
             } else {
-                packageListToSync = repository.FetchPackageList();
+                Console.WriteLine("Updating via delta fetch...");
+                builds = repository.FetchBuilds(lastSynced);
             }
-
-            foreach (var packageInfo in packageListToSync.ToArray()) {
-                var package = repository.FetchPackage(packageInfo.Name);
-                UpsertPackage(package);
-            }
-
-            syncInfo.LastUpdated = DateTime.UtcNow;
-            metaDb.Set<SyncInfo>(SyncInfoMetaName, syncInfo);
-        }
-
-        public void UpsertBuild(string packageName, Build build) {
-            throw new NotImplementedException();
-        }
-
-        public void UpsertPackage(Package package) {
-            Packages.Upsert(package);
-        }
-
-        public class PackageEntry {
-            public PackageEntry() {
-            }
-
-            public PackageEntry(Package package) {
-                this.Name = package.Name;
-                this.Authors = package.Authors.Select(DTOTranslationX.ToDTO).ToList();
-                this.Builds = package.Builds.Select(DTOTranslationX.ToDTO).ToList();
-            }
-
-            [BsonId]
-            public String Name { get; set; }
-
-            [BsonField]
-            public List<Net.DTO.Author> Authors { get; set; }
-
-            [BsonField]
-            public List<Net.DTO.Build> Builds { get; set; }
-
-            public static implicit operator PackageEntry(Package package) {
-                return new PackageEntry(package);
-            }
-
-            public static implicit operator Package(PackageEntry entry) {
-                return new Package(
-                    entry.Name,
-                    entry.Authors.Select(DTOTranslationX.FromDTO).ToArray(),
-                    entry.Builds.Select(DTOTranslationX.FromDTO).ToArray()
-                    );
-            }
-
-            public static implicit operator Net.DTO.Package(PackageEntry entry) {
-                return new Net.DTO.Package {
-                    Name = entry.Name,
-                    Authors = entry.Authors,
-                    Builds = entry.Builds,
-                };
+            foreach (var build in builds) {
+                var found = Builds.FetchBuild(build);
+                if (found != null) {
+                    Console.WriteLine($"\tOverwriting build {build.ToIdentifierString()}");
+                    Builds.UpdateBuild(build);
+                } else {
+                    Console.WriteLine($"\tRegistering build {build.ToIdentifierString()}");
+                    Builds.RegisterBuild(build);
+                }
             }
         }
+
+        #endregion
     }
 }
