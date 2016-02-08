@@ -28,6 +28,12 @@ namespace Repository {
                 Console.WriteLine("Admin account added from settings.");
             }
             var port = appSettings.Get<int>("port", 3000);
+            if (args.Length >= 1) {
+                adminPassword = args[0];
+            }
+            if (args.Length >= 2) {
+                port = Int32.Parse(args[1]);
+            }
             using (var host = new AppHost()) {
                 host.PreRequestFilters.Insert(0, (httpReq, httpRes) => {
                     httpReq.UseBufferedStream = true;
