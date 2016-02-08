@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MPMTest</RootNamespace>
     <AssemblyName>MPMTest</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -79,7 +79,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AlphaFS, Version=2.0.0.0, Culture=neutral, PublicKeyToken=4d31a58f7d7ad5c9, processorArchitecture=MSIL">
-      <HintPath>..\packages\AlphaFS.2.0.1\lib\net451\AlphaFS.dll</HintPath>
+      <HintPath>..\packages\AlphaFS.2.0.1\lib\net45\AlphaFS.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -151,9 +151,8 @@
       <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.229\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="semver.tools, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\semver.tools.1.0.0\lib\net45\semver.tools.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="SemVer">
+      <HintPath>..\packages\SemanticVersioning.0.6.9.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -200,7 +199,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.execution.desktop, Version=2.2.0.3239, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xunit.extensibility.execution.2.2.0-beta1-build3239\lib\net45\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -215,10 +213,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Core\Instances\Cache\CacheTests.cs" />
-    <Compile Include="Data\RepositoryTests.cs" />
     <Compile Include="Data\DbTests.cs" />
     <Compile Include="Extensions\StreamExtensionsTests.cs" />
-    <Compile Include="InstallationScriptTests.cs" />
     <Compile Include="ProfileTests.cs" />
     <None Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />

@@ -1,6 +1,5 @@
 using System.Linq;
 using MPM.Core.Dependency;
-using semver.tools;
 using Xunit;
 
 namespace MPMTest.Core.Dependency {
@@ -9,17 +8,17 @@ namespace MPMTest.Core.Dependency {
         public void Equality() {
             var first = new PackageSpec {
                 Name = "testPackage",
-                VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.1")),
+                VersionSpec = new MPM.Types.SemRange("0.0.1"),
                 Manual = true,
             };
             var second = new PackageSpec {
                 Name = "testPackage",
-                VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.1")),
+                VersionSpec = new MPM.Types.SemRange("0.0.1"),
                 Manual = true,
             };
             var third = new PackageSpec {
                 Name = "testPackage",
-                VersionSpec = new VersionSpec(SemanticVersion.Parse("0.0.2")),
+                VersionSpec = new MPM.Types.SemRange("0.0.1"),
                 Manual = false,
             };
             Assert.Equal(first, second);
