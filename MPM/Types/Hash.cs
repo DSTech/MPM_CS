@@ -25,10 +25,10 @@ namespace MPM.Types {
         public Byte[] Checksum { get; set; }
 
         public static Hash Parse(string hashString) {
-            var lowerHashString = hashString.ToLower().Trim();
-            var algChecksumPair = lowerHashString.Split(new[] { ':' }, 2);//Destructuring for C# 7 please?
+            var trimmed = hashString.Trim();
+            var algChecksumPair = trimmed.Split(new[] { ':' }, 2);//Destructuring for C# 7 please?
             if (algChecksumPair.Length == 2) {
-                var algorithm = algChecksumPair[0];
+                var algorithm = algChecksumPair[0].ToLowerInvariant();
                 var checksum = Base64.GetBytesUnknown(algChecksumPair[1]);
                 return new Hash(algorithm, checksum);
             } else {

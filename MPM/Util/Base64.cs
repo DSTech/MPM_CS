@@ -24,9 +24,9 @@ namespace MPM.Util {
         }
 
         public static string ToStandard(string safeB64) {
-            if (safeB64.Length % 4 == 3) {
-                throw new ArgumentException("contains invalid number of characters", nameof(safeB64));
-            }
+            //if (safeB64.Length % 4 == 3) {
+            //    throw new ArgumentException("contains invalid number of characters", nameof(safeB64));
+            //}
             return safeB64
                 .TransformChars(c => {
                     switch (c) {
