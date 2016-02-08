@@ -61,31 +61,44 @@ namespace MPM.Core.Dependency {
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
         public bool Manual { get; set; } = false;
 
-        public bool Equals(PackageSpec other) {
-            return
-                Name == other.Name
-                    && this.Arch == other.Arch
-                    && this.VersionSpec.ToString() == other.VersionSpec.ToString()
-                    && this.Manual == other.Manual;
-        }
-
-        public override bool Equals(object obj) {
-            var packageSpec = obj as PackageSpec;
-            if (packageSpec == null) {
-                return obj == null;
-            }
-            return Equals(packageSpec);
-        }
-
-        public override int GetHashCode() {
-            return
-                (Name?.GetHashCode() ?? 0)
-                    + (Arch?.GetHashCode() ?? 0)
-                    + (VersionSpec?.GetHashCode() ?? 0)
-                    + Manual.GetHashCode();
-        }
         public override string ToString() {
             return $"Specification: \"{Name}\" for {Arch} with version {VersionSpec} for side {Side} (MANUAL:{Manual})";
         }
+
+        #region Equality members
+
+        public bool Equals(PackageSpec other) {
+            if (ReferenceEquals(null, other)) { return false; }
+            if (ReferenceEquals(this, other)) { return true; }
+            return string.Equals(this.Name, other.Name) && Equals(this.Arch, other.Arch) && Equals(this.VersionSpec, other.VersionSpec) && this.Side == other.Side && this.Manual == other.Manual;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj)) { return false; }
+            if (ReferenceEquals(this, obj)) { return true; }
+            if (obj.GetType() != this.GetType()) { return false; }
+            return Equals((PackageSpec)obj);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = (this.Name != null ? this.Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.Arch != null ? this.Arch.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.VersionSpec != null ? this.VersionSpec.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int)this.Side;
+                hashCode = (hashCode * 397) ^ this.Manual.GetHashCode();
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(PackageSpec left, PackageSpec right) {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(PackageSpec left, PackageSpec right) {
+            return !Equals(left, right);
+        }
+
+        #endregion
     }
 }

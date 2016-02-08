@@ -18,11 +18,16 @@ namespace MPMTest.Core.Dependency {
             };
             var third = new PackageSpec {
                 Name = "testPackage",
-                VersionSpec = new MPM.Types.SemRange("0.0.1"),
+                VersionSpec = new MPM.Types.SemRange("0.0.2"),
                 Manual = false,
             };
             Assert.Equal(first, second);
-            Assert.True(new[] { first }.Except(new[] { second }).Count() == 0);
+            Assert.Equal(first.GetHashCode(), second.GetHashCode());
+            Assert.False(
+                new PackageSpec[] { first }
+                    .Except(new PackageSpec[] { second })
+                    .Any()
+            );
             Assert.NotEqual(second, third);
         }
     }
