@@ -26,7 +26,8 @@ namespace MPM.Data.Repository {
         }
 
         public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
-            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/builds/?format=json&updatedAfter={updatedAfter}"));
+            var updatedAfterString = updatedAfter.ToUniversalTime().ToUnixTimeStamp();
+            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/builds/?format=json&updatedAfter={updatedAfterString}"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();

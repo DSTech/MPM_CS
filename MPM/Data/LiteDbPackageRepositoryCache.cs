@@ -66,11 +66,10 @@ namespace MPM.Data {
 
         public void Sync() {
             var lastSynced = GetLastSynced();
-            if (lastSynced > DateTime.UtcNow.AddMinutes(-1.0)) {
+            if (lastSynced > DateTime.UtcNow/*.AddMinutes(-1.0)*/) {
                 return;
             }
             Console.Write("Package cache older than one minute- ");
-            SetLastSynced(DateTime.UtcNow);
             IEnumerable<Build> builds;
             if (lastSynced == DateTime.MinValue) {
                 Console.WriteLine("Updating via full fetch...");
@@ -89,6 +88,7 @@ namespace MPM.Data {
                     Builds.RegisterBuild(build);
                 }
             }
+            SetLastSynced(DateTime.UtcNow);
         }
 
         #endregion

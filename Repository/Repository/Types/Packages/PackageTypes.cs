@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
 using NServiceKit;
@@ -21,7 +22,7 @@ namespace Repository.Types.Packages {
                 return;
             }
             JsConfig<Build>.RawSerializeFn = _serializeBuild;
-            JsConfig<Build>.RawDeserializeFn= _deserializeBuild;
+            JsConfig<Build>.RawDeserializeFn = _deserializeBuild;
             _isSetup = true;
         }
 
@@ -42,7 +43,24 @@ namespace Repository.Types.Packages {
             JsonSetup.Setup();
         }
         [DataMember(Name = "updatedAfter", IsRequired = false)]
-        public DateTime? UpdatedAfter { get; set; }
+        public String UpdatedAfterString { get; set; }
+
+        [IgnoreDataMember]
+        public DateTime? UpdatedAfter {
+            get {
+                if(UpdatedAfterString == null) {
+                    return null;
+                }
+                return DateTime.SpecifyKind(long.Parse(this.UpdatedAfterString).FromUnixTimeStamp(), DateTimeKind.Utc);
+            }
+            set {
+                if (!value.HasValue) {
+                    UpdatedAfterString = null;
+                    return;
+                }
+                value.Value.ToUnixTimeStamp();
+            }
+        }
     }
 
     [Route("/builds", "POST")]
@@ -51,7 +69,7 @@ namespace Repository.Types.Packages {
             JsonSetup.Setup();
         }
     }
-    
+
     [Route("/builds", "DELETE")]
     public class BuildDeletionRequest : IReturn<Build> {
         static BuildDeletionRequest() {
