@@ -7,7 +7,7 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Extensions;
-using MPM.Net.Protocols.Minecraft.Types;
+using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -32,15 +32,15 @@ namespace MPM.Net.Protocols.Minecraft {
         public MinecraftVersionCollection FetchVersions() {
             var req = new RestRequest("/versions/versions.json");
             var res = client.ExecuteAsGet(req, "GET");
-            var data = JsonConvert.DeserializeObject<DTO.MinecraftVersionCollection>(res.Content);
-            return data.FromDTO();
+            var data = JsonConvert.DeserializeObject<MinecraftVersionCollection>(res.Content);
+            return data;
         }
 
         public MinecraftVersion FetchVersion(string versionId) {
             var req = new RestRequest(String.Format("/versions/{0}/{0}.json", versionId));
-            var res = client.ExecuteAsGet<DTO.MinecraftVersion>(req, "GET");
-            var data = JsonConvert.DeserializeObject<DTO.MinecraftVersion>(res.Content);
-            return data.FromDTO();
+            var res = client.ExecuteAsGet<MinecraftVersion>(req, "GET");
+            var data = JsonConvert.DeserializeObject<MinecraftVersion>(res.Content);
+            return data;
         }
 
         public MinecraftVersion FetchLatest(bool snapshot = false) {

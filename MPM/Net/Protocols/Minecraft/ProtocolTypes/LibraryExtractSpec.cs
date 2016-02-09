@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using MPM.Extensions;
+using Newtonsoft.Json;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class LibraryExtractSpec {
         public LibraryExtractSpec() {
         }
@@ -14,6 +15,7 @@ namespace MPM.Net.Protocols.Minecraft.Types {
         /// <summary>
         ///     A list of paths to exclude from extraction when installing the library
         /// </summary>
+        [JsonProperty("exclude")]
         public List<string> Exclusions { get; set; }
     }
 }

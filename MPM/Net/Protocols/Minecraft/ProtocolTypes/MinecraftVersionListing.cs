@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MPM.Extensions;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class MinecraftVersionListing {
         public MinecraftVersionListing() {
         }

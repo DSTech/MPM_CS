@@ -1,7 +1,7 @@
 using System;
 using MPM.Types;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public abstract class LibraryRuleFilter {
         /// <summary>
         ///     Checks the filter against the specified platform

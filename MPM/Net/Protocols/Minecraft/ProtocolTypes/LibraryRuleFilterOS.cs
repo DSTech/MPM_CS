@@ -1,7 +1,10 @@
 using System;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class LibraryRuleFilterOS : LibraryRuleFilter {
+        public LibraryRuleFilterOS() {
+        }
+
         public LibraryRuleFilterOS(string os) {
             this.OS = os.ToLowerInvariant();
         }

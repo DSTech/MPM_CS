@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 using Platform;
 
 namespace MPM.Util.Json {
-    [JsonConverter(typeof(Hash))]
     public class HashConverter : JsonConverter {
         public override bool CanRead {
             get { return true; }

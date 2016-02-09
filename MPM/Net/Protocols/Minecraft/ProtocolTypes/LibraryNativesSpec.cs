@@ -1,8 +1,9 @@
 using System;
 using System.Diagnostics;
 using MPM.Types;
+using Newtonsoft.Json;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     /// <summary>
     ///     Contains native-library inclusions for each particular operating system, with an optional ${bitness} placeholder in
     ///     circumstances where bitness matters
@@ -28,16 +29,19 @@ namespace MPM.Net.Protocols.Minecraft.Types {
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
+        [JsonProperty("windows")]
         public string Windows { get; set; }
 
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
+        [JsonProperty("linux")]
         public string Linux { get; set; }
 
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
+        [JsonProperty("osx")]
         public string Osx { get; set; }
 
         //Tells which file "natives-spec" to download on the given platform, or returns null if none need downloaded.

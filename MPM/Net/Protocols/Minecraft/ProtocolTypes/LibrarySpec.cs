@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MPM.Types;
+using Newtonsoft.Json;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class LibrarySpec {
         public LibrarySpec() {
         }
@@ -17,41 +18,58 @@ namespace MPM.Net.Protocols.Minecraft.Types {
             this.Rules = rules.ToList();
         }
 
+        [JsonProperty("name")]
+        private string _name {
+            get { return String.Join(":", Package, Name, Version); }
+            set {
+                var splits = value.Split(':');
+                Package = splits[0];
+                Name = splits[1];
+                Version = splits[2];
+            }
+        }
+
         /// <summary>
         ///     Package of the library being specified, eg: "com.google.code.gson"
         /// </summary>
+        [JsonIgnore]
         public string Package { get; set; }
 
         /// <summary>
         ///     Name of the library being specified, eg: "gson"
         /// </summary>
+        [JsonIgnore]
         public string Name { get; set; }
 
         /// <summary>
         ///     Version of the library being specified, eg: "2.2.4"
         /// </summary>
+        [JsonIgnore]
         public string Version { get; set; }
 
         /// <summary>
         ///     A description of native libraries to be used to supplement a particular library
         /// </summary>
+        [JsonProperty("natives")]
         public LibraryNativesSpec Natives { get; set; }
 
         /// <summary>
         ///     A description of how a package should be extracted, with optional exclusions
         /// </summary>
+        [JsonProperty("extract")]
         public LibraryExtractSpec Extract { get; set; }
 
         /// <summary>
         ///     A series of rules for whether or not a library is allowed on an operating system. Later entries take precedence
         ///     over previous ones
         /// </summary>
+        [JsonProperty("rules")]
         public List<LibraryRuleSpec> Rules { get; set; }
 
         public string ApplyNatives(PlatformID platform, bool x64 = true) => Natives?.AppliedTo(platform, x64);
 
         public bool Applies(PlatformID platform) {
-            if (Rules.Count == 0) {
+            if ((Rules?.Count ?? 0) == 0) {
                 //No rules means no restrictions
                 return true;
             }

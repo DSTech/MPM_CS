@@ -1,7 +1,7 @@
 using System;
 using MPM.Types;
 
-namespace MPM.Net.Protocols.Minecraft.Types {
+namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class LibraryRuleFilterOSVersion : LibraryRuleFilter {
         public LibraryRuleFilterOSVersion() {
         }

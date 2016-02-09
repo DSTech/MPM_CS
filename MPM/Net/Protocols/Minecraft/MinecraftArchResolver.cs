@@ -7,7 +7,7 @@ using MPM.Core.Instances.Cache;
 using MPM.Core.Instances.Installation;
 using MPM.Core.Protocols;
 using MPM.Extensions;
-using MPM.Net.Protocols.Minecraft.Types;
+using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using Nito.AsyncEx.Synchronous;
 
 namespace MPM.Net.Protocols.Minecraft {
@@ -17,10 +17,10 @@ namespace MPM.Net.Protocols.Minecraft {
             var versionDetails = mdc.FetchVersion(archVersion.ToString());
             Console.WriteLine(versionDetails.Id);
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.Applies(Environment.OSVersion.Platform));
-            
-            //TODO: Revise how packages load and utilize operations
 
-            //TODO: Download client or server jar as needed by the arch side (How do I get "Side" down here?)
+            //TODO: Download client and server jars
+
+            //versionDetails.downloads
 
             //TODO: Download assets
 
