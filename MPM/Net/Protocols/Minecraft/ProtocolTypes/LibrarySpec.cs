@@ -10,42 +10,45 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         }
 
         public LibrarySpec(string package, string name, string version, LibraryNativesSpec nativesSpec, LibraryExtractSpec extractSpec, IEnumerable<LibraryRuleSpec> rules) {
-            this.Package = package;
-            this.Name = name;
-            this.Version = version;
+            this._identity = new LibraryIdentity {
+                Package = package,
+                Name = name,
+                Version = version,
+            };
             this.Natives = nativesSpec;
             this.Extract = extractSpec;
             this.Rules = rules.ToList();
         }
 
         [JsonProperty("name")]
-        private string _name {
-            get { return String.Join(":", Package, Name, Version); }
-            set {
-                var splits = value.Split(':');
-                Package = splits[0];
-                Name = splits[1];
-                Version = splits[2];
-            }
-        }
+        private LibraryIdentity _identity;
 
         /// <summary>
         ///     Package of the library being specified, eg: "com.google.code.gson"
         /// </summary>
         [JsonIgnore]
-        public string Package { get; set; }
+        public string Package {
+            get { return _identity.Package; }
+            set { _identity.Package = value; }
+        }
 
         /// <summary>
         ///     Name of the library being specified, eg: "gson"
         /// </summary>
         [JsonIgnore]
-        public string Name { get; set; }
+        public string Name {
+            get { return _identity.Name; }
+            set { _identity.Name = value; }
+        }
 
         /// <summary>
         ///     Version of the library being specified, eg: "2.2.4"
         /// </summary>
         [JsonIgnore]
-        public string Version { get; set; }
+        public string Version {
+            get { return _identity.Version; }
+            set { _identity.Version = value; }
+        }
 
         /// <summary>
         ///     A description of native libraries to be used to supplement a particular library

@@ -235,6 +235,7 @@
     <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryIdentity.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftDownload.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftDownloads.cs" />
     <Compile Include="Util\ConsoleColorZone.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="Core\Instances\Installation\Scripts\IFileDeclaration.cs" />
     <Compile Include="Core\Instances\Installation\Scripts\SourcelessType.cs" />
     <Compile Include="Util\Hex.cs" />
+    <Compile Include="Util\Json\LibraryIdentityConverter.cs" />
     <Compile Include="Util\Json\Sha1HashHexConverter.cs" />
     <Compile Include="Util\StreamingZipFetcher.cs" />
     <Compile Include="Util\SeekingZipFetcher.cs" />

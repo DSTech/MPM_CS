@@ -73,6 +73,9 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
                     platformStr = Linux;
                     break;
                 case PlatformID.MacOSX:
+                    if (String.IsNullOrWhiteSpace(Osx)) {
+                        return null;
+                    }
                     platformStr = Osx;
                     break;
                 default:
