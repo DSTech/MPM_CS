@@ -12,13 +12,13 @@ namespace RestSharp.Serializers {
     ///     Default JSON serializer for request bodies
     ///     Doesn't currently use the SerializeAs attribute, defers to Newtonsoft's attributes
     /// </summary>
-    public class JsonSerializer : ISerializer {
+    public class RestSharpJsonSerializer : ISerializer {
         private readonly Newtonsoft.Json.JsonSerializer _serializer;
 
         /// <summary>
         ///     Default serializer
         /// </summary>
-        public JsonSerializer() {
+        public RestSharpJsonSerializer() {
             ContentType = "application/json";
             _serializer = new Newtonsoft.Json.JsonSerializer {
                 MissingMemberHandling = MissingMemberHandling.Ignore,
@@ -31,7 +31,7 @@ namespace RestSharp.Serializers {
         /// <summary>
         ///     Default serializer with overload for allowing custom Json.NET settings
         /// </summary>
-        public JsonSerializer(Newtonsoft.Json.JsonSerializer serializer) {
+        public RestSharpJsonSerializer(Newtonsoft.Json.JsonSerializer serializer) {
             ContentType = "application/json";
             _serializer = serializer;
         }

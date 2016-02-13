@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class LibraryRuleFilterOS : LibraryRuleFilter {
@@ -9,6 +10,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
             this.OS = os.ToLowerInvariant();
         }
 
+        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
         public string OS { get; set; }
 
         /// <summary>

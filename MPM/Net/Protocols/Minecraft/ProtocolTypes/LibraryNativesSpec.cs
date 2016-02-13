@@ -29,19 +29,19 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
-        [JsonProperty("windows")]
+        [JsonProperty("windows", NullValueHandling = NullValueHandling.Ignore)]
         public string Windows { get; set; }
 
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
-        [JsonProperty("linux")]
+        [JsonProperty("linux", NullValueHandling = NullValueHandling.Ignore)]
         public string Linux { get; set; }
 
         /// <summary>
         ///     See info for <seealso cref="LibraryNativesSpec" />
         /// </summary>
-        [JsonProperty("osx")]
+        [JsonProperty("osx", NullValueHandling = NullValueHandling.Ignore)]
         public string Osx { get; set; }
 
         //Tells which file "natives-spec" to download on the given platform, or returns null if none need downloaded.

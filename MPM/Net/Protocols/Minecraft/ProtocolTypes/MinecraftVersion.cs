@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Extensions;
+using MPM.Util.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class MinecraftVersion {
@@ -67,10 +69,22 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         ///     Time of release in string format, eg: 2014-05-14T19:29:23+02:00
         /// </summary>
         [JsonProperty("releaseTime")]
-        public DateTime ReleaseTime { get; set; }
+        private DateTimeOffset _releaseTime;
+
+        [JsonIgnore]
+        public DateTime ReleaseTime {
+            get { return _releaseTime.UtcDateTime; }
+            set { _releaseTime = new DateTimeOffset(value, TimeSpan.Zero); }
+        }
 
         [JsonProperty("time")]
-        public DateTime Time { get; set; }
+        private DateTimeOffset _time;
+
+        [JsonIgnore]
+        public DateTime Time {
+            get { return _time.UtcDateTime; }
+            set { _time = new DateTimeOffset(value, TimeSpan.Zero); }
+        }
 
         /// <summary>
         ///     <see cref="ReleaseType" /> of version, eg <see cref="ReleaseType.Release" /> or <see cref="ReleaseType.Snapshot" />

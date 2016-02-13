@@ -234,11 +234,15 @@
     <Compile Include="Data\StandardCacheNamingProvider.cs" />
     <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\ArtifactSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\DownloadClassifiers.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\DownloadsSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryIdentity.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftDownload.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftDownloads.cs" />
     <Compile Include="Util\ConsoleColorZone.cs" />
+    <Compile Include="Util\DisposerStreamWrapper.cs" />
     <Compile Include="Util\HashingStreamForwarder.cs" />
     <Compile Include="CLI\CLIFactory.cs" />
     <Compile Include="CLI\CLIProtocolResolver.cs" />
@@ -282,7 +286,6 @@
     <Compile Include="Data\Repository\LiteDbPackageRepository.cs" />
     <Compile Include="Data\Repository\RepositoryServer.cs" />
     <Compile Include="Data\SyncInfo.cs" />
-    <Compile Include="DisposerStreamWrapper.cs" />
     <Compile Include="Extensions\EnumeratorX.cs" />
     <Compile Include="Core\Equality.cs" />
     <Compile Include="Core\ForgeServerManager.cs" />
@@ -310,6 +313,7 @@
     <Compile Include="Util\Hex.cs" />
     <Compile Include="Util\Json\LibraryIdentityConverter.cs" />
     <Compile Include="Util\Json\Sha1HashHexConverter.cs" />
+    <Compile Include="Util\Json\UtcDateTimeConverter.cs" />
     <Compile Include="Util\StreamingZipFetcher.cs" />
     <Compile Include="Util\SeekingZipFetcher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />
@@ -337,7 +341,7 @@
     <Compile Include="Extensions\BinaryReaderX.cs" />
     <Compile Include="Extensions\StringX.cs" />
     <Compile Include="Extensions\StreamX.cs" />
-    <Compile Include="JsonSerializer.cs" />
+    <Compile Include="Util\Json\RestSharpJsonSerializer.cs" />
     <Compile Include="Net\IArchResolver.cs" />
     <Compile Include="Net\Protocols\MetaArchResolver.cs" />
     <Compile Include="Net\Protocols\Minecraft\MinecraftArchResolver.cs" />

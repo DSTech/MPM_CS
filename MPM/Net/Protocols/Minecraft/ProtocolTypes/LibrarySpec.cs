@@ -20,8 +20,10 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
             this.Rules = rules.ToList();
         }
 
-        [JsonProperty("name")]
+        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore, Order = 2)]
         private LibraryIdentity _identity;
+
+        #region PseudoProperties
 
         /// <summary>
         ///     Package of the library being specified, eg: "com.google.code.gson"
@@ -50,24 +52,29 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
             set { _identity.Version = value; }
         }
 
+        #endregion
+
         /// <summary>
         ///     A description of native libraries to be used to supplement a particular library
         /// </summary>
-        [JsonProperty("natives")]
+        [JsonProperty("natives", NullValueHandling = NullValueHandling.Ignore, Order = 3)]
         public LibraryNativesSpec Natives { get; set; }
 
         /// <summary>
         ///     A description of how a package should be extracted, with optional exclusions
         /// </summary>
-        [JsonProperty("extract")]
+        [JsonProperty("extract", NullValueHandling = NullValueHandling.Ignore, Order = 1)]
         public LibraryExtractSpec Extract { get; set; }
 
         /// <summary>
         ///     A series of rules for whether or not a library is allowed on an operating system. Later entries take precedence
         ///     over previous ones
         /// </summary>
-        [JsonProperty("rules")]
+        [JsonProperty("rules", NullValueHandling = NullValueHandling.Ignore, Order = 4)]
         public List<LibraryRuleSpec> Rules { get; set; }
+
+        [JsonProperty("downloads", NullValueHandling = NullValueHandling.Ignore, Order = 5)]
+        public DownloadsSpec Downloads { get; set; }
 
         public string ApplyNatives(PlatformID platform, bool x64 = true) => Natives?.AppliedTo(platform, x64);
 

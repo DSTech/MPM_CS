@@ -219,6 +219,7 @@
     <Compile Include="Data\DbTests.cs" />
     <Compile Include="Extensions\StreamExtensionsTests.cs" />
     <Compile Include="Net\Protocols\Minecraft\MinecraftVersionDetails.cs" />
+    <Compile Include="TestUtilities\TestResources.cs" />
     <Compile Include="ProfileTests.cs" />
     <None Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />
@@ -237,6 +238,9 @@
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="TestResources\MinecraftDetails_1.7.10.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestResources\MinecraftDetails_1.8.9.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 namespace MPM.Util.Json {
     [JsonConverter(typeof(Arch))]
     public class ArchConverter : JsonConverter {
-        public override bool CanRead {
-            get { return true; }
-        }
+        public override bool CanRead => true;
+
+        public override bool CanWrite => true;
 
         public override bool CanConvert(Type objectType) {
             return (objectType == typeof(Arch));

@@ -15,7 +15,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
             this.OsFilter = osFilter;
         }
 
-        [JsonProperty("action")]
+        [JsonProperty("action", NullValueHandling = NullValueHandling.Ignore)]
         public LibraryRuleAction Action { get; set; }
 
         [JsonIgnore]
@@ -26,7 +26,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         [JsonIgnore]
         public bool IsDefault => Filters.Count == 0;
 
-        [JsonProperty("os")]
+        [JsonProperty("os", NullValueHandling = NullValueHandling.Ignore)]
         public LibraryRuleFilterOS OsFilter { get; set; }
 
         public bool Applies(PlatformID platform, bool x64 = true) {

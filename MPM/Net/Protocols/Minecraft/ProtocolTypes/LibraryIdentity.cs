@@ -31,7 +31,9 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         private static LibraryIdentity ParseIdentity(string identityString) {
             var pairs = identityString.Split(new[] { ':' }, 3);
             return new LibraryIdentity {
-                Package = pairs[0]
+                Package = pairs[0],
+                Name = pairs[1],
+                Version = pairs[2],
             };
         }
 

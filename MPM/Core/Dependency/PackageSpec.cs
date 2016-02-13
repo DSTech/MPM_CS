@@ -70,7 +70,10 @@ namespace MPM.Core.Dependency {
         public bool Equals(PackageSpec other) {
             if (ReferenceEquals(null, other)) { return false; }
             if (ReferenceEquals(this, other)) { return true; }
-            return string.Equals(this.Name, other.Name) && Equals(this.Arch, other.Arch) && Equals(this.VersionSpec, other.VersionSpec) && this.Side == other.Side && this.Manual == other.Manual;
+            return string.Equals(this.Name, other.Name)
+                && Equals(this.Arch, other.Arch)
+                && Equals(this.VersionSpec, other.VersionSpec)
+                && this.Side == other.Side && this.Manual == other.Manual;
         }
 
         public override bool Equals(object obj) {
