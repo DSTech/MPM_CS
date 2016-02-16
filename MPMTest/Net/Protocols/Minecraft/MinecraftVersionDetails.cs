@@ -55,6 +55,24 @@ namespace MPMTest.Net.Protocols.Minecraft {
             }
         }
 
+        [Fact]
+        [Trait("Category", "Serialization")]
+        public void Assets_1_7_10() {
+            var testMinecraftAssetsFile = TestResources.ResourceDirectory.SubFile("MinecraftAssets_1.7.10.json");
+            var originalText = File.ReadAllText(testMinecraftAssetsFile.FullName);
+            var assets = JsonConvert.DeserializeObject<MPM.Net.Protocols.Minecraft.ProtocolTypes.AssetCollection>(originalText);
+            var assetsReserialized = JsonConvert.SerializeObject(assets, Formatting.Indented);
+            var origJsonRaw = JToken.Parse(originalText);
+            var reserializedJsonRaw = JToken.Parse(assetsReserialized);
+            Console.WriteLine(assetsReserialized);
+            if (!JToken.DeepEquals(origJsonRaw, reserializedJsonRaw)) {
+                var tempOutput = new FileInfo(Path.GetTempFileName());
+                File.WriteAllText(tempOutput.FullName, assetsReserialized);
+                TestResources.LaunchOutputComparison(testMinecraftAssetsFile, tempOutput);
+                Assert.True(false);
+            }
+        }
+
         //TODO: Add a unit test checking for download field processing
     }
 }

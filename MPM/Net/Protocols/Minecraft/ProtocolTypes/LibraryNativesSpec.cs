@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
 
@@ -21,9 +22,9 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         }
 
         public LibraryNativesSpec(string windows, string linux, string osx) {
-            this.Windows = windows ?? "natives-windows";
-            this.Linux = linux ?? "natives-linux";
-            this.Osx = osx ?? "natives-osx";
+            this.Windows = windows;// ?? "natives-windows";
+            this.Linux = linux;//?? "natives-linux";
+            this.Osx = osx;//?? "natives-osx";
         }
 
         /// <summary>
@@ -61,19 +62,19 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
                     throw new NotSupportedException();
                 }
                 case PlatformID.Win32NT:
-                    if (String.IsNullOrWhiteSpace(Windows)) {
+                    if (Windows.IsNullOrWhiteSpace()) {
                         return null;
                     }
                     platformStr = Windows;
                     break;
                 case PlatformID.Unix:
-                    if (String.IsNullOrWhiteSpace(Linux)) {
+                    if (Linux.IsNullOrWhiteSpace()) {
                         return null;
                     }
                     platformStr = Linux;
                     break;
                 case PlatformID.MacOSX:
-                    if (String.IsNullOrWhiteSpace(Osx)) {
+                    if (Osx.IsNullOrWhiteSpace()) {
                         return null;
                     }
                     platformStr = Osx;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using MPM.Types;
 using Newtonsoft.Json;
@@ -76,9 +77,47 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         [JsonProperty("downloads", NullValueHandling = NullValueHandling.Ignore, Order = 5)]
         public DownloadsSpec Downloads { get; set; }
 
-        public string ApplyNatives(PlatformID platform, bool x64 = true) => Natives?.AppliedTo(platform, x64);
+        public struct NativesDetails {
+            public ArtifactSpec Artifact { get; set; }
+            public string Tag { get; set; }
+        }
 
-        public bool Applies(PlatformID platform) {
+        public NativesDetails ApplyNatives(PlatformID platform, bool x64 = true) {
+            Debug.Assert(AppliesToPlatform(platform), "This library should be checked with AppliesToPlatform before calling this function on said platform");
+            var spec = Natives?.AppliedTo(platform, x64);
+            if (spec == null) {
+                return new NativesDetails {
+                    Artifact = null,
+                    Tag = null,
+                };
+            }
+            var artifact = _NativeTagToArtifact(spec);
+            return new NativesDetails {
+                Artifact = artifact,
+                Tag = artifact != null ? "natives-" + spec : null,
+            };
+        }
+
+        private ArtifactSpec _NativeTagToArtifact(string spec) {
+            Debug.Assert(spec != null && spec.StartsWith("natives-"));
+            spec = spec.Substring("natives-".Length);
+            switch (spec) {
+                case "windows":
+                    return Downloads.Classifiers.Windows;
+                case "windows-64":
+                    return Downloads.Classifiers.Windows64;
+                case "windows-32":
+                    return Downloads.Classifiers.Windows32;
+                case "linux":
+                    return Downloads.Classifiers.Linux;
+                case "osx":
+                    return Downloads.Classifiers.Osx;
+                default:
+                    return null;
+            }
+        }
+
+        public bool AppliesToPlatform(PlatformID platform) {
             if ((Rules?.Count ?? 0) == 0) {
                 //No rules means no restrictions
                 return true;

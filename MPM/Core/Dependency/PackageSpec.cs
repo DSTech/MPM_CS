@@ -73,7 +73,8 @@ namespace MPM.Core.Dependency {
             return string.Equals(this.Name, other.Name)
                 && Equals(this.Arch, other.Arch)
                 && Equals(this.VersionSpec, other.VersionSpec)
-                && this.Side == other.Side && this.Manual == other.Manual;
+                && this.Side == other.Side
+                && this.Manual == other.Manual;
         }
 
         public override bool Equals(object obj) {

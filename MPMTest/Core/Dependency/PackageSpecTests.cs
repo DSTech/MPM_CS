@@ -18,6 +18,7 @@ namespace MPMTest.Core.Dependency {
             Assert.NotEqual(first, third);
             Assert.NotEqual(third, first);
         }
+
         [Fact]
         public void Equality() {
             var first = new PackageSpec {

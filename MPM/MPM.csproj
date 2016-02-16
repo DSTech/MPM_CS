@@ -118,7 +118,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="MsgPack, Version=0.6.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
-      <HintPath>..\packages\MsgPack.Cli.0.6.2\lib\net45\MsgPack.dll</HintPath>
+      <HintPath>..\packages\MsgPack.Cli.0.6.8\lib\net45\MsgPack.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -165,8 +165,8 @@
       <HintPath>..\packages\Platform.Xml.Serialization.1.1.0.229\lib\net40\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PowerArgs, Version=2.7.0.0, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
-      <HintPath>..\packages\PowerArgs.2.7.0.0\lib\net45\PowerArgs.dll</HintPath>
+    <Reference Include="PowerArgs, Version=2.7.1.0, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
+      <HintPath>..\packages\PowerArgs.2.7.1.0\lib\net45\PowerArgs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
@@ -234,6 +234,9 @@
     <Compile Include="Data\StandardCacheNamingProvider.cs" />
     <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\Asset.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetCollection.cs" />
+    <Compile Include="Util\TimerUtil.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\ArtifactSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\DownloadClassifiers.cs" />

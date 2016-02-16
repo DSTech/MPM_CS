@@ -239,6 +239,9 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="TestResources\MinecraftAssets_1.7.10.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestResources\MinecraftDetails_1.7.10.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
