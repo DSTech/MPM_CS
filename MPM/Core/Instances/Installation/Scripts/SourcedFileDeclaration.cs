@@ -13,6 +13,8 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
         public MPM.Types.SemVersion PackageVersion { get; set; }
 
+        public MPM.Types.CompatibilitySide PackageSide { get; set; }
+
         public string Description { get; set; }
 
         public Hash @Hash { get; set; }

@@ -94,6 +94,7 @@ namespace MPM.Types {
                     op.PackageName = PackageName;
                     op.PackageVersion = Version;
                     op.PackageArch = Arch;
+                    op.PackageSide = Side;
                 }
                 return _installation;
             }

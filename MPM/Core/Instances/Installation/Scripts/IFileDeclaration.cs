@@ -19,6 +19,8 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
         MPM.Types.Arch PackageArch { get; set; }
 
+        MPM.Types.CompatibilitySide PackageSide { get; set; }
+
         /// <summary>
         ///     The path of the file to be installed relative to the root of the package archive root.
         ///     The first portion may be a "protocol", eg https://. Protocols require a <see cref="Hash" /> to be specified.

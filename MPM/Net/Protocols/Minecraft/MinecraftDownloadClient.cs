@@ -10,6 +10,7 @@ using MPM.Core.Instances.Cache;
 using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using MPM.Types;
+using MPM.Util;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -44,5 +45,17 @@ namespace MPM.Net.Protocols.Minecraft {
             return res.GetResponseStream().AndDispose(res);
         }
 
+        //Assets download from http://resources.download.minecraft.net/<first 2 hex letters of hash>/<whole hash>
+        //and should be saved at .minecraft/assets/objects/<first 2 hex letters of hash>/<whole hash>
+        //with a copy stored in .minecraft/assets/virtual/legacy/ for 1.7.2 and below
+        public async Task<Stream> FetchAsset(Asset asset) {
+            var assetHex = Hex.GetString(asset.Hash.Checksum).ToLowerInvariant();
+            // ReSharper disable once UseStringInterpolation
+            //^VS doesn't handle $"" very well with links, so this'll have to do
+            var assetUrl = string.Format("http://resources.download.minecraft.net/{0}/{1}", assetHex.Substring(0, 2), assetHex);
+            var req = WebRequest.Create(assetUrl);
+            var res = await req.GetResponseAsync();
+            return res.GetResponseStream().AndDispose(res);
+        }
     }
 }
