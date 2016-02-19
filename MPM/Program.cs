@@ -15,7 +15,7 @@ namespace MPM {
         public static void DemoArchInstallation() {
             var mai = new MetaArchInstaller();
             var fsCache = new FileSystemCacheManager("./cache");
-            var procedure = mai.EnsureCached("minecraft", new MPM.Types.SemVersion("1.8.8"), fsCache, null);
+            var procedure = mai.EnsureCached("minecraft", Types.CompatibilitySide.Client, new MPM.Types.SemVersion("1.8.8"), fsCache, null);
             var opMap = procedure.GenerateOperations();
             foreach (var target in opMap) {
                 foreach (var operation in target.Value) {

@@ -29,7 +29,7 @@ namespace MPM.Core.Instances.Installation.Scripts {
 
         public void EnsureCached(string packageCachedName, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var archResolver = protocolResolver.GetArchResolver();
-            this.installationProcedure = archResolver.EnsureCached(ArchName, PackageArch, cacheManager, protocolResolver);
+            this.installationProcedure = archResolver.EnsureCached(ArchName, PackageSide, PackageArch, cacheManager, protocolResolver);
         }
 
         public IReadOnlyDictionary<string, IReadOnlyCollection<IFileOperation>> GenerateOperations() => installationProcedure.GenerateOperations();

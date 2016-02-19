@@ -237,6 +237,7 @@
     <Compile Include="Archival\PackageExtractor.cs" />
     <Compile Include="Data\StandardCacheNamingProvider.cs" />
     <Compile Include="Extensions\AlphaFileSystemInfoX.cs" />
+    <Compile Include="Extensions\CacheManagerX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\Asset.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetCollection.cs" />

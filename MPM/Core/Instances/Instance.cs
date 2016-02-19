@@ -12,6 +12,7 @@ using MPM.Core.Dependency;
 using MPM.Core.Instances.Installation;
 using MPM.Data;
 using MPM.Extensions;
+using MPM.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
@@ -68,6 +69,17 @@ namespace MPM.Core.Instances {
                 return conf ?? InstanceConfiguration.Empty;
             }
             set { FetchDbMeta().Set<InstanceConfiguration>(ConfigurationMetaKey, value); }
+        }
+
+        public CompatibilitySide Side {
+            get {
+                var _s = FetchDbMeta().Get<String>("side");
+                if (_s == null) {
+                    return CompatibilitySide.Universal;
+                }
+                return JsonConvert.DeserializeObject<CompatibilitySide>(_s);
+            }
+            set { FetchDbMeta().Set<String>("name", JsonConvert.SerializeObject(value, new Newtonsoft.Json.Converters.StringEnumConverter())); }
         }
 
         public bool IsDisposed { get; private set; }

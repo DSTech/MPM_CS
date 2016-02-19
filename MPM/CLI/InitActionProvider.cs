@@ -46,34 +46,24 @@ namespace MPM.CLI {
             this.Init(factory, args.Arch, args.Side, args.InstanceDirectory);
         }
 
-        private static Configuration GenerateArchConfiguration(MPM.Types.SemVersion instanceArch, InstanceSide instanceSide) {
-            CompatibilitySide packageSide;
-            switch (instanceSide) {
-                case InstanceSide.Client:
-                    packageSide = CompatibilitySide.Client;
-                    break;
-                case InstanceSide.Server:
-                    packageSide = CompatibilitySide.Server;
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+        private static Configuration GenerateArchConfiguration(MPM.Types.SemVersion instanceArch, CompatibilitySide instanceSide) {
             return new Configuration(new[] {
                 new PackageSpec {
                     Name = "minecraft",
                     Arch = new Arch(instanceArch.ToString()),
                     Manual = true,
-                    Side = packageSide,
+                    Side = instanceSide,
                     VersionSpec = new MPM.Types.SemRange("*.*.*", true),
                 },
             });
         }
 
-        public void Init(IContainer factory, MPM.Types.SemVersion instanceArch, InstanceSide instanceSide, DirectoryInfo instanceDirectory) {
+        public void Init(IContainer factory, MPM.Types.SemVersion instanceArch, CompatibilitySide instanceSide, DirectoryInfo instanceDirectory) {
             using (var instance = new Instance(instanceDirectory) {
                 Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
                 LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide/instanceArch and able to be overridden
                 Configuration = InstanceConfiguration.Empty,
+                Side = instanceSide,
             }) {
                 var resolver = factory.Resolve<IDependencyResolver>();
                 var repository = factory.Resolve<IPackageRepository>();

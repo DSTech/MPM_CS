@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,27 +16,44 @@ using Nito.AsyncEx.Synchronous;
 
 namespace MPM.Net.Protocols.Minecraft {
     public class MinecraftArchInstaller {
-        public IArchInstallationProcedure EnsureCached(MPM.Types.SemVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
+        public IArchInstallationProcedure EnsureCached(MPM.Types.CompatibilitySide archSide, MPM.Types.SemVersion archVersion, ICacheManager cacheManager, IProtocolResolver protocolResolver) {
             var mdc = new MinecraftDownloadClient();
             MinecraftVersion versionDetails;
             {
                 Console.WriteLine("Fetching minecraft details");
                 var elapsedTime = TimerUtil.Time(out versionDetails, () => {
-                    versionDetails = mdc.FetchVersion(archVersion.ToString());
+                    versionDetails = mdc.FetchVersion(archVersion);
                 });
                 Console.WriteLine("Fetched details for {0} in {1}ms", versionDetails.Id, elapsedTime.TotalMilliseconds.ToString());
             }
-            var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
-
-            //TODO: Download client and server jars
-
-            //versionDetails.downloads
-
-            //TODO: Download assets
             var installingPlatform = Environment.OSVersion.Platform;
             var installingBitness64 = Environment.Is64BitOperatingSystem;
 
             var operations = new List<ArchInstallationOperation>();
+
+            {
+                {
+                    var binaryCacheClientName = $"minecraft_{archVersion}_client.jar";
+                    var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
+                    cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
+                    var clientBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheClientName, "client.jar");
+                    operations.Add(clientBinaryCopyOp);
+                }
+                {
+                    var binaryCacheServerName = $"minecraft_{archVersion}_server.jar";
+                    var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
+                    cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
+                    var serverBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheServerName, "server.jar");
+                    operations.Add(serverBinaryCopyOp);
+                }
+            }
+
+
+            var assetIndex = mdc.FetchAssetIndex(versionDetails);
+            //TODO: Download assets
+
+
+            var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
             foreach (var lib in libsToInstall) {
                 if (!lib.AppliesToPlatform(installingPlatform)) {
                     continue;
@@ -101,7 +119,7 @@ namespace MPM.Net.Protocols.Minecraft {
                     packageVersion: archVersion,
                     cacheManager: cacheManager,
                     cachedName: cacheEntryName,
-                    targetPath: $"libraries/{lib.Package}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTagOrNull}.jar"
+                    targetPath: $"libraries/{lib.Package.Replace('.', '/')}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTagOrNull}.jar"
                     );
             }
         }

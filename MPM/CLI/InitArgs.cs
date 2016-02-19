@@ -1,4 +1,5 @@
 using System.IO;
+using MPM.Types;
 using Newtonsoft.Json;
 using PowerArgs;
 
@@ -19,10 +20,10 @@ namespace MPM.CLI {
         [ArgShortcut("-a"), ArgShortcut("--arch"), ArgShortcut(ArgShortcutPolicy.ShortcutsOnly)]
         public MPM.Types.SemVersion Arch { get; set; }
 
-        [ArgDescription("The minecraft side, eg server, client")]
+        [ArgDescription("The minecraft side, e.g. server, client")]
         [ArgDefaultValue("client")]
         [ArgShortcut("-s"), ArgShortcut("--side"), ArgShortcut(ArgShortcutPolicy.ShortcutsOnly)]
-        public InstanceSide Side { get; set; }
+        public CompatibilitySide Side { get; set; }
 
         #region Arg Revivers
 
