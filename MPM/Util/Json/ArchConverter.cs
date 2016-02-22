@@ -3,7 +3,6 @@ using MPM.Types;
 using Newtonsoft.Json;
 
 namespace MPM.Util.Json {
-    [JsonConverter(typeof(Arch))]
     public class ArchConverter : JsonConverter {
         public override bool CanRead => true;
 

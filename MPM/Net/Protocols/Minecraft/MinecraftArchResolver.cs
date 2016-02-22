@@ -24,7 +24,7 @@ namespace MPM.Net.Protocols.Minecraft {
                 var elapsedTime = TimerUtil.Time(out versionDetails, () => {
                     versionDetails = mdc.FetchVersion(archVersion);
                 });
-                Console.WriteLine("Fetched details for {0} in {1}ms", versionDetails.Id, elapsedTime.TotalMilliseconds.ToString());
+                Console.WriteLine("Fetched details for {0} in {1}ms", versionDetails.Id, elapsedTime.TotalMilliseconds);
             }
             var installingPlatform = Environment.OSVersion.Platform;
             var installingBitness64 = Environment.Is64BitOperatingSystem;
@@ -50,14 +50,18 @@ namespace MPM.Net.Protocols.Minecraft {
 
 
             var assetIndex = mdc.FetchAssetIndex(versionDetails);
-            //TODO: Download assets
+            foreach (var asset in assetIndex.Assets) {
+                var assetStream = mdc.FetchAsset(asset);
+                //TODO: Download / install asset from stream
+                throw new NotImplementedException();
+            }
 
 
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
             foreach (var lib in libsToInstall) {
                 if (!lib.AppliesToPlatform(installingPlatform)) {
                     continue;
-                }
+                } 
 
                 var _nativeDetails = lib.ApplyNatives(installingPlatform, installingBitness64);
                 var nativeArtifact = _nativeDetails.Artifact;

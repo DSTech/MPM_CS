@@ -32,7 +32,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         }
 
         [JsonProperty("assetIndex")]
-        public AssetIndex @AssetIndex { get; set; }
+        public AssetIndexSpecifier @AssetIndex { get; set; }
 
         /// <summary>
         ///     Version for which assets should be loaded, eg: "1.7.10"

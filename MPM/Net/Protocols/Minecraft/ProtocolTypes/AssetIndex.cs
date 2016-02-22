@@ -3,7 +3,7 @@ using MPM.Util.Json;
 using Newtonsoft.Json;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
-    public class AssetIndex {
+    public class AssetIndexSpecifier {
         [JsonProperty("id")]
         public string Id { get; set; }
 

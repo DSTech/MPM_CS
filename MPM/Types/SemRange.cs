@@ -2,6 +2,7 @@
 using SemVer;
 
 namespace MPM.Types {
+    //TODO: Convert to using SemVersion range equality, added via next release of SemanticVersioning
     [Newtonsoft.Json.JsonConverter(typeof(MPM.Util.Json.VersionRangeConverter))]
     public class SemRange : SemVer.Range, IEquatable<SemRange> {
         public SemRange(string rangeSpec, bool loose = false)
