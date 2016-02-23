@@ -11,6 +11,7 @@ using MPM.Core.Instances.Installation;
 using MPM.Core.Protocols;
 using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.ProtocolTypes;
+using MPM.Types;
 using MPM.Util;
 using Nito.AsyncEx.Synchronous;
 
@@ -50,18 +51,62 @@ namespace MPM.Net.Protocols.Minecraft {
 
 
             var assetIndex = mdc.FetchAssetIndex(versionDetails);
-            foreach (var asset in assetIndex.Assets) {
-                var assetStream = mdc.FetchAsset(asset);
-                //TODO: Download / install asset from stream
-                throw new NotImplementedException();
-            }
+            if (assetIndex.Assets.Count > 0) {
+                var currentIndex = 0;
+                var assetCount = assetIndex.Assets.Count;
+                var assetCountCharWidth = assetCount.ToString().Length;
+                Console.WriteLine("Caching and verifying assets...");
+                using (var sha1 = new System.Security.Cryptography.SHA1Managed()) {
+                    foreach (var asset in assetIndex.Assets) {
+                        var assetCacheId = $"arch/minecraft/{archVersion}/asset/{asset.Uri.ToString()}";
+                        Console.WriteLine($"\t[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}] ({Huminz.ByteSizeShort(asset.Size).PadLeft(8)}) {asset.Uri}");
 
+                        //Check existing entry if found
+                        if (cacheManager.Contains(assetCacheId)) {
+                            var data = cacheManager.Fetch(assetCacheId).Fetch();
+                            if (data.LongLength == asset.Size) {
+                                var cachedAssetHash = new Hash("sha1", sha1.ComputeHash(data));
+                                if (cachedAssetHash == asset.Hash) {
+                                    continue;//Entry is okay
+                                }
+                                Console.WriteLine($"Cached asset {asset.Uri} with hash {cachedAssetHash} did not match hash {asset.Hash}, redownloading.");
+                            } else {
+                                Console.WriteLine($"Cached asset {asset.Uri} with size {data.LongLength} did not match size {asset.Size}, redownloading.");
+                            }
+                            cacheManager.Delete(assetCacheId);
+                        }
+
+                        //Download asset for caching
+                        var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
+                        var assetData = assetStream.ReadToEndAndClose();
+                        if (assetData.LongLength != asset.Size) {
+                            throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                        }
+                        var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
+                        if (downloadedAssetHash != asset.Hash) {
+                            throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
+                        }
+                        cacheManager.Store(assetCacheId, assetData);
+                        var hexHash = Hex.GetString(asset.Hash.Checksum);
+                        var assetCopy = new CopyArchInstallationOperation(
+                            packageName: "minecraft",
+                            packageVersion: archVersion,
+                            cacheManager: cacheManager,
+                            cachedName: assetCacheId,
+                            targetPath: $"assets/objects/{hexHash.Substring(0, 2)}/{hexHash}"
+                            );
+                        //Milestone Gamma: 1.7.2 and below require files to be stored in a different format under assets/virtual/legacy/
+                        operations.Add(assetCopy);
+                    }
+                }
+                Console.WriteLine("Assets cached.");
+            }
 
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
             foreach (var lib in libsToInstall) {
                 if (!lib.AppliesToPlatform(installingPlatform)) {
                     continue;
-                } 
+                }
 
                 var _nativeDetails = lib.ApplyNatives(installingPlatform, installingBitness64);
                 var nativeArtifact = _nativeDetails.Artifact;

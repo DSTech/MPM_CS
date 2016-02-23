@@ -189,8 +189,8 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SemVer, Version=0.6.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SemanticVersioning.0.6.9.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
+    <Reference Include="SemVer, Version=0.6.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SemanticVersioning.0.6.12.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -240,10 +240,11 @@
     <Compile Include="Extensions\CacheManagerX.cs" />
     <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\Asset.cs" />
-    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetCollection.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Util\Huminz.cs" />
     <Compile Include="Util\TimerUtil.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\ArtifactSpec.cs" />
-    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndexSpecifier.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\DownloadClassifiers.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\DownloadsSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryIdentity.cs" />

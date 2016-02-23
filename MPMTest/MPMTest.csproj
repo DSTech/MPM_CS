@@ -221,6 +221,7 @@
     <Compile Include="Net\Protocols\Minecraft\MinecraftVersionDetails.cs" />
     <Compile Include="TestUtilities\TestResources.cs" />
     <Compile Include="ProfileTests.cs" />
+    <Compile Include="Types\HashTests.cs" />
     <None Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />
     <None Include="Core\Dependency\ResolverTests.cs" />

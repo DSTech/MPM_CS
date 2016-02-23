@@ -60,7 +60,7 @@ namespace MPMTest.Net.Protocols.Minecraft {
         public void Assets_1_7_10() {
             var testMinecraftAssetsFile = TestResources.ResourceDirectory.SubFile("MinecraftAssets_1.7.10.json");
             var originalText = File.ReadAllText(testMinecraftAssetsFile.FullName);
-            var assets = JsonConvert.DeserializeObject<MPM.Net.Protocols.Minecraft.ProtocolTypes.AssetCollection>(originalText);
+            var assets = JsonConvert.DeserializeObject<MPM.Net.Protocols.Minecraft.ProtocolTypes.AssetIndex>(originalText);
             var assetsReserialized = JsonConvert.SerializeObject(assets, Formatting.Indented);
             var origJsonRaw = JToken.Parse(originalText);
             var reserializedJsonRaw = JToken.Parse(assetsReserialized);

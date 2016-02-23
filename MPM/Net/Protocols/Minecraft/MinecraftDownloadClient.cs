@@ -36,7 +36,7 @@ namespace MPM.Net.Protocols.Minecraft {
 
         public MinecraftVersion FetchVersion(SemVersion versionId) => this.GetFromUrlAsType<MinecraftVersion>(String.Format("{0}/versions/{1}/{1}.json", this.BaseUrl, versionId));
 
-        public AssetCollection FetchAssetIndex(MinecraftVersion details) => this.GetFromUrlAsType<AssetCollection>(details.AssetIndex.Url);
+        public AssetIndex FetchAssetIndex(MinecraftVersion details) => this.GetFromUrlAsType<AssetIndex>(details.AssetIndex.Url);
 
         public async Task<Stream> FetchClient(MinecraftVersion version) {
             var url = version.Downloads.Client.Url;

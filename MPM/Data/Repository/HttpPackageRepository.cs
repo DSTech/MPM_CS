@@ -17,7 +17,7 @@ namespace MPM.Data.Repository {
         }
 
         public IEnumerable<Build> FetchBuilds() {
-            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/builds/?format=json"));
+            var req = WebRequest.Create(new Uri(baseUri, $"/builds/?format=json"));
             byte[] responseData;
             using (var response = req.GetResponse()) {
                 responseData = response.GetResponseStream().ReadToEndAndClose();
@@ -26,12 +26,17 @@ namespace MPM.Data.Repository {
         }
 
         public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
-            var updatedAfterString = updatedAfter.ToUniversalTime().ToUnixTimeStamp();
-            var req = WebRequest.CreateHttp(new Uri(baseUri, $"/builds/?format=json&updatedAfter={updatedAfterString}"));
             byte[] responseData;
-            using (var response = req.GetResponse()) {
-                responseData = response.GetResponseStream().ReadToEndAndClose();
-            }
+            var fetchTime = Util.TimerUtil.Time(out responseData, () => {
+                Console.Write($"Fetching builds from {baseUri}...");
+                var updatedAfterString = updatedAfter.ToUniversalTime().ToUnixTimeStamp();
+                var req = WebRequest.Create(new Uri(baseUri, $"/builds/?format=json&updatedAfter={updatedAfterString}"));
+                req.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
+                using (var response = req.GetResponse()) {
+                    responseData = response.GetResponseStream().ReadToEndAndClose();
+                }
+            });
+            Console.WriteLine($" Done in {fetchTime.TotalMilliseconds}ms.");
             return JsonConvert.DeserializeObject<IEnumerable<Build>>(Encoding.UTF8.GetString(responseData));
         }
     }

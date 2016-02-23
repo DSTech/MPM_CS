@@ -88,6 +88,7 @@ namespace MPM.Data {
                     Builds.RegisterBuild(build);
                 }
             }
+            Console.WriteLine("Synced.");
             SetLastSynced(DateTime.UtcNow);
         }
 
