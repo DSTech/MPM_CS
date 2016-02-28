@@ -75,22 +75,28 @@ namespace MPM.Core.Instances.Installation {
 
             //Generate operation listings for installation
             var fileMap = configuration.GenerateFileMap(cacheManager, protocolResolver);
-            foreach (var opTarget in fileMap) {
-                var target = opTarget.Key;
-                foreach (var operation in opTarget.Value) {
-                    operation.Perform(fileSystem, target, cacheManager);
-                }
-            }
 
-            //Perform operations in order
-            foreach (var entrySet in fileMap) {
-                var entry = entrySet.Value.LastOrDefault();
-                if (entry == null) {
-                    continue;
+            //Prep operation plan
+            var targets = fileMap.Select(e => new {
+                Path = e.Key,
+                Operation = e.Value.LastOrDefault(),//Select the last operation at any path
+            });
+
+            Console.Write("Performing installation operations... ");
+
+            var duration = TimerUtil.Time(() => {
+                using (var cp = new ConsoleProgress()) {
+                    var targCount = targets.Count();
+                    var curTarget = 0;
+                    //Perform operations
+                    foreach (var target in targets) {
+                        cp.Report(((double) (++curTarget)) / ((double) targCount));
+                        target.Operation.Perform(fileSystem, target.Path, cacheManager);
+                    }
                 }
-                Console.WriteLine($"\t{entry}");
-                entry.Perform(fileSystem, entrySet.Key, cacheManager);
-            }
+            });
+
+            Console.WriteLine("Done in {0:0.00}s.", duration.TotalSeconds);
 
             instance.Configuration = configuration;
         }

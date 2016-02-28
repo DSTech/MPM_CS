@@ -9,6 +9,8 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using MPM.Archival;
 using MPM.Core.Instances.Cache;
+using MPM.Extensions;
+using MPM.Types;
 using Platform.VirtualFileSystem;
 
 namespace MPM.Core.Instances.Installation {
@@ -19,7 +21,7 @@ namespace MPM.Core.Instances.Installation {
         public CopyFileOperation() {
         }
 
-        public CopyFileOperation(string packageName, MPM.Types.SemVersion packageVersion, string cacheEntryName) {
+        public CopyFileOperation(string packageName, SemVersion packageVersion, string cacheEntryName) {
             this.PackageName = PackageName;
             this.PackageVersion = packageVersion;
             this.CacheEntryName = cacheEntryName;
@@ -31,7 +33,7 @@ namespace MPM.Core.Instances.Installation {
 
         public string PackageName { get; set; }
 
-        public MPM.Types.SemVersion PackageVersion { get; set; }
+        public SemVersion PackageVersion { get; set; }
 
         public void Perform(IFileSystem fileSystem, String path, ICacheReader cache) {
             var targetFile = fileSystem.ResolveFile(path);
@@ -46,10 +48,8 @@ namespace MPM.Core.Instances.Installation {
             if (cacheEntry == null) {
                 throw new KeyNotFoundException($"Cache did not contain an entry for {CacheEntryName}");
             }
-            using (var entryStream = cacheEntry.FetchStream()) {
-                using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
-                    entryStream.CopyTo(fileWriter);
-                }
+            using (var fileWriter = targetFile.GetContent().GetOutputStream(System.IO.FileMode.Create)) {
+                cacheEntry.FetchStream().CopyToAndClose(fileWriter);
             }
         }
 

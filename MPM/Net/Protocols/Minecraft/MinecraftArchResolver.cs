@@ -152,33 +152,18 @@ namespace MPM.Net.Protocols.Minecraft {
                 Asset = asset,
             }).ToArray();
 
-            using (var sha1 = new SHA1Managed()) {
-                var assetsToDownload = new List<AssetCacheEntry>();
-                //Check currently available assets- Check cached values, flag bad entries for redownload
-                foreach (var _asset in assetsWithIds) {
-                    var asset = _asset.Asset;
-                    var assetCacheId = _asset.CacheId;
-                    if (!cacheManager.Contains(assetCacheId)) {
-                        assetsToDownload.Add(_asset);
-                        continue;
-                    }
-                    var data = cacheManager.Fetch(assetCacheId).Fetch();
-                    if (data.LongLength != asset.Size) {
-                        Console.WriteLine($"Cached asset {asset.Uri} with size {data.LongLength} did not match size {asset.Size}, redownloading.");
-                        cacheManager.Delete(assetCacheId);
-                        assetsToDownload.Add(_asset);
-                        continue;
-                    }
-                    var cachedAssetHash = new Hash("sha1", sha1.ComputeHash(data));
-                    if (cachedAssetHash != asset.Hash) {
-                        Console.WriteLine($"Cached asset {asset.Uri} with hash {cachedAssetHash} did not match hash {asset.Hash}, redownloading.");
-                        cacheManager.Delete(assetCacheId);
-                        assetsToDownload.Add(_asset);
-                        continue;
-                    }
-                    //Entry is okay, continue
+            var assetsToDownload = new List<AssetCacheEntry>();
+            //Check currently available assets- Check cached values, flag bad entries for redownload
+            foreach (var _asset in assetsWithIds) {
+                var asset = _asset.Asset;
+                var assetCacheId = _asset.CacheId;
+                if (cacheManager.Contains(assetCacheId)) {
+                    continue;
                 }
+                assetsToDownload.Add(_asset);
+            }
 
+            using (var sha1 = new SHA1Managed()) {
                 //Download missing assets to cache
                 {
                     var currentIndex = 0;
