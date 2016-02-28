@@ -11,3 +11,6 @@ build:
   verbosity: minimal
 test:
   assemblies: MPMTest\bin\Release\MPMTest.dll
+artifacts:
+- path: MPM/bin/Release/*
+  name: Release
