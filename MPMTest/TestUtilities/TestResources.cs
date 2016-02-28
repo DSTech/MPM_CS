@@ -13,7 +13,19 @@ namespace MPMTest.TestUtilities {
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 FileName = "cmd.exe",
-                Arguments = $"/k {command} \"{String.Join(" ", arguments.Select(s => $"\"{s.Replace("\"", "\"\"") }\""))}\"",
+                Arguments = String.Format(
+                    "/k {0} \"{1}\"",
+                    command,
+                    String.Join(
+                        " ",
+                        arguments.Select(
+                            s => String.Format(
+                                "\"{0}\"",
+                                s.Replace("\"", "\"\"")
+                            )
+                        )
+                    )
+                ),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
