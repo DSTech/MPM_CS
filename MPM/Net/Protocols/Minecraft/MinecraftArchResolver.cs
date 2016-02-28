@@ -31,16 +31,22 @@ namespace MPM.Net.Protocols.Minecraft {
             var installingPlatform = Environment.OSVersion.Platform;
             var installingBitness64 = Environment.Is64BitOperatingSystem;
 
+            Console.WriteLine("Installing client and server jars...");
             var operations = new List<ArchInstallationOperation>();
             operations.AddRange(CacheServerAndClientJars(archVersion, cacheManager, mdc, versionDetails));
+            Console.WriteLine("Client and server jars installed.");
 
             var assetIndex = mdc.FetchAssetIndex(versionDetails);
             if (assetIndex.Assets.Count > 0) {
+                Console.WriteLine("Caching and verifying assets...");
                 operations.AddRange(CacheAssets(archVersion, assetIndex, mdc, cacheManager));
+                Console.WriteLine("Assets cached.");
             }
 
             if (versionDetails.Libraries.Count > 0) {
+                Console.WriteLine("Caching libraries...");
                 operations.AddRange(CacheLibraries(archVersion, cacheManager, mdc, versionDetails, installingPlatform, installingBitness64));
+                Console.WriteLine("Libraries cached.");
             }
 
             return new ArchInstallationProcedure(operations.ToArray());
@@ -75,7 +81,6 @@ namespace MPM.Net.Protocols.Minecraft {
                     );
                 operations.Add(cacheOp);
                 if (cacheManager.Contains(cacheEntryName)) {
-                    Console.WriteLine($"File already cached as {cacheEntryName}.");
                     continue;
                 }
                 Console.WriteLine($"Fetching {lib.Name}...");
@@ -92,15 +97,19 @@ namespace MPM.Net.Protocols.Minecraft {
             var operations = new List<ArchInstallationOperation>(2);
             {
                 var binaryCacheClientName = $"minecraft_{archVersion}_client.jar";
-                var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
-                cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
+                if (!cacheManager.Contains(binaryCacheClientName)) {
+                    var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
+                    cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
+                }
                 var clientBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheClientName, "client.jar");
                 operations.Add(clientBinaryCopyOp);
             }
             {
                 var binaryCacheServerName = $"minecraft_{archVersion}_server.jar";
-                var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
-                cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
+                if (!cacheManager.Contains(binaryCacheServerName)) {
+                    var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
+                    cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
+                }
                 var serverBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheServerName, "server.jar");
                 operations.Add(serverBinaryCopyOp);
             }
@@ -138,10 +147,6 @@ namespace MPM.Net.Protocols.Minecraft {
         }
 
         private static IEnumerable<ArchInstallationOperation> CacheAssets(SemVersion archVersion, AssetIndex assetIndex, MinecraftDownloadClient mdc, ICacheManager cacheManager) {
-            var currentIndex = 0;
-            var assetCount = assetIndex.Assets.Count;
-            var assetCountCharWidth = assetCount.ToString().Length;
-            Console.WriteLine("Caching and verifying assets...");
             var assetsWithIds = assetIndex.Assets.Select(asset => new AssetCacheEntry {
                 CacheId = $"arch/minecraft/{archVersion}/asset/{asset.Uri.ToString()}",
                 Asset = asset,
@@ -175,22 +180,34 @@ namespace MPM.Net.Protocols.Minecraft {
                 }
 
                 //Download missing assets to cache
-                foreach (var _asset in assetsToDownload) {//C# needs real destructuring support
-                    var assetCacheId = _asset.CacheId;
-                    var asset = _asset.Asset;
+                {
+                    var currentIndex = 0;
+                    var assetCount = assetsToDownload.Count;
+                    if (assetCount > 0) {
+                        var assetCountCharWidth = assetCount.ToString().Length;
+                        var totalSize = assetsToDownload.Sum(asset => asset.Asset.Size);
+                        Console.WriteLine($"Downloading {assetCount} files adding up to {Huminz.ByteSize(totalSize)}");
+                        foreach (var _asset in assetsToDownload) {//C# needs real destructuring support
+                            var assetCacheId = _asset.CacheId;
+                            var asset = _asset.Asset;
 
-                    Console.WriteLine($"\t[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}] ({Huminz.ByteSizeShort(asset.Size).PadLeft(8)}) {asset.Uri}");
+                            var countSection = $"[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}]";
+                            var byteLength = $"({Huminz.ByteSizeShort(asset.Size).PadLeft(8)})";
 
-                    var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
-                    var assetData = assetStream.ReadToEndAndClose();
-                    if (assetData.LongLength != asset.Size) {
-                        throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                            Console.WriteLine($"\t{countSection} {byteLength} {asset.Uri}");
+
+                            var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
+                            var assetData = assetStream.ReadToEndAndClose();
+                            if (assetData.LongLength != asset.Size) {
+                                throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                            }
+                            var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
+                            if (downloadedAssetHash != asset.Hash) {
+                                throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
+                            }
+                            cacheManager.Store(assetCacheId, assetData);
+                        }
                     }
-                    var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
-                    if (downloadedAssetHash != asset.Hash) {
-                        throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
-                    }
-                    cacheManager.Store(assetCacheId, assetData);
                 }
             }
 
@@ -208,7 +225,6 @@ namespace MPM.Net.Protocols.Minecraft {
                 //Milestone Gamma: 1.7.2 and below require files to be stored in a different format under assets/virtual/legacy/
                 operations.Add(assetCopy);
             }
-            Console.WriteLine("Assets cached.");
             return operations;
         }
     }

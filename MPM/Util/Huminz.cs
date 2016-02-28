@@ -10,6 +10,9 @@ namespace MPM.Util {
         public static string ByteSize(int bytes) => ByteSize((long)bytes);
 
         public static string ByteSize(long bytes) {
+            if (bytes == 0) {
+                return "0 bytes";
+            }
             var orders = Convert.ToByte(Math.Floor(Math.Log(bytes, 1024)));
             var ground = Math.Pow(1024, orders);
             var dec = (double)bytes / (double)ground;
@@ -40,6 +43,9 @@ namespace MPM.Util {
         public static string ByteSizeShort(int bytes) => ByteSizeShort((long) bytes);
 
         public static string ByteSizeShort(long bytes) {
+            if (bytes == 0) {
+                return "0b";
+            }
             var orders = Convert.ToByte(Math.Floor(Math.Log(bytes, 1024)));
             var ground = Math.Pow(1024, orders);
             var dec = (double)bytes / (double)ground;
