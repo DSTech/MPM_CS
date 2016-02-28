@@ -241,6 +241,7 @@
     <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\Asset.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Util\ConsoleProgress.cs" />
     <Compile Include="Util\Huminz.cs" />
     <Compile Include="Util\TimerUtil.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\ArtifactSpec.cs" />
@@ -322,7 +323,7 @@
     <Compile Include="Util\Hex.cs" />
     <Compile Include="Util\Json\LibraryIdentityConverter.cs" />
     <Compile Include="Util\Json\Sha1HashHexConverter.cs" />
-    <Compile Include="Util\Json\UtcDateTimeConverter.cs" />
+    <Compile Include="Util\Json\UTCDateTimeConverter.cs" />
     <Compile Include="Util\StreamingZipFetcher.cs" />
     <Compile Include="Util\SeekingZipFetcher.cs" />
     <Compile Include="Core\Instances\Instance.cs" />

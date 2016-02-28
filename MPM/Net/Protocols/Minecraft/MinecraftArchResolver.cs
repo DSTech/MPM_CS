@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reactive.Disposables;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using MPM.Core.Instances.Cache;
@@ -31,77 +32,22 @@ namespace MPM.Net.Protocols.Minecraft {
             var installingBitness64 = Environment.Is64BitOperatingSystem;
 
             var operations = new List<ArchInstallationOperation>();
-
-            {
-                {
-                    var binaryCacheClientName = $"minecraft_{archVersion}_client.jar";
-                    var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
-                    cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
-                    var clientBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheClientName, "client.jar");
-                    operations.Add(clientBinaryCopyOp);
-                }
-                {
-                    var binaryCacheServerName = $"minecraft_{archVersion}_server.jar";
-                    var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
-                    cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
-                    var serverBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheServerName, "server.jar");
-                    operations.Add(serverBinaryCopyOp);
-                }
-            }
-
+            operations.AddRange(CacheServerAndClientJars(archVersion, cacheManager, mdc, versionDetails));
 
             var assetIndex = mdc.FetchAssetIndex(versionDetails);
             if (assetIndex.Assets.Count > 0) {
-                var currentIndex = 0;
-                var assetCount = assetIndex.Assets.Count;
-                var assetCountCharWidth = assetCount.ToString().Length;
-                Console.WriteLine("Caching and verifying assets...");
-                using (var sha1 = new System.Security.Cryptography.SHA1Managed()) {
-                    foreach (var asset in assetIndex.Assets) {
-                        var assetCacheId = $"arch/minecraft/{archVersion}/asset/{asset.Uri.ToString()}";
-                        Console.WriteLine($"\t[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}] ({Huminz.ByteSizeShort(asset.Size).PadLeft(8)}) {asset.Uri}");
-
-                        //Check existing entry if found
-                        if (cacheManager.Contains(assetCacheId)) {
-                            var data = cacheManager.Fetch(assetCacheId).Fetch();
-                            if (data.LongLength == asset.Size) {
-                                var cachedAssetHash = new Hash("sha1", sha1.ComputeHash(data));
-                                if (cachedAssetHash == asset.Hash) {
-                                    continue;//Entry is okay
-                                }
-                                Console.WriteLine($"Cached asset {asset.Uri} with hash {cachedAssetHash} did not match hash {asset.Hash}, redownloading.");
-                            } else {
-                                Console.WriteLine($"Cached asset {asset.Uri} with size {data.LongLength} did not match size {asset.Size}, redownloading.");
-                            }
-                            cacheManager.Delete(assetCacheId);
-                        }
-
-                        //Download asset for caching
-                        var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
-                        var assetData = assetStream.ReadToEndAndClose();
-                        if (assetData.LongLength != asset.Size) {
-                            throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
-                        }
-                        var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
-                        if (downloadedAssetHash != asset.Hash) {
-                            throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
-                        }
-                        cacheManager.Store(assetCacheId, assetData);
-                        var hexHash = Hex.GetString(asset.Hash.Checksum);
-                        var assetCopy = new CopyArchInstallationOperation(
-                            packageName: "minecraft",
-                            packageVersion: archVersion,
-                            cacheManager: cacheManager,
-                            cachedName: assetCacheId,
-                            targetPath: $"assets/objects/{hexHash.Substring(0, 2)}/{hexHash}"
-                            );
-                        //Milestone Gamma: 1.7.2 and below require files to be stored in a different format under assets/virtual/legacy/
-                        operations.Add(assetCopy);
-                    }
-                }
-                Console.WriteLine("Assets cached.");
+                operations.AddRange(CacheAssets(archVersion, assetIndex, mdc, cacheManager));
             }
 
+            if (versionDetails.Libraries.Count > 0) {
+                operations.AddRange(CacheLibraries(archVersion, cacheManager, mdc, versionDetails, installingPlatform, installingBitness64));
+            }
+
+            return new ArchInstallationProcedure(operations.ToArray());
+        }
+
+        private IEnumerable<ArchInstallationOperation> CacheLibraries(SemVersion archVersion, ICacheManager cacheManager, MinecraftDownloadClient mdc, MinecraftVersion versionDetails, PlatformID installingPlatform, bool installingBitness64) {
+            var operations = new List<ArchInstallationOperation>();
             var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
             foreach (var lib in libsToInstall) {
                 if (!lib.AppliesToPlatform(installingPlatform)) {
@@ -139,17 +85,29 @@ namespace MPM.Net.Protocols.Minecraft {
                     cacheManager.Store(cacheEntryName, libStream.ReadToEnd());
                 }
             }
-            return new ArchInstallationProcedure(operations.ToArray());
+            return operations;
         }
 
-        private ArchInstallationOperation GenerateOp(
-            MPM.Types.SemVersion archVersion,
-            LibrarySpec lib,
-            ArtifactSpec artifact,
-            string nativeTagOrNull,
-            string cacheEntryName,
-            ICacheManager cacheManager
-            ) {
+        private static IEnumerable<ArchInstallationOperation> CacheServerAndClientJars(SemVersion archVersion, ICacheManager cacheManager, MinecraftDownloadClient mdc, MinecraftVersion versionDetails) {
+            var operations = new List<ArchInstallationOperation>(2);
+            {
+                var binaryCacheClientName = $"minecraft_{archVersion}_client.jar";
+                var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
+                cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
+                var clientBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheClientName, "client.jar");
+                operations.Add(clientBinaryCopyOp);
+            }
+            {
+                var binaryCacheServerName = $"minecraft_{archVersion}_server.jar";
+                var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
+                cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
+                var serverBinaryCopyOp = new CopyArchInstallationOperation("minecraft", archVersion, cacheManager, binaryCacheServerName, "server.jar");
+                operations.Add(serverBinaryCopyOp);
+            }
+            return operations;
+        }
+
+        private ArchInstallationOperation GenerateOp(SemVersion archVersion, LibrarySpec lib, ArtifactSpec artifact, string nativeTagOrNull, string cacheEntryName, ICacheManager cacheManager) {
             if (lib.Extract != null) {
                 //generate extract def
                 string extractDestination = nativeTagOrNull != null ? "bin/natives/" : "bin/";
@@ -171,6 +129,87 @@ namespace MPM.Net.Protocols.Minecraft {
                     targetPath: $"libraries/{lib.Package.Replace('.', '/')}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTagOrNull}.jar"
                     );
             }
+        }
+
+
+        private struct AssetCacheEntry {
+            public string CacheId { get; set; }
+            public Asset Asset { get; set; }
+        }
+
+        private static IEnumerable<ArchInstallationOperation> CacheAssets(SemVersion archVersion, AssetIndex assetIndex, MinecraftDownloadClient mdc, ICacheManager cacheManager) {
+            var currentIndex = 0;
+            var assetCount = assetIndex.Assets.Count;
+            var assetCountCharWidth = assetCount.ToString().Length;
+            Console.WriteLine("Caching and verifying assets...");
+            var assetsWithIds = assetIndex.Assets.Select(asset => new AssetCacheEntry {
+                CacheId = $"arch/minecraft/{archVersion}/asset/{asset.Uri.ToString()}",
+                Asset = asset,
+            }).ToArray();
+
+            using (var sha1 = new SHA1Managed()) {
+                var assetsToDownload = new List<AssetCacheEntry>();
+                //Check currently available assets- Check cached values, flag bad entries for redownload
+                foreach (var _asset in assetsWithIds) {
+                    var asset = _asset.Asset;
+                    var assetCacheId = _asset.CacheId;
+                    if (!cacheManager.Contains(assetCacheId)) {
+                        assetsToDownload.Add(_asset);
+                        continue;
+                    }
+                    var data = cacheManager.Fetch(assetCacheId).Fetch();
+                    if (data.LongLength != asset.Size) {
+                        Console.WriteLine($"Cached asset {asset.Uri} with size {data.LongLength} did not match size {asset.Size}, redownloading.");
+                        cacheManager.Delete(assetCacheId);
+                        assetsToDownload.Add(_asset);
+                        continue;
+                    }
+                    var cachedAssetHash = new Hash("sha1", sha1.ComputeHash(data));
+                    if (cachedAssetHash != asset.Hash) {
+                        Console.WriteLine($"Cached asset {asset.Uri} with hash {cachedAssetHash} did not match hash {asset.Hash}, redownloading.");
+                        cacheManager.Delete(assetCacheId);
+                        assetsToDownload.Add(_asset);
+                        continue;
+                    }
+                    //Entry is okay, continue
+                }
+
+                //Download missing assets to cache
+                foreach (var _asset in assetsToDownload) {//C# needs real destructuring support
+                    var assetCacheId = _asset.CacheId;
+                    var asset = _asset.Asset;
+
+                    Console.WriteLine($"\t[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}] ({Huminz.ByteSizeShort(asset.Size).PadLeft(8)}) {asset.Uri}");
+
+                    var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
+                    var assetData = assetStream.ReadToEndAndClose();
+                    if (assetData.LongLength != asset.Size) {
+                        throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                    }
+                    var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
+                    if (downloadedAssetHash != asset.Hash) {
+                        throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
+                    }
+                    cacheManager.Store(assetCacheId, assetData);
+                }
+            }
+
+            var operations = new List<ArchInstallationOperation>();
+            //Install all entries
+            foreach (var _asset in assetsWithIds) {
+                var hexHash = Hex.GetString(_asset.Asset.Hash.Checksum);
+                var assetCopy = new CopyArchInstallationOperation(
+                    packageName: "minecraft",
+                    packageVersion: archVersion,
+                    cacheManager: cacheManager,
+                    cachedName: _asset.CacheId,
+                    targetPath: $"assets/objects/{hexHash.Substring(0, 2)}/{hexHash}"
+                    );
+                //Milestone Gamma: 1.7.2 and below require files to be stored in a different format under assets/virtual/legacy/
+                operations.Add(assetCopy);
+            }
+            Console.WriteLine("Assets cached.");
+            return operations;
         }
     }
 }

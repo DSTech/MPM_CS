@@ -7,6 +7,9 @@ using JetBrains.Annotations;
 using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 
 namespace MPM.Data.Repository {
     public class HttpPackageRepository : IPackageRepository {
@@ -17,27 +20,29 @@ namespace MPM.Data.Repository {
         }
 
         public IEnumerable<Build> FetchBuilds() {
-            var req = WebRequest.Create(new Uri(baseUri, $"/builds/?format=json"));
-            byte[] responseData;
-            using (var response = req.GetResponse()) {
-                responseData = response.GetResponseStream().ReadToEndAndClose();
-            }
-            return JsonConvert.DeserializeObject<IEnumerable<Build>>(Encoding.UTF8.GetString(responseData));
-        }
-
-        public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
-            byte[] responseData;
-            var fetchTime = Util.TimerUtil.Time(out responseData, () => {
-                Console.Write($"Fetching builds from {baseUri}...");
-                var updatedAfterString = updatedAfter.ToUniversalTime().ToUnixTimeStamp();
-                var req = WebRequest.Create(new Uri(baseUri, $"/builds/?format=json&updatedAfter={updatedAfterString}"));
-                req.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-                using (var response = req.GetResponse()) {
-                    responseData = response.GetResponseStream().ReadToEndAndClose();
+            string responseString;
+            var fetchTime = Util.TimerUtil.Time(out responseString, () => {
+                using (var wc = new WebClient()) {
+                    Console.Write($"Full-Fetching builds from {baseUri}...");
+                    responseString = wc.DownloadString(new Uri(baseUri, $"/builds/?format=json"));
                 }
             });
             Console.WriteLine($" Done in {fetchTime.TotalMilliseconds}ms.");
-            return JsonConvert.DeserializeObject<IEnumerable<Build>>(Encoding.UTF8.GetString(responseData));
+            return JsonConvert.DeserializeObject<IEnumerable<Build>>(responseString);
+        }
+
+        public IEnumerable<Build> FetchBuilds(DateTime updatedAfter) {
+            string responseString;
+            var fetchTime = Util.TimerUtil.Time(out responseString, () => {
+                Console.Write($"Delta-Fetching builds from {this.baseUri}...");
+                var updatedAfterString = updatedAfter.ToUniversalTime().ToUnixTimeStamp();
+                var uri = new Uri(this.baseUri, $"/builds/?format=json&updatedAfter={updatedAfterString}");
+                using (var wc = new WebClient()) {
+                    responseString = wc.DownloadString(uri);
+                }
+            });
+            Console.WriteLine($" Done in {fetchTime.TotalMilliseconds}ms.");
+            return JsonConvert.DeserializeObject<IEnumerable<Build>>(responseString);
         }
     }
 }
