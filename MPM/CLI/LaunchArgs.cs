@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using MPM.Core;
+using MPM.Core.Instances;
 using MPM.Extensions;
 using PowerArgs;
 
@@ -71,10 +72,20 @@ namespace MPM.CLI {
 		}*/
 
         [ArgActionMethod]
-        [ArgShortcut("l"), ArgShortcut("-l"), ArgShortcut("--launch")]
+        [ArgShortcut("l"), ArgShortcut("-l"), ArgShortcut("launch"), ArgShortcut("--launch")]
         public void LaunchMinecraft(LaunchMinecraftArgs args) {
+            var global = Resolver.Resolve<GlobalStorage>();
+            var instance = new Instance(args.InstanceDirectory);
+            var profile = global.FetchProfile(args.UserName);
+            if (profile == null) {
+                var firstProfileName = global.FetchProfileManager().Names.FirstOrDefault();
+                if (firstProfileName == null) {
+                    throw new Exception("No user found for launch. Please login.");
+                }
+                global.FetchProfile(firstProfileName);
+            }
             using (var minecraftLauncher = args.ToConfiguredLauncher()) {
-                throw new NotImplementedException();//minecraftLauncher.Launch();
+                minecraftLauncher.Launch(instance, profile);
             }
         }
     }

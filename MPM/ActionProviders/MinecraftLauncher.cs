@@ -16,6 +16,13 @@ namespace MPM.ActionProviders {
         }
 
         public void Launch(Instance instance, IProfile profile) {
+            Console.WriteLine("Launching instance {0} with profile {1}...", instance.Location, profile.Name);
+            var packageNames = instance.Configuration.Packages.Select(p => p.PackageName).ToArray();
+            var hasMinecraft = packageNames.Contains("minecraft");
+            var hasForge = packageNames.Contains("minecraftforge");
+            if (!hasMinecraft) {
+                throw new Exception("This launcher cannot launch this instance, as it does not contain Minecraft");
+            }
             throw new NotImplementedException();
         }
 
