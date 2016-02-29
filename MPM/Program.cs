@@ -45,12 +45,12 @@ namespace MPM {
         }
 
         public static void ProcessCommandLine(Autofac.IContainer resolver, IEnumerable<string> args) {
-            ArgAction<LaunchArgs> parsed;
+            ArgAction<RootArgs> parsed;
             try {
-                parsed = Args.ParseAction<LaunchArgs>(args.ToArray());
+                parsed = Args.ParseAction<RootArgs>(args.ToArray());
             } catch (ArgException ex) {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine(ArgUsage.GenerateUsageFromTemplate<LaunchArgs>());
+                Console.WriteLine(ArgUsage.GenerateUsageFromTemplate<RootArgs>());
                 return;
             }
             if (parsed?.Args == null) {
@@ -61,7 +61,7 @@ namespace MPM {
                 parsed.Invoke();
             } catch (ArgException ex) {
                 Console.WriteLine(ex.Message);
-                Console.WriteLine(ArgUsage.GenerateUsageFromTemplate<LaunchArgs>());
+                Console.WriteLine(ArgUsage.GenerateUsageFromTemplate<RootArgs>());
                 return;
             }
         }

@@ -23,11 +23,21 @@ using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
 using MPM.Extensions;
 using MPM.Util;
+using PowerArgs;
 using File = Alphaleonis.Win32.Filesystem.File;
 using Path = Alphaleonis.Win32.Filesystem.Path;
 
 namespace MPM.CLI {
-    public class CreatePackageActionProvider {
+    public partial class RootArgs {
+        [ArgActionMethod]
+        [ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("pack"), ArgShortcut("create"), ArgShortcut("build")]
+        public void CreatePackage(CreatePackageArgs args) {
+            var createPackageActionProvider = new CreatePackageActionProvider();
+            createPackageActionProvider.Provide(Resolver, args);
+        }
+    }
+
+    public class CreatePackageActionProvider : IActionProvider<CreatePackageArgs> {
         public void Provide(IContainer factory, CreatePackageArgs args) {
             if (!args.PackageDirectory.Exists) { throw new DirectoryNotFoundException(); }
             if (!args.PackageSpecFile.Exists) { throw new FileNotFoundException(); }

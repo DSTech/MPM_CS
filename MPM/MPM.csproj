@@ -231,6 +231,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\IActionProvider.cs" />
+    <Compile Include="CLI\ICommandLineArgs.cs" />
+    <Compile Include="CLI\LaunchMinecraftActionProvider.cs" />
+    <Compile Include="CLI\LoginActionProvider.cs" />
+    <Compile Include="CLI\LoginArgs.cs" />
+    <Compile Include="CLI\SyncActionProvider.cs" />
+    <Compile Include="CLI\SyncArgs.cs" />
     <Compile Include="Core\Instances\Cache\ICacheNamingConventionProvider.cs" />
     <Compile Include="Core\Instances\Cache\ICacheReader.cs" />
     <Compile Include="Core\Instances\Cache\ICacheWriter.cs" />
@@ -265,8 +272,6 @@
     <Compile Include="CLI\InstanceSide.cs" />
     <Compile Include="CLI\LaunchMinecraftArgs.cs" />
     <Compile Include="CLI\InitArgs.cs" />
-    <Compile Include="CLI\UpdateForgeArgs.cs" />
-    <Compile Include="CLI\UpdateCauldronArgs.cs" />
     <Compile Include="Core\Dependency\InstanceConfigurationX.cs" />
     <Compile Include="Core\Dependency\InstanceConfiguration.cs" />
     <Compile Include="Core\Dependency\DependencyConstraint.cs" />
@@ -395,7 +400,7 @@
     <Compile Include="Util\Json\VersionConverter.cs" />
     <Compile Include="Util\SolidifyingReadOnlyCollection.cs" />
     <Compile Include="Extensions\ActionProviderArgX.cs" />
-    <Compile Include="CLI\LaunchArgs.cs" />
+    <Compile Include="CLI\RootArgs.cs" />
     <Compile Include="Archival\Archive.cs" />
     <Compile Include="Extensions\PackageConflictX.cs" />
     <Compile Include="Net\Protocols\Minecraft\MinecraftDownloadClient.cs" />

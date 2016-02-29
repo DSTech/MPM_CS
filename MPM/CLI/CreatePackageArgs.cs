@@ -7,7 +7,7 @@ using Alphaleonis.Win32.Filesystem;
 using PowerArgs;
 
 namespace MPM.CLI {
-    public class CreatePackageArgs {
+    public class CreatePackageArgs : ICommandLineArgs {
         [ArgIgnore]
         public DirectoryInfo PackageDirectory => PackageSpecFile.Directory;
 

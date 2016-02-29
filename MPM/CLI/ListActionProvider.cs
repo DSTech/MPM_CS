@@ -16,9 +16,19 @@ using MPM.Data;
 using MPM.Data.Repository;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
+using PowerArgs;
 
 namespace MPM.CLI {
-    public class ListActionProvider {
+    public partial class RootArgs {
+        [ArgActionMethod]
+        [ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("list"), ArgShortcut("--list")]
+        public void ListPackages(ListArgs args) {
+            var listActionProvider = new ListActionProvider();
+            listActionProvider.Provide(Resolver, args);
+        }
+    }
+
+    public class ListActionProvider : IActionProvider<ListArgs> {
         public void Provide(IContainer factory, ListArgs args) {
             this.List(factory);
         }

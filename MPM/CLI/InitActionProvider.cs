@@ -18,9 +18,19 @@ using MPM.Types;
 using MPM.Util;
 using Nito.AsyncEx;
 using Nito.AsyncEx.Synchronous;
+using PowerArgs;
 
 namespace MPM.CLI {
-    public class InitActionProvider {
+    public partial class RootArgs {
+        [ArgActionMethod]
+        [ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("i"), ArgShortcut("--init")]
+        public void Init(InitArgs args) {
+            var initActionProvider = new InitActionProvider();
+            initActionProvider.Provide(Resolver, args);
+        }
+    }
+
+    public class InitActionProvider : IActionProvider<InitArgs> {
         public void Provide(IContainer factory, InitArgs args) {
             var instanceDir = args.InstanceDirectory;
             using (ConsoleColorZone.Success)
