@@ -100,7 +100,8 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
             string assetsIndex,
             string uuid,
             string accessToken,
-            string userType
+            string userType,
+            Dictionary<string, string> userProperties
             ) {
             return MinecraftArguments
                 .Replace("${auth_player_name}", $"\"{username}\"")
@@ -111,6 +112,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
                 .Replace("${auth_uuid}", $"\"{uuid}\"")
                 .Replace("${auth_access_token}", $"\"{accessToken}\"")
                 .Replace("${user_type}", $"\"{userType}\"")
+                .Replace("${user_properties}", $"{JsonConvert.SerializeObject(userProperties)}")
                 ;
         }
     }

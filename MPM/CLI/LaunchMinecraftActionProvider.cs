@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Autofac;
 using MPM.Core;
@@ -20,16 +21,18 @@ namespace MPM.CLI {
         public void Provide(IContainer resolver, LaunchMinecraftArgs args) {
             var global = resolver.Resolve<GlobalStorage>();
             var instance = new Instance(args.InstanceDirectory);
-            var profile = global.FetchProfile(args.UserName);
+            var profMgr = global.FetchProfileManager();
+            var profile = profMgr.Fetch(args.UserName);
             if (profile == null) {
-                var firstProfileName = global.FetchProfileManager().Names.FirstOrDefault();
+                var firstProfileName = profMgr.Names.FirstOrDefault();
                 if (firstProfileName == null) {
                     throw new Exception("No user found for launch. Please login.");
                 }
-                global.FetchProfile(firstProfileName);
+                profile = profMgr.Fetch(firstProfileName);
+                Debug.Assert(profile != null, "If it found a name, that name should be valid");
             }
             using (var minecraftLauncher = args.ToConfiguredLauncher()) {
-                minecraftLauncher.Launch(instance, profile);
+                minecraftLauncher.Launch(resolver, instance, profile);
             }
         }
     }

@@ -22,9 +22,25 @@ namespace MPM.Core.Profiles {
 
         public bool Contains(String profileName) => Fetch(profileName) != null;
 
-        public void Delete(String profileName) => ProfileCollection.Delete(profile => profile.Name == profileName);
+        public void Delete(String profileName) {
+            var matchingProfName = FindNameIgnoreCase(profileName);
+            if (matchingProfName == null) {
+                return;
+            }
+            ProfileCollection.Delete(matchingProfName);
+        }
 
-        public IProfile Fetch(String profileName) => ProfileCollection.FindOne(profile => profile.Name == profileName);
+        public IProfile Fetch(String profileName) {
+            var matchingProfName = FindNameIgnoreCase(profileName);
+            if (matchingProfName == null) {
+                return null;
+            }
+            return ProfileCollection.FindOne(prof => prof.Name == matchingProfName);
+        }
+
+        private string FindNameIgnoreCase(string profileName) {
+            return Names.FirstOrDefault(name => String.Equals(name, profileName, StringComparison.InvariantCultureIgnoreCase));
+        }
 
         public void Store(IProfile profileData) {
             var mutableProfile = profileData.ToMutableProfile();

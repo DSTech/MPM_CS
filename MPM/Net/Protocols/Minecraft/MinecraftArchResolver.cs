@@ -14,6 +14,7 @@ using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using MPM.Types;
 using MPM.Util;
+using Newtonsoft.Json;
 using Nito.AsyncEx.Synchronous;
 
 namespace MPM.Net.Protocols.Minecraft {
@@ -152,6 +153,22 @@ namespace MPM.Net.Protocols.Minecraft {
                 Asset = asset,
             }).ToArray();
 
+            var operations = new List<ArchInstallationOperation>();
+
+            var assetIndexCacheKey = $"arch/minecraft/{archVersion}/assetIndex.json";
+            if (!cacheManager.Contains(assetIndexCacheKey)) {
+                cacheManager.Store(assetIndexCacheKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(assetIndex, Formatting.Indented)));
+            }
+
+            var assetIndexCopy = new CopyArchInstallationOperation(
+                packageName: "minecraft",
+                packageVersion: archVersion,
+                cacheManager: cacheManager,
+                cachedName: assetIndexCacheKey,
+                targetPath: $"assets/indexes/{archVersion}.json"
+                );
+            operations.Add(assetIndexCopy);
+
             var assetsToDownload = new List<AssetCacheEntry>();
             //Check currently available assets- Check cached values, flag bad entries for redownload
             foreach (var _asset in assetsWithIds) {
@@ -195,8 +212,6 @@ namespace MPM.Net.Protocols.Minecraft {
                     }
                 }
             }
-
-            var operations = new List<ArchInstallationOperation>();
             //Install all entries
             foreach (var _asset in assetsWithIds) {
                 var hexHash = Hex.GetString(_asset.Asset.Hash.Checksum);
