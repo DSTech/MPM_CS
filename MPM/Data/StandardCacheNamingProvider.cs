@@ -22,5 +22,29 @@ namespace MPM.Data {
         public string GetNameForPackageUnarchived(Build package) {
             return GetNameForPackageUnarchived(package.PackageName, package.Arch.ToString(), package.Version, package.Side);
         }
+
+        public string GetNameForArchVersionDetails(string archName, SemVersion archVersion) {
+            return $"arch/{archName}/{archVersion}/versionDetails.json";
+        }
+
+        public string GetNameForArchAssetIndex(string archName, SemVersion archVersion) {
+            return $"arch/{archName}/{archVersion}/assetIndex.json";
+        }
+
+        public string GetNameForArchClient(string archName, SemVersion archVersion) {
+            return $"minecraft_{archVersion}_client.jar";
+        }
+
+        public string GetNameForArchServer(string archName, SemVersion archVersion) {
+            return $"minecraft_{archVersion}_server.jar";
+        }
+
+        public string GetNameForArchLibrary(string package, string name, string version, string nativeClause) {
+            return $"{package}_{name}_{version}{nativeClause}";
+        }
+
+        public string GetNameForArchAsset(string archName, SemVersion archVersion, string assetPath) {
+            return $"arch/{archName}/{archVersion}/asset/{assetPath}";
+        }
     }
 }

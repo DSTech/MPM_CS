@@ -91,29 +91,5 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         /// </summary>
         [JsonProperty("type"), JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public ReleaseType Type { get; set; }
-
-        public string FillArguments(
-            string username,
-            string versionName,
-            string gameDir,
-            string assetsDir,
-            string assetsIndex,
-            string uuid,
-            string accessToken,
-            string userType,
-            Dictionary<string, string> userProperties
-            ) {
-            return MinecraftArguments
-                .Replace("${auth_player_name}", $"\"{username}\"")
-                .Replace("${version_name}", $"\"{versionName}\"")
-                .Replace("${game_directory}", $"\"{gameDir}\"")
-                .Replace("${assets_root}", $"\"{assetsDir}\"")
-                .Replace("${assets_index_name}", $"\"{assetsIndex}\"")
-                .Replace("${auth_uuid}", $"\"{uuid}\"")
-                .Replace("${auth_access_token}", $"\"{accessToken}\"")
-                .Replace("${user_type}", $"\"{userType}\"")
-                .Replace("${user_properties}", $"{JsonConvert.SerializeObject(userProperties)}")
-                ;
-        }
     }
 }

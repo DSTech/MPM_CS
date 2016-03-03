@@ -23,11 +23,18 @@ namespace MPM.Net.Protocols.Minecraft {
             var mdc = new MinecraftDownloadClient();
             MinecraftVersion versionDetails;
             {
-                Console.WriteLine("Fetching minecraft details");
-                var elapsedTime = TimerUtil.Time(out versionDetails, () => {
-                    versionDetails = mdc.FetchVersion(archVersion);
-                });
-                Console.WriteLine("Fetched details for {0} in {1}ms", versionDetails.Id, elapsedTime.TotalMilliseconds);
+                var versionDetailsCacheKey = cacheManager.NamingProvider.GetNameForArchVersionDetails("minecraft", archVersion);
+                if (!cacheManager.Contains(versionDetailsCacheKey)) {
+                    Console.WriteLine("Fetching minecraft details...");
+                    var elapsedTime = TimerUtil.Time(out versionDetails, () => {
+                        versionDetails = mdc.FetchVersion(archVersion);
+                    });
+                    cacheManager.StoreAsJson(versionDetailsCacheKey, versionDetails);
+                    Console.WriteLine("Fetched details for Minecraft {0} in {1}ms", versionDetails.Id, elapsedTime.TotalMilliseconds);
+                } else {
+                    versionDetails = cacheManager.FetchFromJson<MinecraftVersion>(versionDetailsCacheKey);
+                    Console.WriteLine("Fetched details for Minecraft {0} from cache", versionDetails.Id);
+                }
             }
             var installingPlatform = Environment.OSVersion.Platform;
             var installingBitness64 = Environment.Is64BitOperatingSystem;
@@ -55,12 +62,7 @@ namespace MPM.Net.Protocols.Minecraft {
 
         private IEnumerable<ArchInstallationOperation> CacheLibraries(SemVersion archVersion, ICacheManager cacheManager, MinecraftDownloadClient mdc, MinecraftVersion versionDetails, PlatformID installingPlatform, bool installingBitness64) {
             var operations = new List<ArchInstallationOperation>();
-            var libsToInstall = versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(Environment.OSVersion.Platform));
-            foreach (var lib in libsToInstall) {
-                if (!lib.AppliesToPlatform(installingPlatform)) {
-                    continue;
-                }
-
+            foreach (var lib in versionDetails.Libraries.Where(lib => lib.AppliesToPlatform(installingPlatform))) {
                 var _nativeDetails = lib.ApplyNatives(installingPlatform, installingBitness64);
                 var nativeArtifact = _nativeDetails.Artifact;
                 string nativeTag = null;
@@ -71,7 +73,7 @@ namespace MPM.Net.Protocols.Minecraft {
                 }
 
                 Debug.Assert(nativeArtifact != null || lib.Downloads.Artifact != null, "At least one artifact should be available if a library applies for this platform");
-                var cacheEntryName = $"{lib.Package}_{lib.Name}_{lib.Version}{nativeClause}";
+                var cacheEntryName = cacheManager.NamingProvider.GetNameForArchLibrary(lib.Package, lib.Name, lib.Version, nativeClause);
                 var cacheOp = GenerateOp(
                     archVersion,
                     lib,
@@ -97,7 +99,7 @@ namespace MPM.Net.Protocols.Minecraft {
         private static IEnumerable<ArchInstallationOperation> CacheServerAndClientJars(SemVersion archVersion, ICacheManager cacheManager, MinecraftDownloadClient mdc, MinecraftVersion versionDetails) {
             var operations = new List<ArchInstallationOperation>(2);
             {
-                var binaryCacheClientName = $"minecraft_{archVersion}_client.jar";
+                var binaryCacheClientName = cacheManager.NamingProvider.GetNameForArchClient("minecraft", archVersion);
                 if (!cacheManager.Contains(binaryCacheClientName)) {
                     var clientBinaryStream = mdc.FetchClient(versionDetails).WaitAndUnwrapException();
                     cacheManager.StoreFromStream(binaryCacheClientName, clientBinaryStream);
@@ -106,7 +108,7 @@ namespace MPM.Net.Protocols.Minecraft {
                 operations.Add(clientBinaryCopyOp);
             }
             {
-                var binaryCacheServerName = $"minecraft_{archVersion}_server.jar";
+                var binaryCacheServerName = cacheManager.NamingProvider.GetNameForArchServer("minecraft", archVersion);
                 if (!cacheManager.Contains(binaryCacheServerName)) {
                     var serverBinaryStream = mdc.FetchServer(versionDetails).WaitAndUnwrapException();
                     cacheManager.StoreFromStream(binaryCacheServerName, serverBinaryStream);
@@ -149,13 +151,13 @@ namespace MPM.Net.Protocols.Minecraft {
 
         private static IEnumerable<ArchInstallationOperation> CacheAssets(SemVersion archVersion, AssetIndex assetIndex, MinecraftDownloadClient mdc, ICacheManager cacheManager) {
             var assetsWithIds = assetIndex.Assets.Select(asset => new AssetCacheEntry {
-                CacheId = $"arch/minecraft/{archVersion}/asset/{asset.Uri.ToString()}",
+                CacheId = cacheManager.NamingProvider.GetNameForArchAsset("minecraft", archVersion, asset.Uri.ToString()),
                 Asset = asset,
             }).ToArray();
 
             var operations = new List<ArchInstallationOperation>();
 
-            var assetIndexCacheKey = $"arch/minecraft/{archVersion}/assetIndex.json";
+            var assetIndexCacheKey = cacheManager.NamingProvider.GetNameForArchAssetIndex("minecraft", archVersion);
             if (!cacheManager.Contains(assetIndexCacheKey)) {
                 cacheManager.Store(assetIndexCacheKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(assetIndex, Formatting.Indented)));
             }

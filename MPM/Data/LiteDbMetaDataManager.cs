@@ -41,7 +41,14 @@ namespace MPM.Data {
                 Delete(key);
                 return;
             }
-            Collection.Upsert(new MetaDataEntry(key, JsonConvert.SerializeObject(value, typeof(VALUETYPE), JsonSettings)));
+            MetaDataEntry entry;
+            if (typeof(VALUETYPE) == typeof(string)) {
+                entry = new MetaDataEntry(key, (string)(object)value);
+            } else {
+                entry = new MetaDataEntry(key, JsonConvert.SerializeObject(value, typeof(VALUETYPE), JsonSettings));
+            }
+
+            Collection.Upsert(entry);
         }
 
         public VALUETYPE Get<VALUETYPE>(string key) where VALUETYPE : class {
@@ -49,7 +56,11 @@ namespace MPM.Data {
             if (stored == null) {
                 return null;
             }
-            return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
+            if (typeof(VALUETYPE) == typeof(string)) {
+                return (VALUETYPE)(object)stored;
+            } else {
+                return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
+            }
         }
 
         public VALUETYPE Get<VALUETYPE>(string key, VALUETYPE defaultValue) where VALUETYPE : class {
@@ -57,7 +68,32 @@ namespace MPM.Data {
             if (stored == null) {
                 return defaultValue;
             }
-            return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
+            if (typeof(VALUETYPE) == typeof(string)) {
+                return (VALUETYPE)(object)stored;
+            } else {
+                return JsonConvert.DeserializeObject<VALUETYPE>(stored, JsonSettings);
+            }
+        }
+
+        public class LiteDbWrappedString {
+            public string Value { get; set; }
+
+            public LiteDbWrappedString() {
+            }
+
+            public LiteDbWrappedString(string value) {
+                this.Value = value;
+            }
+
+            public override string ToString() => Value;
+
+            public static implicit operator string(LiteDbWrappedString wrapped) {
+                return wrapped.Value;
+            }
+
+            public static implicit operator LiteDbWrappedString(string unwrapped) {
+                return new LiteDbWrappedString(unwrapped);
+            }
         }
 
         public class MetaDataEntry {

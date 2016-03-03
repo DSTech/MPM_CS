@@ -248,6 +248,7 @@
     <Compile Include="Extensions\FileSystemInfoX.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\Asset.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndex.cs" />
+    <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftLaunchArgsBuilder.cs" />
     <Compile Include="Util\ConsoleProgress.cs" />
     <Compile Include="Util\Huminz.cs" />
     <Compile Include="Util\TimerUtil.cs" />
@@ -359,7 +360,7 @@
     <Compile Include="Util\Json\RestSharpJsonSerializer.cs" />
     <Compile Include="Net\IArchResolver.cs" />
     <Compile Include="Net\Protocols\MetaArchResolver.cs" />
-    <Compile Include="Net\Protocols\Minecraft\MinecraftArchResolver.cs" />
+    <Compile Include="Net\Protocols\Minecraft\MinecraftArchInstaller.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryExtractSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryNativesSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\LibraryRuleFilterOSVersion.cs" />
