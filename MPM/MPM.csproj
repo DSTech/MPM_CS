@@ -231,6 +231,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Util\JavaLauncher.cs" />
     <Compile Include="CLI\IActionProvider.cs" />
     <Compile Include="CLI\ICommandLineArgs.cs" />
     <Compile Include="CLI\LaunchMinecraftActionProvider.cs" />
