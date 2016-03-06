@@ -48,7 +48,7 @@ namespace MPM.Util {
 
             var classPath = "";
             if (this.ClassPaths.Count > 0) {
-                classPath = $"-cp {string.Join(PlatformSeparator, this.ClassPaths.Select(p => $"\"{p}\""))}";
+                classPath = $"-cp {string.Join(PlatformSeparator, this.ClassPaths.Select(p => $"\"{p.FullName}\""))}";
             }
 
             var heapDumpPath = "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump";

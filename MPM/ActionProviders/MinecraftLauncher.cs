@@ -47,20 +47,20 @@ namespace MPM.ActionProviders {
             var launchArgs = "";
 
             if (instance.Side == CompatibilitySide.Client) {
+                //Client launching
 
                 var launchArgsBuilder = new MinecraftLaunchArgsBuilder() {
                     UserName = profile.Name,
                     VersionId = versionDetails.Id,
                     InstanceDirectory = instance.Location,
                     AssetsDirectory = instance.Location.CreateSubdirectory("assets"),
-                    AssetsIndexId = versionDetails.AssetIndex.Id,
+                    AssetsIndexId = versionDetails.Id,
                     AuthProfileId = profile.YggdrasilProfileId,
                     AuthAccessToken = profile.YggdrasilAccessToken,
                     AuthUserType = profile.YggdrasilUserType,
                     UserProperties = new Dictionary<string, string>(),//TODO: Support custom user properties
                 };
 
-                //Client launching
                 {
                     //Add jar file to classpaths
                     var clientJarFile = instance.Location.SubFile("client.jar");
@@ -114,8 +114,10 @@ namespace MPM.ActionProviders {
                     }
                 }
             }
-
             using (var proc = javaLauncher.Launch(launchArgs)) {
+                Console.WriteLine();
+                Console.WriteLine(proc.StartInfo.Arguments);
+                Console.WriteLine();
                 proc.WaitForExit();
             }
         }
