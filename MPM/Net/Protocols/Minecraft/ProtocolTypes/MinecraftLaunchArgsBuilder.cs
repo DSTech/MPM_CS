@@ -21,7 +21,7 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
         public Dictionary<string, string> UserProperties { get; set; } = new Dictionary<string, string>();
         public string TweakClass { get; set; } = "";
 
-        public string Build(string minecraftArgumentsTemplate) {
+        public IEnumerable<string> Build(string minecraftArgumentsTemplate) {
 
             var minecraftArgs = minecraftArgumentsTemplate
                 .Replace("${auth_player_name}", $"\"{this.UserName}\"")
@@ -34,9 +34,9 @@ namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
                 .Replace("${user_type}", $"\"{this.AuthUserType}\"")
                 .Replace("${user_properties}", JsonConvert.SerializeObject(this.UserProperties ?? new Dictionary<string, string>()));
 
-            var tweakClass = TweakClass.IsNullOrWhiteSpace() ? "" : $"--tweakClass {this.TweakClass}";
+            var tweakClass = TweakClass.IsNullOrWhiteSpace() ? new string[0] : new string[] { "--tweakClass", this.TweakClass.ToString() };
 
-            return $"{minecraftArgs} {tweakClass}";
+            return new [] { minecraftArgs }.Concat(tweakClass);
         }
     }
 }

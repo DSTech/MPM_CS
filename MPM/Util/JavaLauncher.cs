@@ -28,7 +28,7 @@ namespace MPM.Util {
             this.Prefer64Bit = prefer64Bit;
         }
 
-        public Process Launch(string launchArgs, bool showConsole = true) {
+        public Process Launch(IEnumerable<string> launchArgs, bool showConsole = true) {
             var javaPath = GetBestJavaPath();
 
             var Xms = $"-Xms{this.XmsMb}M";
@@ -72,7 +72,7 @@ namespace MPM.Util {
                 CreateNoWindow = !showConsole,
                 WorkingDirectory = (this.WorkingDirectory?.FullName ?? Environment.CurrentDirectory),
                 FileName = javaPath,
-                Arguments = $"{jvmArgs} {additionalJvmArgs} {launchArgs} {additionalArgs}".Trim(),
+                Arguments = $"{jvmArgs} {additionalJvmArgs} {string.Join(" ", launchArgs)} {additionalArgs}".Trim(),
             };
             var proc = Process.Start(startInfo);
             return proc;

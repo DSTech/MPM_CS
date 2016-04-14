@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,12 +24,20 @@ namespace MPM.ActionProviders {
             GC.SuppressFinalize(this);
         }
 
-        public void Launch(IContainer resolver, Instance instance, IProfile _profile) {
-            var profile = _profile?.ToMutableProfile();
+        public void Launch(IContainer resolver, Instance instance, IProfile profile) {
+            MutableProfile mutableProfile;
 
             if (instance.Side == CompatibilitySide.Client) {
-                Console.WriteLine("Launching instance {0} with profile {1}...", instance.Location.FullName, profile.Name);
+                if (profile == null) {
+                    throw new ArgumentNullException(nameof(profile), "This launcher requires a profile to launch client instances, and none was provided");
+                }
+                mutableProfile = profile.ToMutableProfile();
+                Debug.Assert(mutableProfile != null);
+                Console.WriteLine("Launching instance {0} with profile {1}...", instance.Location.FullName, mutableProfile.Name);
+            } else {
+                mutableProfile = null;//Server launcher does not require a profile
             }
+
             var packagesByName = instance.Configuration.Packages.ToDictionary(p => p.PackageName);
             var hasMinecraft = packagesByName.ContainsKey("minecraft");
             var hasForge = packagesByName.ContainsKey("minecraftforge");
@@ -44,20 +53,20 @@ namespace MPM.ActionProviders {
 
             var javaLauncher = new Util.JavaLauncher(prefer64Bit: true);
 
-            var launchArgs = "";
+            var launchArgs = new List<string>();
 
             if (instance.Side == CompatibilitySide.Client) {
                 //Client launching
-
+                Debug.Assert(mutableProfile != null);
                 var launchArgsBuilder = new MinecraftLaunchArgsBuilder() {
-                    UserName = profile.Name,
+                    UserName = mutableProfile.Name,
                     VersionId = versionDetails.Id,
                     InstanceDirectory = instance.Location,
                     AssetsDirectory = instance.Location.CreateSubdirectory("assets"),
                     AssetsIndexId = versionDetails.Id,
-                    AuthProfileId = profile.YggdrasilProfileId,
-                    AuthAccessToken = profile.YggdrasilAccessToken,
-                    AuthUserType = profile.YggdrasilUserType,
+                    AuthProfileId = mutableProfile.YggdrasilProfileId,
+                    AuthAccessToken = mutableProfile.YggdrasilAccessToken,
+                    AuthUserType = mutableProfile.YggdrasilUserType,
                     UserProperties = new Dictionary<string, string>(),//TODO: Support custom user properties
                 };
 
@@ -85,7 +94,7 @@ namespace MPM.ActionProviders {
 
                 javaLauncher.LaunchClass = versionDetails.MainClass;
 
-                launchArgs = launchArgsBuilder.Build(versionDetails.MinecraftArguments);
+                launchArgs.AddRange(launchArgsBuilder.Build(versionDetails.MinecraftArguments));
             } else {
                 //Server launching
                 {
