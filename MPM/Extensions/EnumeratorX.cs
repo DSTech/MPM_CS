@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MPM.Extensions {
+namespace System.Collections.Generic {
     public static class EnumeratorX {
         public static IEnumerable<T> TakeApply<T>(this IEnumerable<T> sequence, int count, Action<IEnumerable<T>> callback) {
             var enumr = sequence.GetEnumerator();

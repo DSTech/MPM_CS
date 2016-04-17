@@ -1,8 +1,7 @@
 using System;
-using Alphaleonis.Win32.Filesystem;
 using JetBrains.Annotations;
 
-namespace MPM.Extensions {
+namespace Alphaleonis.Win32.Filesystem {
     public static class AlphaFileSystemInfoX {
         private static string _getPath(FileSystemInfo fileSystemInfo) {
             var d = fileSystemInfo as DirectoryInfo;

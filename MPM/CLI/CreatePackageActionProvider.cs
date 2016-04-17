@@ -2,30 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Autofac;
 using ICSharpCode.SharpZipLib.Zip;
-using MPM.ActionProviders;
-using MPM.Core;
-using MPM.Core.Dependency;
-using MPM.Core.Instances;
-using MPM.Core.Instances.Cache;
-using MPM.Core.Instances.Installation;
 using MPM.Core.Instances.Installation.Scripts;
-using MPM.Core.Protocols;
-using MPM.Data;
-using MPM.Data.Repository;
 using MPM.Types;
 using Newtonsoft.Json;
-using Nito.AsyncEx;
-using Nito.AsyncEx.Synchronous;
-using MPM.Extensions;
 using MPM.Util;
 using PowerArgs;
 using File = Alphaleonis.Win32.Filesystem.File;
 using Path = Alphaleonis.Win32.Filesystem.Path;
+using Alphaleonis.Win32.Filesystem;
 
 namespace MPM.CLI {
     public partial class RootArgs {

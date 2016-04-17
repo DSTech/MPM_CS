@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MPM.Core.Dependency;
-using MPM.Core.Instances.Info;
-using MPM.Extensions;
 using MPM.Types;
 
 namespace MPM.Core.Instances.Installation {

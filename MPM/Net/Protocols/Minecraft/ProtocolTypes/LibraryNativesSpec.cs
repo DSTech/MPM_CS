@@ -1,7 +1,5 @@
 using System;
 using System.Diagnostics;
-using MPM.Extensions;
-using MPM.Types;
 using Newtonsoft.Json;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {

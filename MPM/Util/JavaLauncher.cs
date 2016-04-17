@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
-using MPM.Extensions;
 
 namespace MPM.Util {
     public class JavaLauncher {

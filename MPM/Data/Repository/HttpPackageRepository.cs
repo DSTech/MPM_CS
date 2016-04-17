@@ -1,15 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using JetBrains.Annotations;
-using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 
 namespace MPM.Data.Repository {
     public class HttpPackageRepository : IPackageRepository {

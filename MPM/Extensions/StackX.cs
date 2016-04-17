@@ -1,12 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using MPM.CLI;
-
-namespace MPM.Extensions {
+namespace System.Collections.Generic {
     public static class StackX {
         public static bool RemoveFirst<T>(this Stack<T> stack, Predicate<T> qualifier) {
             if (stack == null) {

@@ -1,7 +1,6 @@
 using MPM.ActionProviders;
-using MPM.CLI;
 
-namespace MPM.Extensions {
+namespace MPM.CLI {
     public static class ActionProviderArgX {
         public static MinecraftLauncher ToConfiguredLauncher(this LaunchMinecraftArgs self) {
             return new MinecraftLauncher {

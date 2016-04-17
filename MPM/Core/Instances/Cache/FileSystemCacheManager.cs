@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using MPM.Data;
-using MPM.Extensions;
 
 namespace MPM.Core.Instances.Cache {
     //FUTURE: Replace standard filesystem usage with Platform.VirtualFileSystem

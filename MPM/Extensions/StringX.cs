@@ -1,9 +1,6 @@
-using System;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace MPM.Extensions {
+namespace System {
     public static class StringX {
         public static bool IsNullOrWhiteSpace(this String @string) => String.IsNullOrWhiteSpace(@string);
         public static string TransformChars(this String str, Func<char, char> charModifier) {

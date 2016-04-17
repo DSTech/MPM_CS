@@ -1,15 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ICSharpCode.SharpZipLib;
-using ICSharpCode.SharpZipLib.Core;
-using ICSharpCode.SharpZipLib.Zip;
-using MPM.Archival;
+using System.IO;
 using MPM.Core.Instances.Cache;
-using MPM.Extensions;
 using MPM.Types;
 using Platform.VirtualFileSystem;
 

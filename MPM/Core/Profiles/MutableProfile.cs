@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LiteDB;
-using MPM.Extensions;
-using Newtonsoft.Json;
 
 namespace MPM.Core.Profiles {
     public static class MutableProfileExtensions {

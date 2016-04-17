@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MPM.Extensions;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class MinecraftVersionCollection : IReadOnlyList<MinecraftVersionListing> {

@@ -9,7 +9,6 @@ using MPM.Core;
 using MPM.Core.Instances;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Profiles;
-using MPM.Extensions;
 using MPM.Net.Protocols.Minecraft;
 using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using MPM.Types;

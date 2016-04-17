@@ -1,6 +1,4 @@
-using System;
-
-namespace MPM.Extensions {
+namespace System {
     public static class DateTimeX {
         public static DateTime UnixEpoc => new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 

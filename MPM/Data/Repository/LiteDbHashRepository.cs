@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using LiteDB;
-using MPM.Extensions;
 
 namespace MPM.Data.Repository {
     static class HexStrings {

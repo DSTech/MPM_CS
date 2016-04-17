@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MPM.Core.Instances.Cache;
-using MPM.Core.Instances.Info;
 using MPM.Core.Instances.Installation;
 using MPM.Core.Protocols;
-using MPM.Extensions;
 using MPM.Types;
 
 namespace MPM.Core.Dependency {

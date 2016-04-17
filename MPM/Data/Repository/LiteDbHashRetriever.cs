@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using LiteDB;
-using MPM.Extensions;
 
 namespace MPM.Data.Repository {
     public class LiteDbHashRetriever : IHashRetriever {

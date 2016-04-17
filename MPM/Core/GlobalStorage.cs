@@ -1,19 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive;
 using System.Reactive.Disposables;
 using LiteDB;
 using MPM.Core.Instances.Cache;
 using MPM.Core.Profiles;
 using MPM.Data;
-using Newtonsoft.Json;
 using Autofac;
-using MPM.Extensions;
 
 namespace MPM.Core {
     /// <summary>

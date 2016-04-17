@@ -4,7 +4,6 @@ using System.Linq;
 using Autofac;
 using MPM.Core;
 using MPM.Core.Instances;
-using MPM.Extensions;
 using PowerArgs;
 
 namespace MPM.CLI {

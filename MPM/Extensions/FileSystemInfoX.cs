@@ -1,8 +1,6 @@
-using System;
-using System.IO;
 using JetBrains.Annotations;
 
-namespace MPM.Extensions {
+namespace System.IO {
     public static class FileSystemInfoX {
         private static string _getPath(FileSystemInfo fileSystemInfo) {
             var d = fileSystemInfo as DirectoryInfo;

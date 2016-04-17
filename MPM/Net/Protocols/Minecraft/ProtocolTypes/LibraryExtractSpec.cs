@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using MPM.Extensions;
 using Newtonsoft.Json;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {

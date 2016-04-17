@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace MPM.Extensions {
+namespace System.Collections.Generic {
     public static class EnumerableX {
         [NotNull] public static IEnumerable<T> Denull<T>([CanBeNull] this IEnumerable<T> enumerable) => enumerable ?? Enumerable.Empty<T>();
 
@@ -43,7 +41,7 @@ namespace MPM.Extensions {
             return enumerable.Skip(startIndex).Take(count);
         }
 
-        public static IReadOnlyCollection<T> Solidify<T>(this IEnumerable<T> enumerable) => new Util.SolidifyingReadOnlyCollection<T>(enumerable);
+        public static IReadOnlyCollection<T> Solidify<T>(this IEnumerable<T> enumerable) => new MPM.Util.SolidifyingReadOnlyCollection<T>(enumerable);
 
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable) => new HashSet<T>(enumerable);
 

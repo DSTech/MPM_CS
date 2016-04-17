@@ -1,8 +1,6 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
 
-namespace MPM.Extensions {
+namespace System.IO {
     public static class BinaryReaderX {
         public static void CopyTo(this BinaryReader reader, Stream destination) {
             reader.BaseStream.CopyTo(destination);

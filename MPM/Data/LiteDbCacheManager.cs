@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using LiteDB;
 using MPM.Core.Instances.Cache;
-using System.Reactive.Disposables;
-using MPM.Extensions;
 
 namespace MPM.Data {
     public class LiteDbCacheManager : ICacheManager {

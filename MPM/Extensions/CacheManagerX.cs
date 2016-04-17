@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using MPM.Core.Instances.Cache;
 using Newtonsoft.Json;
 
-namespace MPM.Extensions {
+namespace MPM.Core.Instances.Cache {
     public static class CacheManagerX {
         public static void StoreFromStream(this MPM.Core.Instances.Cache.ICacheManager cacheManager, string cacheEntryName, Stream content, bool closeTarget = true) {
             using (var memStr = new MemoryStream()) {

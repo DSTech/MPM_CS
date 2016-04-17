@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Zip;
-using MPM.Extensions;
 
 namespace MPM.Util {
     public sealed class StreamingZipFetcher : IDisposable {

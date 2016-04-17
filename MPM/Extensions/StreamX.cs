@@ -1,10 +1,7 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using MPM.Util;
 
-namespace MPM.Extensions {
+namespace System.IO {
     public static class StreamX {
         public static byte[] ReadToEnd(this Stream stream) {
             using (var ms = new MemoryStream()) {

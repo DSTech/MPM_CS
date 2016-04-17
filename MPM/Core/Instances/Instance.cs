@@ -1,23 +1,14 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
 using Autofac;
 using LiteDB;
 using MPM.Core.Dependency;
-using MPM.Core.Instances.Installation;
 using MPM.Data;
-using MPM.Extensions;
 using MPM.Types;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Platform.VirtualFileSystem;
-using Platform.VirtualFileSystem.Providers.Local;
 
 namespace MPM.Core.Instances {
     public class Instance : ICancelable {

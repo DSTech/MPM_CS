@@ -1,13 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using MPM.CLI;
-
 namespace MPM.Extensions {
-    class ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> {
+    using System.Collections;
+    using System.Collections.Generic;
+    internal class ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue> {
         private readonly IDictionary<TKey, TValue> dictionary;
 
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary) {
@@ -30,10 +24,13 @@ namespace MPM.Extensions {
 
         IEnumerator IEnumerable.GetEnumerator() => dictionary.GetEnumerator();
     }
+}
+
+namespace System.Collections.Generic {
 
     public static class IDictionaryExtensions {
         public static IReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> dictionary) {
-            return new ReadOnlyDictionary<TKey, TValue>(dictionary);
+            return new MPM.Extensions.ReadOnlyDictionary<TKey, TValue>(dictionary);
         }
     }
 }

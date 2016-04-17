@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MPM.Core.Instances.Info;
 using MPM.Core.Instances.Installation.Scripts;
-using MPM.Extensions;
 using Newtonsoft.Json;
 
 namespace MPM.Types {

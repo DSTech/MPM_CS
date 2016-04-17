@@ -1,7 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using MPM.Util.Json;
+﻿using Newtonsoft.Json;
 
 namespace MPM.Net.Protocols.Minecraft.ProtocolTypes {
     public class DownloadClassifiers {
