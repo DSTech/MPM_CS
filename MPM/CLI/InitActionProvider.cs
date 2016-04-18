@@ -93,7 +93,7 @@ namespace MPM.CLI {
                             var depinner = inner as DependencyException;
                             if (depinner != null) {
                                 Console.WriteLine("Details:");
-                                Console.WriteLine("\t{0}", depinner.PackageSpec);
+                                using (new ConsoleIndenter()) { Console.WriteLine(depinner.PackageSpec.ToString()); }
                             }
                         } else {
                             Console.WriteLine(e.Message);

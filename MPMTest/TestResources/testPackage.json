@@ -3,7 +3,7 @@
 	"authors": [
 		{
 			"name": "DSTech",
-			"email": "",
+			"email": ""
 		}
 	],
 	"arch": "1.8.9",
@@ -18,7 +18,7 @@
 				"name": "Forge",
 				"version": "~1.8.9"
 			}
-		],
+		]
 	},
 	"conflicts": [ ],
 	"installation": [

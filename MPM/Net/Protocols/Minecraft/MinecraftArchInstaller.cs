@@ -188,25 +188,27 @@ namespace MPM.Net.Protocols.Minecraft {
                         var assetCountCharWidth = assetCount.ToString().Length;
                         var totalSize = assetsToDownload.Sum(asset => asset.Asset.Size);
                         Console.WriteLine($"Downloading {assetCount} files adding up to {Huminz.ByteSize(totalSize)}");
-                        foreach (var _asset in assetsToDownload) {//C# needs real destructuring support
-                            var assetCacheId = _asset.CacheId;
-                            var asset = _asset.Asset;
+                        using (new ConsoleIndenter()) {
+                            foreach (var _asset in assetsToDownload) {//C# needs real destructuring support
+                                var assetCacheId = _asset.CacheId;
+                                var asset = _asset.Asset;
 
-                            var countSection = $"[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}]";
-                            var byteLength = $"({Huminz.ByteSizeShort(asset.Size).PadLeft(8)})";
+                                var countSection = $"[{(++currentIndex).ToString().PadLeft(assetCountCharWidth, '0')}/{assetCount}]";
+                                var byteLength = $"({Huminz.ByteSizeShort(asset.Size).PadLeft(8)})";
 
-                            Console.WriteLine($"\t{countSection} {byteLength} {asset.Uri}");
+                                Console.WriteLine($"{countSection} {byteLength} {asset.Uri}");
 
-                            var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
-                            var assetData = assetStream.ReadToEndAndClose();
-                            if (assetData.LongLength != asset.Size) {
-                                throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                                var assetStream = mdc.FetchAsset(asset).WaitAndUnwrapException();
+                                var assetData = assetStream.ReadToEndAndClose();
+                                if (assetData.LongLength != asset.Size) {
+                                    throw new Exception($"Error downloading asset {asset.Uri} with size {assetData.LongLength} did not match size {asset.Size}!");
+                                }
+                                var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
+                                if (downloadedAssetHash != asset.Hash) {
+                                    throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
+                                }
+                                cacheManager.Store(assetCacheId, assetData);
                             }
-                            var downloadedAssetHash = new Hash("sha1", sha1.ComputeHash(assetData));
-                            if (downloadedAssetHash != asset.Hash) {
-                                throw new Exception($"Error downloading asset {asset.Uri}:\n\t{downloadedAssetHash} did not match hash {asset.Hash}!");
-                            }
-                            cacheManager.Store(assetCacheId, assetData);
                         }
                     }
                 }

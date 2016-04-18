@@ -11,6 +11,7 @@ using MPM.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MPM.Data.Repository;
+using MPM.Util;
 
 namespace MPM.Data {
     public class LiteDbPackageRepositoryCache : IPackageRepositoryCache {
@@ -64,31 +65,49 @@ namespace MPM.Data {
             }
         }
 
+        private static readonly TimeSpan SyncPeriod = TimeSpan.FromMinutes(5);
         public void Sync() {
             var lastSynced = GetLastSynced();
-            if (lastSynced > DateTime.UtcNow/*.AddMinutes(-1.0)*/) {
+
+            //Skip if synced in the last sync period
+            if (lastSynced > DateTime.UtcNow.Subtract(SyncPeriod)) {
                 return;
             }
+
             Console.Write("Package cache older than one minute- ");
-            IEnumerable<Build> builds;
-            if (lastSynced == DateTime.MinValue) {
-                Console.WriteLine("Updating via full fetch...");
-                builds = repository.FetchBuilds();
-            } else {
-                Console.WriteLine("Updating via delta fetch...");
-                builds = repository.FetchBuilds(lastSynced);
+            using (new ConsoleIndenter()) {
+                var syncDuration = TimerUtil.Time(() => {
+                    IEnumerable<Build> builds;
+                    if (lastSynced == DateTime.MinValue) {
+                        Console.Write("Updating via full fetch... ");
+                        var duration = TimerUtil.Time(out builds, () => {
+                            using (var consoleProgress = new ConsoleProgress()) {
+                                builds = repository.FetchBuilds().ToArray();
+                            }
+                        });
+                        Console.WriteLine("Loaded in {0:0.00}s.", duration.TotalSeconds);
+                    } else {
+                        Console.Write("Updating via delta fetch... ");
+                        var duration = TimerUtil.Time(out builds, () => {
+                            using (var consoleProgress = new ConsoleProgress()) {
+                                builds = repository.FetchBuilds(lastSynced).ToArray();
+                            }
+                        });
+                        Console.WriteLine("Loaded in {0:0.00}s.", duration.TotalSeconds);
+                    }
+                    foreach (var build in builds) {
+                        var found = Builds.FetchBuild(build);
+                        if (found != null) {
+                            Console.Write($"Overwriting build {build.ToIdentifierString()}");
+                            Builds.UpdateBuild(build);
+                        } else {
+                            Console.WriteLine($"Registering build {build.ToIdentifierString()}");
+                            Builds.RegisterBuild(build);
+                        }
+                    }
+                });
+                Console.WriteLine("Synced in {0:0.00}s.", syncDuration.TotalSeconds);
             }
-            foreach (var build in builds) {
-                var found = Builds.FetchBuild(build);
-                if (found != null) {
-                    Console.WriteLine($"\tOverwriting build {build.ToIdentifierString()}");
-                    Builds.UpdateBuild(build);
-                } else {
-                    Console.WriteLine($"\tRegistering build {build.ToIdentifierString()}");
-                    Builds.RegisterBuild(build);
-                }
-            }
-            Console.WriteLine("Synced.");
             SetLastSynced(DateTime.UtcNow);
         }
 
