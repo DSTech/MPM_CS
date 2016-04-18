@@ -10,5 +10,14 @@ namespace System {
             }
             return sb.ToString();
         }
+        public static string Repeat(this String str, uint count) {
+            if (count == 0) { return String.Empty; }
+            var sb = new StringBuilder(str.Length * (int)count);
+            for (uint i = 0; i < count; ++i) { sb.Append(str); }
+            return sb.ToString();
+        }
+
+        // ReSharper disable once InvokeAsExtensionMethod
+        public static string RepeatStr(this String str, uint count) => StringX.Repeat(str, count);
     }
 }

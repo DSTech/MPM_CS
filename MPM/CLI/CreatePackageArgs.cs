@@ -27,5 +27,10 @@ namespace MPM.CLI {
         public static FileInfo ReviveFileInfo(string keyName, string filePath) {
             return new FileInfo(filePath, PathFormat.RelativePath);
         }
+
+        [ArgReviver]
+        public static DirectoryInfo ReviveDirectoryInfo(string keyName, string filePath) {
+            return new DirectoryInfo(filePath, PathFormat.RelativePath);
+        }
     }
 }

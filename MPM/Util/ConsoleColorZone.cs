@@ -2,15 +2,18 @@ using System;
 using System.Reactive.Disposables;
 
 namespace MPM.Util {
-    public class ConsoleColorZone : IDisposable {
-        readonly IDisposable disposable;
+    public struct ConsoleColorZone : IDisposable {
+        readonly bool _changed;
+        readonly ConsoleColor originalColor;
 
         public ConsoleColorZone(ConsoleColor newColor) {
-            var originalColor = Console.ForegroundColor;
-            Console.ForegroundColor = newColor;
-            disposable = Disposable.Create(() => {
-                Console.ForegroundColor = originalColor;
-            });
+            this.originalColor = Console.ForegroundColor;
+            if (originalColor != newColor) {
+                Console.ForegroundColor = newColor;
+                _changed = true;
+            } else {
+                _changed = false;
+            }
         }
 
         public static ConsoleColorZone Create(ConsoleColor newColor) => new ConsoleColorZone(newColor);
@@ -22,7 +25,9 @@ namespace MPM.Util {
         #region Implementation of IDisposable
 
         public void Dispose() {
-            this.disposable.Dispose();
+            if (_changed) {
+                Console.ForegroundColor = originalColor;
+            }
         }
 
         #endregion

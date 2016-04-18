@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MPM.Util {
-    public class Huminz {
+    public static class Huminz {
         public static string ByteSize(int bytes) => ByteSize((long)bytes);
 
         public static string ByteSize(long bytes) {

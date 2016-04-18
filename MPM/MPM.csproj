@@ -227,6 +227,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\BuildForgeActionProvider.cs" />
+    <Compile Include="CLI\BuildForgeArgs.cs" />
+    <Compile Include="Util\ConsoleIndenter.cs" />
+    <Compile Include="Util\IndentedTextWriter.cs" />
     <Compile Include="Util\JavaLauncher.cs" />
     <Compile Include="CLI\IActionProvider.cs" />
     <Compile Include="CLI\ICommandLineArgs.cs" />
@@ -248,6 +252,7 @@
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\MinecraftLaunchArgsBuilder.cs" />
     <Compile Include="Util\ConsoleProgress.cs" />
     <Compile Include="Util\Huminz.cs" />
+    <Compile Include="Util\StringBuilderWriter.cs" />
     <Compile Include="Util\TimerUtil.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\ArtifactSpec.cs" />
     <Compile Include="Net\Protocols\Minecraft\ProtocolTypes\AssetIndexSpecifier.cs" />

@@ -222,6 +222,8 @@
     <Compile Include="TestUtilities\TestResources.cs" />
     <Compile Include="ProfileTests.cs" />
     <Compile Include="Types\HashTests.cs" />
+    <Compile Include="Util\ConsoleIndenterTests.cs" />
+    <Compile Include="Util\IndentedTextWriterTests.cs" />
     <None Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />
     <None Include="Core\Dependency\ResolverTests.cs" />
