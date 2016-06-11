@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 
 namespace System {
@@ -19,5 +20,7 @@ namespace System {
 
         // ReSharper disable once InvokeAsExtensionMethod
         public static string RepeatStr(this String str, uint count) => StringX.Repeat(str, count);
+
+        public static string Join(this IEnumerable<string> subject, string separator) => String.Join(separator, subject);
     }
 }

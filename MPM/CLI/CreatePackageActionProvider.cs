@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using Path = Alphaleonis.Win32.Filesystem.Path;
 using Alphaleonis.Win32.Filesystem;
 
 namespace MPM.CLI {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public partial class RootArgs {
         [ArgActionMethod]
         [ArgShortcut(ArgShortcutPolicy.ShortcutsOnly), ArgShortcut("pack"), ArgShortcut("create"), ArgShortcut("build")]
@@ -36,8 +38,10 @@ namespace MPM.CLI {
             var packageName = $"{build.PackageName}_{build.Version}_{build.Side}";
 
             Console.WriteLine($"{build.PackageName} ({build.Version}:{build.Side})=>");
-            Console.WriteLine(build);
-            Console.WriteLine(JsonConvert.SerializeObject(build, Formatting.Indented));
+            using (new ConsoleIndenter()) {
+                Console.WriteLine(build);
+                Console.WriteLine(JsonConvert.SerializeObject(build, Formatting.Indented));
+            }
 
             var outputDir = args.PackageDirectory.CreateSubdirectory("output");
             foreach (var file in outputDir.GetFiles()) {
@@ -46,9 +50,12 @@ namespace MPM.CLI {
 
             using (var archiveContent = new MemoryStream()) {
                 using (var zipContent = new MemoryStream()) {
-                    Console.WriteLine("Adding source files...");
-                    AddSourcesToZip(args, build, outputStream: zipContent);
+                    Console.WriteLine("Adding source files... ");
+                    using (new ConsoleIndenter()) {
+                        AddSourcesToZip(args, build, outputStream: zipContent);
+                    }
                     zipContent.SeekToStart();
+
                     Console.WriteLine("Building archive...");
                     Archival.Archive.Create(zipContent, build.PackageName, archiveContent, leaveSourceOpen: true);
                 }
@@ -63,7 +70,7 @@ namespace MPM.CLI {
                         archiveContent.CopyTo(hashfileStream);
                         fileHash = hashfileStream.GetHash();
                     }
-                    Console.WriteLine("\tHash: {0}", fileHash.ToString());
+                    Console.WriteLine("\tHash: {0}", fileHash);
                     hashes.Add(fileHash);
                 }
 
@@ -86,7 +93,7 @@ namespace MPM.CLI {
         }
 
         private static void AddSourcesToZip(CreatePackageArgs args, Build build, Stream outputStream) {
-            using (var zipStream = new ICSharpCode.SharpZipLib.Zip.ZipOutputStream(outputStream) { IsStreamOwner = false }) {
+            using (var zipStream = new ZipOutputStream(outputStream) { IsStreamOwner = false }) {
                 zipStream.SetLevel(9);
                 Console.WriteLine("Packing file {0} as \"package.json\"", args.PackageSpecFile.FullName);
                 {

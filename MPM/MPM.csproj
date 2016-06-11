@@ -227,8 +227,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLI\BuildForgeActionProvider.cs" />
-    <Compile Include="CLI\BuildForgeArgs.cs" />
+    <Compile Include="CLI\PrepForgeActionProvider.cs" />
+    <Compile Include="CLI\PrepForgeArgs.cs" />
+    <Compile Include="CLI\ScriptActionProvider.cs" />
+    <Compile Include="CLI\ScriptArgs.cs" />
     <Compile Include="Util\ConsoleIndenter.cs" />
     <Compile Include="Util\IndentedTextWriter.cs" />
     <Compile Include="Util\JavaLauncher.cs" />
