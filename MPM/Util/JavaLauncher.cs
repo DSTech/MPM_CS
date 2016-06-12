@@ -81,6 +81,20 @@ namespace MPM.Util {
 
         private static string GetBestJavaPath() => Path.Combine(GetJavaInstallationPath(), "bin", "java.exe");
 
+        private static string GetUnpack200Path() => GetBestJavaPath().Replace("java.exe", "unpack200.exe");
+
+        public static void Unpack200(FileInfo inputFile, FileInfo outputFile) => Unpack200(inputFile.FullName, outputFile.FullName);
+
+        public static void Unpack200(string inputPath, string outputPath) {
+            var processStartInfo = new ProcessStartInfo(GetUnpack200Path(), $"\"{inputPath}\" \"{outputPath}\"") {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+            };
+            using (var unpackProc = Process.Start(processStartInfo)) {
+                unpackProc?.WaitForExit();
+            }
+        }
+
         private static string GetJavaInstallationPath() {
             var environmentPath = Environment.GetEnvironmentVariable("JAVA_HOME");
             if (!string.IsNullOrEmpty(environmentPath)) {

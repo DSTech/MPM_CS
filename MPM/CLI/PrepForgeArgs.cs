@@ -25,6 +25,11 @@ namespace MPM.CLI {
         [ArgPosition(3), ArgShortcut("-f"), ArgShortcut("--forge"), ArgShortcut("--forgeversion")]
         public string ForgeVersion { get; set; }
 
+        [ArgDescription("Side for compatibility (eg client/server/universal)")]
+        [ArgDefaultValue("universal")]
+        [ArgPosition(4), ArgShortcut("-s"), ArgShortcut("--side")]
+        public CompatibilitySide Side { get; set; }
+
         [ArgReviver]
         public static FileInfo ReviveFileInfo(string keyName, string filePath) {
             return new FileInfo(filePath, PathFormat.RelativePath);
@@ -33,6 +38,23 @@ namespace MPM.CLI {
         [ArgReviver]
         public static DirectoryInfo ReviveDirectoryInfo(string keyName, string filePath) {
             return new DirectoryInfo(filePath, PathFormat.RelativePath);
+        }
+
+        [ArgReviver]
+        public static CompatibilitySide ReviveSide(string keyName, string sideString) {
+            switch (sideString.ToLowerInvariant()) {
+                case "c":
+                case "client":
+                    return CompatibilitySide.Client;
+                case "s":
+                case "server":
+                    return CompatibilitySide.Server;
+                case "u":
+                case "universal":
+                    return CompatibilitySide.Universal;
+                default:
+                    throw new KeyNotFoundException("Side specifier not found");
+            }
         }
     }
 }

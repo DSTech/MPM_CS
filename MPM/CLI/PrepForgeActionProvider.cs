@@ -81,7 +81,7 @@ namespace MPM.CLI {
                         )
                     )
                 }),
-                Side = CompatibilitySide.Universal,
+                Side = args.Side,
                 GivenVersion = args.ForgeVersion,
                 Version = forgeVersionAsSemVer,
                 Dependencies = new BuildDependencySet(),
@@ -90,37 +90,14 @@ namespace MPM.CLI {
                 }),
             };
 
+            var forgeInstallProfile = FetchInstallProfile(forgeUrl);
 
+            AddForgeLibrariesToBuild(args.PackageDirectory, args.MinecraftVersion, chosenForgeVersion, forgeInstallProfile, args.Side, ref buildInfo);
 
             File.WriteAllText(packageDir.SubFile("package.json").FullName, JsonConvert.SerializeObject(buildInfo, Formatting.Indented));
         }
 
-        protected class ForgeInstallProfile {
-            [JsonProperty(PropertyName = "versionInfo")]
-            public ForgeInstallVersionInfo VersionInfo { get; set; }
-        }
-
-        protected class ForgeInstallVersionInfo {
-            [JsonProperty(PropertyName = "libraries")]
-            public List<ForgeInstallLibraryEntry> Libraries { get; set; }
-        }
-
-        protected class ForgeInstallLibraryEntry {
-            [JsonProperty(PropertyName = "name")]// eg "org.scala-lang:scala-compiler:2.11.1"
-            public string Name { get; set; }
-
-            [JsonProperty(PropertyName = "url")]// eg "http://files.minecraftforge.net/maven/"
-            public string Url { get; set; } = null;
-
-            [JsonProperty(PropertyName = "serverreq")]
-            public bool ServerReq { get; set; } = false;
-
-            [JsonProperty(PropertyName = "clientreq")]
-            public bool ClientReq { get; set; } = false;
-
-            [JsonProperty(PropertyName = "checksums")]// eg ["56ea2e6c025e0821f28d73ca271218b8dd04926a", "1444992390544ba3780867a13ff696a89d7d1639"]
-            public List<string> Checksums { get; set; }
-        }
+        #region ForgeListings
 
         protected class ForgeVersionEntry {
             [JsonProperty(PropertyName = "name")]
@@ -182,5 +159,136 @@ namespace MPM.CLI {
                 Version = forgeVersion,
             };
         }
+
+        #endregion ForgeListings
+
+        #region ForgeInstallProfiles
+
+        public class ForgeInstallProfile {
+            [JsonProperty(PropertyName = "versionInfo")]
+            public ForgeInstallVersionInfo VersionInfo { get; set; }
+        }
+
+        public class ForgeInstallVersionInfo {
+            [JsonProperty(PropertyName = "libraries")]
+            public List<ForgeInstallLibraryEntry> Libraries { get; set; }
+        }
+
+        public class ForgeInstallLibraryEntry {
+            [JsonProperty(PropertyName = "name")]// eg "org.scala-lang:scala-compiler:2.11.1"
+            public string Name { get; set; }
+
+            [JsonProperty(PropertyName = "url")]// eg "http://files.minecraftforge.net/maven/"
+            public string Url { get; set; } = null;
+
+            [JsonProperty(PropertyName = "serverreq")]
+            public bool ServerReq { get; set; } = false;
+
+            [JsonProperty(PropertyName = "clientreq")]
+            public bool ClientReq { get; set; } = false;
+
+            [JsonProperty(PropertyName = "checksums")]// eg ["56ea2e6c025e0821f28d73ca271218b8dd04926a", "1444992390544ba3780867a13ff696a89d7d1639"]
+            public List<string> Checksums { get; set; }
+        }
+
+        public ForgeInstallProfile FetchInstallProfile(string forgeInstallProfileUrl) {
+            ForgeInstallProfile installProfile;
+            using (var wc = new WebClient()) {
+                var versionsJson = wc.DownloadString(forgeInstallProfileUrl);
+                installProfile = JsonConvert.DeserializeObject<ForgeInstallProfile>(versionsJson, new VersionConverter(loose: true), new VersionRangeConverter(loose: true));
+            }
+            return installProfile;
+        }
+
+        private void AddForgeLibrariesToBuild(DirectoryInfo buildDirectory, string minecraftVersion, string forgeVersion, ForgeInstallProfile forgeInstallProfile, CompatibilitySide side, ref Build buildInfo) {
+            var libs = forgeInstallProfile.VersionInfo.Libraries.Where(lib => lib.Url != null);
+            var libsToInstall = libs.Where(lib => lib.ServerReq || lib.ClientReq).ToList();
+            var installation = new List<IFileDeclaration>();
+
+            libsToInstall.Insert(0, new ForgeInstallLibraryEntry {
+                Name = libs.FirstOrDefault(l => l.Name.StartsWith("net.minecraftforge:forge")).Name,
+                Url = GetForgeUniversalUrl(minecraftVersion, forgeVersion),
+                ClientReq = true,
+                ServerReq = true,
+            });
+
+            using (var wc = new WebClient()) {
+                foreach (var lib in libsToInstall) {
+                    var fileDec = new SourcedFileDeclaration();
+                    var libPath = AssembleLibraryPath(lib.Name);
+                    string libUrl;
+                    if (!lib.Name.StartsWith("net.minecraftforge:forge")) {
+                        libUrl = AssembleLibraryUrl(lib.Url, lib.Name);
+                    } else {
+                        libUrl = lib.Url;
+                    }
+
+                    var localFile = buildDirectory.CreateSubdirectory("lib").SubFile(libPath);
+                    localFile.Directory.Create();
+
+                    if (!localFile.Exists) {
+                        try {
+                            var packed = wc.DownloadData($"{libUrl}.pack.xz");
+                            File.WriteAllBytes(localFile.FullName, Unpack(packed));
+                        } catch (WebException) {
+                            wc.DownloadFile(libUrl, localFile.FullName);
+                        }
+                    }
+                    fileDec.Description = $"{libUrl} => {libPath}";
+                    fileDec.Source = $"lib/{libPath}";
+                    fileDec.Targets = new[] { libPath };
+
+                    installation.Add(fileDec);
+                }
+            }
+
+            buildInfo.Installation = installation;
+        }
+
+        private static string AssembleLibraryPath(string libraryName) {
+            var nameParts = libraryName.Split(new[] { ':' });
+            return $"{nameParts[0].Replace('.', '/')}/{nameParts[1]}/{nameParts[2]}/{nameParts[1]}-{nameParts[2]}.jar";
+        }
+
+        private static string AssembleLibraryUrl(string baseUrl, string libraryName) {
+            var libraryPath = AssembleLibraryPath(libraryName);
+            return $"{baseUrl}{libraryPath}";
+        }
+
+        private static string GetForgeUniversalUrl(string minecraftVersion, string forgeVersion) {
+            JObject forgeListing;
+            using (var wc = new WebClient()) {
+                var forgeListingJson = wc.DownloadString($"http://thej89.dessix.net/mmdb/forge/{minecraftVersion}/{forgeVersion}/{forgeVersion}.json");
+                forgeListing = JObject.Parse(forgeListingJson);
+            }
+            var downloads = forgeListing["downloads"].AsJEnumerable();
+            var url = downloads.FirstOrDefault(i => i["type"].ToString() == "universal")?["url"]?.ToString();
+            return url;
+        }
+
+        private byte[] Unpack(byte[] packed) {
+            var unpacked = ManagedXZ.XZUtils.DecompressBytes(packed, 0, packed.Length);
+            if (unpacked.Length < 8) {
+                throw new FormatException("FileSize is too small.");
+            }
+            var checksumLength = BitConverter.ToUInt32(unpacked, unpacked.Length - 8);
+            if (checksumLength > unpacked.Length - 8) {
+                throw new FormatException("Invalid checksum file size.");
+            }
+            var tempPackedFile = new FileInfo(Path.GetTempFileName());
+            var tempUnpackedFile = new DirectoryInfo(Path.GetTempPath()).SubFile($"{tempPackedFile.Name}_unpacked");
+            using (var file = File.OpenWrite(tempPackedFile.FullName)) {
+                file.Write(unpacked, 0, Convert.ToInt32(unpacked.Length - (8 + checksumLength)));
+            }
+            JavaLauncher.Unpack200(tempPackedFile.FullName, tempUnpackedFile.FullName);
+
+            var output = File.ReadAllBytes(tempUnpackedFile.FullName);
+            if (tempPackedFile.Exists) { tempPackedFile.Delete(); }
+            if (tempUnpackedFile.Exists) { tempUnpackedFile.Delete(); }
+            return output;
+        }
+
+        #endregion ForgeInstallProfiles
+
     }
 }
