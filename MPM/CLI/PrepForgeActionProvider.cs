@@ -65,12 +65,22 @@ namespace MPM.CLI {
 
             // 12.17.0.1954_b => 17.0.1954-b
             var forgeVersionAsSemVer = new SemVersion(chosenForgeVersion.Substring(chosenForgeVersion.IndexOf('.') + 1).Replace('_', '-'), true);
+            var buildInfo = CreateForgeBuildInfo(args, forgeVersionAsSemVer);
+
+            var forgeInstallProfile = FetchInstallProfile(forgeUrl);
+
+            AddForgeLibrariesToBuild(args.PackageDirectory, args.MinecraftVersion, chosenForgeVersion, forgeInstallProfile, args.Side, ref buildInfo);
+
+            File.WriteAllText(packageDir.SubFile("package.json").FullName, JsonConvert.SerializeObject(buildInfo, Formatting.Indented));
+        }
+
+        private static Build CreateForgeBuildInfo(PrepForgeArgs args, SemVersion forgeVersionAsSemVer) {
             var buildInfo = new Build() {
-                PackageName = "Forge",
+                PackageName = "minecraftforge",
                 Arch = new SemVersion(args.MinecraftVersion),
                 Authors = new List<Author>(new Author[] { new Author("Forge Authors", "") }),
                 Conflicts = new List<Conflict>(new Conflict[] {
-                    new Conflict(
+                    new Conflict(//TODO: Make a fluent interface for declaring conflicts
                         new ConflictCondition(packageName: "Bukkit"),//TODO: Verify that this is how conflicts are defined
                         new ConflictResolution(
                             new DependencyConflictResolution(
@@ -89,12 +99,7 @@ namespace MPM.CLI {
                     new InterfaceProvision("Forge", forgeVersionAsSemVer)
                 }),
             };
-
-            var forgeInstallProfile = FetchInstallProfile(forgeUrl);
-
-            AddForgeLibrariesToBuild(args.PackageDirectory, args.MinecraftVersion, chosenForgeVersion, forgeInstallProfile, args.Side, ref buildInfo);
-
-            File.WriteAllText(packageDir.SubFile("package.json").FullName, JsonConvert.SerializeObject(buildInfo, Formatting.Indented));
+            return buildInfo;
         }
 
         #region ForgeListings
@@ -205,6 +210,7 @@ namespace MPM.CLI {
             var libsToInstall = libs.Where(lib => lib.ServerReq || lib.ClientReq).ToList();
             var installation = new List<IFileDeclaration>();
 
+            // Add Forge to 
             libsToInstall.Insert(0, new ForgeInstallLibraryEntry {
                 Name = libs.FirstOrDefault(l => l.Name.StartsWith("net.minecraftforge:forge")).Name,
                 Url = GetForgeUniversalUrl(minecraftVersion, forgeVersion),
@@ -214,7 +220,26 @@ namespace MPM.CLI {
 
             using (var wc = new WebClient()) {
                 foreach (var lib in libsToInstall) {
-                    var fileDec = new SourcedFileDeclaration();
+                    switch (side) {
+                        case CompatibilitySide.Universal:
+                            if (!lib.ClientReq && !lib.ServerReq) {
+                                continue;
+                            }
+                            break;
+                        case CompatibilitySide.Client:
+                            if (!lib.ClientReq) {
+                                continue;
+                            }
+                            break;
+                        case CompatibilitySide.Server:
+                            if (!lib.ServerReq) {
+                                continue;
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(side), side, null);
+                    }
+
                     var libPath = AssembleLibraryPath(lib.Name);
                     string libUrl;
                     if (!lib.Name.StartsWith("net.minecraftforge:forge")) {
@@ -223,7 +248,9 @@ namespace MPM.CLI {
                         libUrl = lib.Url;
                     }
 
-                    var localFile = buildDirectory.CreateSubdirectory("lib").SubFile(libPath);
+                    var localPath = $"libraries/{libPath}";
+                    var targetPath = localPath;
+                    var localFile = buildDirectory.SubFile(localPath);
                     localFile.Directory.Create();
 
                     if (!localFile.Exists) {
@@ -234,11 +261,17 @@ namespace MPM.CLI {
                             wc.DownloadFile(libUrl, localFile.FullName);
                         }
                     }
-                    fileDec.Description = $"{libUrl} => {libPath}";
-                    fileDec.Source = $"lib/{libPath}";
-                    fileDec.Targets = new[] { libPath };
+
+                    var fileDec = new SourcedFileDeclaration {
+                        Description = lib.Name,
+                        Source = localPath,
+                        Targets = new[] { targetPath },
+                    };
 
                     installation.Add(fileDec);
+                    if (lib.Name.StartsWith("net.minecraftforge:forge") && (side == CompatibilitySide.Server || side == CompatibilitySide.Universal)) {
+                        fileDec.Targets = fileDec.Targets.Concat(new[] { "minecraftforge.jar" }).ToArray();
+                    }
                 }
             }
 
@@ -266,7 +299,7 @@ namespace MPM.CLI {
             return url;
         }
 
-        private byte[] Unpack(byte[] packed) {
+        private static byte[] Unpack(byte[] packed) {
             var unpacked = ManagedXZ.XZUtils.DecompressBytes(packed, 0, packed.Length);
             if (unpacked.Length < 8) {
                 throw new FormatException("FileSize is too small.");
@@ -289,6 +322,5 @@ namespace MPM.CLI {
         }
 
         #endregion ForgeInstallProfiles
-
     }
 }

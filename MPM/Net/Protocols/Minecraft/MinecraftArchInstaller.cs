@@ -135,7 +135,7 @@ namespace MPM.Net.Protocols.Minecraft {
                     packageVersion: archVersion,
                     cacheManager: cacheManager,
                     cachedName: cacheEntryName,
-                    targetPath: $"libraries/{lib.Package.Replace('.', '/')}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTagOrNull}.jar"
+                    targetPath: $"lib/{lib.Package.Replace('.', '/')}/{lib.Name}/{lib.Version}/{lib.Name}-{lib.Version}{nativeTagOrNull}.jar"
                     );
             }
         }

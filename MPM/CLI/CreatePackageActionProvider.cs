@@ -38,7 +38,7 @@ namespace MPM.CLI {
             var packageName = $"{build.PackageName}_{build.Version}_{build.Side}";
 
             Console.WriteLine($"{build.PackageName} ({build.Version}:{build.Side})=>");
-            using (new ConsoleIndenter()) {
+            using (ConsoleIndenter.ByTabs) {
                 Console.WriteLine(build);
                 Console.WriteLine(JsonConvert.SerializeObject(build, Formatting.Indented));
             }
@@ -51,7 +51,7 @@ namespace MPM.CLI {
             using (var archiveContent = new MemoryStream()) {
                 using (var zipContent = new MemoryStream()) {
                     Console.WriteLine("Adding source files... ");
-                    using (new ConsoleIndenter()) {
+                    using (ConsoleIndenter.ByTabs) {
                         AddSourcesToZip(args, build, outputStream: zipContent);
                     }
                     zipContent.SeekToStart();

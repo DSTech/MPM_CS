@@ -50,12 +50,15 @@ namespace MPM.Util {
                 classPath = $"-cp {string.Join(PlatformSeparator, this.ClassPaths.Select(p => $"\"{p.FullName}\""))}";
             }
 
-            var heapDumpPath = "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump";
+            const string heapDumpPath = "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump";
 
-            var preferIPv4 = "-Djava.net.preferIPv4Stack=true";
+            const string preferIPv4 = "-Djava.net.preferIPv4Stack=true";
 
             string launchMethod;
             if (LaunchJar != null) {
+                if (LaunchClass != null) {
+                    throw new InvalidOperationException("Cannot specify two launch methods simultaneously.");
+                }
                 launchMethod = $"-jar {LaunchJar.FullName}";
             } else if (LaunchClass != null) {
                 launchMethod = LaunchClass;

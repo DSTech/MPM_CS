@@ -12,6 +12,7 @@ using MPM.Core.Profiles;
 using MPM.Net.Protocols.Minecraft;
 using MPM.Net.Protocols.Minecraft.ProtocolTypes;
 using MPM.Types;
+using MPM.Util;
 using Newtonsoft.Json;
 
 namespace MPM.ActionProviders {
@@ -44,89 +45,112 @@ namespace MPM.ActionProviders {
                 throw new Exception("This launcher cannot launch this instance, as it does not contain Minecraft");
             }
 
-            var cacheManager = resolver.Resolve<GlobalStorage>().FetchGlobalCache();
             var installedMinecraftBuild = packagesByName["minecraft"];
             var mdc = new MinecraftDownloadClient();
-            
+            var cacheManager = resolver.Resolve<GlobalStorage>().FetchGlobalCache();
             var versionDetails = GetAndEnsureVersionDetailsCached(installedMinecraftBuild.Arch, mdc, cacheManager);
 
             var javaLauncher = new Util.JavaLauncher(prefer64Bit: true);
 
-            var launchArgs = new List<string>();
+            var launchArgs = BuildArgs(ref instance, mutableProfile, versionDetails, ref javaLauncher, hasForge);
+            VerifyEula(instance);
+            LaunchJava(javaLauncher, launchArgs);
+        }
 
+        private static List<string> BuildArgs(ref Instance instance, MutableProfile mutableProfile, MinecraftVersion versionDetails, ref JavaLauncher javaLauncher, bool hasForge) {
             if (instance.Side == CompatibilitySide.Client) {
-                //Client launching
-                Debug.Assert(mutableProfile != null);
-                var launchArgsBuilder = new MinecraftLaunchArgsBuilder() {
-                    UserName = mutableProfile.Name,
-                    VersionId = versionDetails.Id,
-                    InstanceDirectory = instance.Location,
-                    AssetsDirectory = instance.Location.CreateSubdirectory("assets"),
-                    AssetsIndexId = versionDetails.Id,
-                    AuthProfileId = mutableProfile.YggdrasilProfileId,
-                    AuthAccessToken = mutableProfile.YggdrasilAccessToken,
-                    AuthUserType = mutableProfile.YggdrasilUserType,
-                    UserProperties = new Dictionary<string, string>(),//TODO: Support custom user properties
-                };
-
-                {
-                    //Add jar file to classpaths
-                    var clientJarFile = instance.Location.SubFile("client.jar");
-                    javaLauncher.ClassPaths.Add(clientJarFile);
-                }
-
-                {
-                    //Add classpaths for libraries
-                    //TODO: Install from non-native libs, accounting for extract-based non-natives if they are actually something that occurs (Update: They are not[Citation Needed])
-                    //var installingPlatform = Environment.OSVersion.Platform;
-                    //var installingBitness64 = Environment.Is64BitOperatingSystem;
-                    //var nonNativeLibs = versionDetails.Libraries.Where(l => l.AppliesToPlatform(installingPlatform)).Where(l => l.ApplyNatives(installingPlatform, installingBitness64).Artifact == null);
-
-                    //Replace this with the above behaviour
-                    var libraryFiles = instance.Location.CreateSubdirectory("libraries")
-                        .EnumerateFiles("*.jar", SearchOption.AllDirectories)
-                        .Where(f => f.Extension == ".jar");
-                    javaLauncher.ClassPaths.AddRange(libraryFiles);
-                }
-
-                javaLauncher.NativesPaths.Add(instance.Location.CreateSubdirectory("bin").CreateSubdirectory("natives"));
-
-                javaLauncher.LaunchClass = versionDetails.MainClass;
-
-                launchArgs.AddRange(launchArgsBuilder.Build(versionDetails.MinecraftArguments));
+                return BuildClientArgs(instance, mutableProfile, versionDetails, javaLauncher, hasForge);
             } else {
-                //Server launching
-                {
-                    //Add jar file to classpaths
-                    var serverJarFile = instance.Location.SubFile("server.jar");
-                    javaLauncher.ClassPaths.Add(serverJarFile);
-                }
+                return BuildServerArgs(instance, javaLauncher, hasForge);
+            }
+        }
 
-                javaLauncher.LaunchJar = instance.Location.SubFile("server.jar");
+        private static List<string> BuildClientArgs(Instance instance, MutableProfile mutableProfile, MinecraftVersion versionDetails, JavaLauncher javaLauncher, bool hasForge) {
+            Debug.Assert(mutableProfile != null);
+            var launchArgsBuilder = new MinecraftLaunchArgsBuilder() {
+                UserName = mutableProfile.Name,
+                VersionId = versionDetails.Id,
+                InstanceDirectory = instance.Location,
+                AssetsDirectory = instance.Location.CreateSubdirectory("assets"),
+                AssetsIndexId = versionDetails.Id,
+                AuthProfileId = mutableProfile.YggdrasilProfileId,
+                AuthAccessToken = mutableProfile.YggdrasilAccessToken,
+                AuthUserType = mutableProfile.YggdrasilUserType,
+                UserProperties = new Dictionary<string, string>(),//TODO: Support custom user properties
+            };
 
-                javaLauncher.AdditionalArguments.Add("nogui");
+            {
+                //Add jar file to classpaths
+                var clientJarFile = instance.Location.SubFile("client.jar");
+                javaLauncher.ClassPaths.Add(clientJarFile);
             }
 
             {
-                if (instance.Side == CompatibilitySide.Server) {
-                    var eulaFile = instance.Location.SubFile("eula.txt");
-                    if (!eulaFile.Exists) {
-                        Console.Write("Do you accept the Minecraft EULA at \"https://account.mojang.com/documents/minecraft_eula\"?\n[Y/N]> ");
-                        var response = Console.ReadLine();
-                        if (response?.ToLowerInvariant() != "y") {
-                            throw new ApplicationException("User did not accept Minecraft server EULA");
-                        }
-                        using (var eulaWriter = new StreamWriter(eulaFile.OpenWrite())) {
-                            eulaWriter.WriteLine("eula=true");
-                        }
+                //Add classpaths for libraries
+                //TODO: Install from non-native libs, accounting for extract-based non-natives if they are actually something that occurs (Update: They are not[Citation Needed])
+                //var installingPlatform = Environment.OSVersion.Platform;
+                //var installingBitness64 = Environment.Is64BitOperatingSystem;
+                //var nonNativeLibs = versionDetails.Libraries.Where(l => l.AppliesToPlatform(installingPlatform)).Where(l => l.ApplyNatives(installingPlatform, installingBitness64).Artifact == null);
+
+                //Replace this with the above behaviour
+                var libraryFiles = instance.Location.CreateSubdirectory("libraries")
+                    .EnumerateFiles("*.jar", SearchOption.AllDirectories)
+                    .Where(f => f.Extension == ".jar");
+                javaLauncher.ClassPaths.AddRange(libraryFiles);
+            }
+
+            javaLauncher.NativesPaths.Add(instance.Location.CreateSubdirectory("bin").CreateSubdirectory("natives"));
+
+            javaLauncher.LaunchClass = versionDetails.MainClass;
+
+            if (hasForge) {
+                launchArgsBuilder.TweakClass = "net.minecraftforge.fml.common.launcher.FMLTweaker";
+            }
+
+            return launchArgsBuilder.Build(versionDetails.MinecraftArguments).ToList();
+        }
+
+        private static List<string> BuildServerArgs(Instance instance, JavaLauncher javaLauncher, bool hasForge) {
+            {
+                //Add jar file to classpaths
+                var serverJarFile = instance.Location.SubFile("server.jar");
+                javaLauncher.ClassPaths.Add(serverJarFile);
+            }
+
+            if (!hasForge) {
+                javaLauncher.LaunchJar = instance.Location.SubFile("server.jar");
+            } else {
+                var minecraftForgeFile = instance.Location.SubFile("minecraftforge.jar");
+                javaLauncher.LaunchJar = minecraftForgeFile;
+                javaLauncher.ClassPaths.Add(minecraftForgeFile);
+            }
+
+            javaLauncher.AdditionalArguments.Add("nogui");
+            return new List<string>(0);
+        }
+
+        private static void VerifyEula(Instance instance) {
+            if (instance.Side == CompatibilitySide.Server) {
+                var eulaFile = instance.Location.SubFile("eula.txt");
+                if (!eulaFile.Exists) {
+                    Console.Write("Do you accept the Minecraft EULA at \"https://account.mojang.com/documents/minecraft_eula\"?\n[Y/N]> ");
+                    var response = Console.ReadLine();
+                    if (response?.ToLowerInvariant() != "y") {
+                        throw new ApplicationException("User did not accept Minecraft server EULA");
+                    }
+                    using (var eulaWriter = new StreamWriter(eulaFile.OpenWrite())) {
+                        eulaWriter.WriteLine("eula=true");
                     }
                 }
             }
-            using (var proc = javaLauncher.Launch(launchArgs)) {
+        }
+
+        private static void LaunchJava(JavaLauncher javaLauncher, List<string> launchArgs) {
+            using (var javaProc = javaLauncher.Launch(launchArgs)) {
                 Console.WriteLine();
-                Console.WriteLine(proc.StartInfo.Arguments);
+                Console.WriteLine(javaProc.StartInfo.Arguments);
                 Console.WriteLine();
-                proc.WaitForExit();
+                javaProc.WaitForExit();
             }
         }
 

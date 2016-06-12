@@ -63,7 +63,7 @@ namespace MPM.Types {
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public CompatibilitySide Side { get; set; } = CompatibilitySide.Universal;
 
-        [JsonProperty("interfaces", ItemTypeNameHandling = TypeNameHandling.None)]
+        [JsonProperty("interfaces")]
         public List<InterfaceProvision> Interfaces { get; set; } = new List<InterfaceProvision>();
 
         [JsonRequired]
