@@ -1,17 +1,27 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public class DependencyConflictResolution : IEquatable<DependencyConflictResolution> {
         public DependencyConflictResolution() {
         }
 
-        public DependencyConflictResolution(ForcedDependencySet force, DeclinedDependencySet decline) {
+        public DependencyConflictResolution(ForcedDependencySet force = null, DeclinedDependencySet decline = null) {
             this.Force = force;
             this.Decline = decline;
         }
 
+        [JsonProperty(PropertyName = "Force", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ForcedDependencySet Force { get; set; }
+
+        [JsonProperty(PropertyName = "Decline", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DeclinedDependencySet Decline { get; set; }
+
+        public bool ShouldSerialize() => ShouldSerializeForce() || ShouldSerializeDecline();
+
+        public bool ShouldSerializeForce() => Force?.ShouldSerialize() == true;
+
+        public bool ShouldSerializeDecline() => Decline?.ShouldSerialize() == true;
 
         #region Equality members
 

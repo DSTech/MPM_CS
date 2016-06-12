@@ -11,7 +11,12 @@ namespace MPM.Types {
         }
 
         public ConflictCondition Condition { get; set; }
+
         public ConflictResolution Resolution { get; set; }
+
+        public bool ShouldSerializeCondition() => Condition?.ShouldSerialize() == true;
+
+        public bool ShouldSerializeResolution() => Resolution?.ShouldSerialize() == true;
 
         #region Equality members
 

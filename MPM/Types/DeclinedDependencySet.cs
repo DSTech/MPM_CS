@@ -7,13 +7,20 @@ namespace MPM.Types {
         public DeclinedDependencySet() {
         }
 
-        public DeclinedDependencySet(IEnumerable<string> packageNames, IEnumerable<string> interfaceNames) {
-            this.PackageNames = packageNames.ToList();
-            this.InterfaceNames = interfaceNames.ToList();
+        public DeclinedDependencySet(IEnumerable<string> packageNames = null, IEnumerable<string> interfaceNames = null) {
+            this.PackageNames = packageNames.DenullList();
+            this.InterfaceNames = interfaceNames.DenullList();
         }
 
         public List<String> PackageNames { get; set; }
         public List<String> InterfaceNames { get; set; }
+
+
+        public bool ShouldSerialize() => ShouldSerializePackageNames() || ShouldSerializeInterfaceNames();
+
+        public bool ShouldSerializePackageNames() => PackageNames != null && PackageNames.Count > 0;
+
+        public bool ShouldSerializeInterfaceNames() => InterfaceNames != null && InterfaceNames.Count > 0;
 
         #region Equality members
 

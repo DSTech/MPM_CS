@@ -13,6 +13,8 @@ namespace MPM.Types {
 
         public List<String> PackageNames { get; set; }
 
+        public bool ShouldSerialize() => PackageNames != null && PackageNames.Count > 0;
+
         #region Equality members
 
         public bool Equals(InstallationConflictResolution other) {

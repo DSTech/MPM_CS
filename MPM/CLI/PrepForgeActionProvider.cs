@@ -36,30 +36,46 @@ namespace MPM.CLI {
 
     public class PrepForgeActionProvider : IActionProvider<PrepForgeArgs> {
         public void Provide(IContainer factory, PrepForgeArgs args) {
-            if (args.PackageDirectory.Exists) { args.PackageDirectory.Create(); }
             string forgeUrl;
+            string chosenForgeVersion;
             using (ConsoleColorZone.Info) {
                 Console.Write("Resolving Forge version to URL... ");
-                forgeUrl = ResolveForgeVersion(minecraftVersion: args.MinecraftVersion, forgeVersion: args.ForgeVersion);
+                try {
+                    var choice = ResolveForgeVersion(minecraftVersion: new SemVersion(args.MinecraftVersion), forgeVersion: args.ForgeVersion);
+                    forgeUrl = choice.Url;
+                    chosenForgeVersion = choice.Version;
+                } catch (ApplicationException e) {
+                    using (ConsoleColorZone.Error) {
+                        Console.WriteLine("Failed!");
+                        Console.WriteLine($"\t{e.Message}");
+                    }
+                    return;
+                }
                 using (ConsoleColorZone.Success) {
                     Console.WriteLine("Done.");
                 }
                 using (ConsoleColorZone.Info) {
-                    Console.WriteLine("\t{0}", forgeUrl);
+                    Console.WriteLine($"\t{forgeUrl}");
                 }
             }
             Console.WriteLine($"Preparing Forge at path:\n\t{args.PackageDirectory}");
-            Environment.CurrentDirectory = args.PackageDirectory.FullName;
+            var packageDir = args.PackageDirectory;
+            if (!packageDir.Exists) { packageDir.Create(); }
+            Environment.CurrentDirectory = packageDir.FullName;
+
+            // 12.17.0.1954_b => 17.0.1954-b
+            var forgeVersionAsSemVer = new SemVersion(chosenForgeVersion.Substring(chosenForgeVersion.IndexOf('.') + 1).Replace('_', '-'), true);
             var buildInfo = new Build() {
                 PackageName = "Forge",
-                Arch = args.MinecraftVersion,
+                Arch = new SemVersion(args.MinecraftVersion),
                 Authors = new List<Author>(new Author[] { new Author("Forge Authors", "") }),
                 Conflicts = new List<Conflict>(new Conflict[] {
                     new Conflict(
-                        new ConflictCondition(packageName: "Forge"),
-                            new ConflictResolution(new DependencyConflictResolution(
+                        new ConflictCondition(packageName: "Bukkit"),//TODO: Verify that this is how conflicts are defined
+                        new ConflictResolution(
+                            new DependencyConflictResolution(
                                 new ForcedDependencySet(),
-                                new DeclinedDependencySet(new string[] { "Bukkit" }, null)
+                                new DeclinedDependencySet(packageNames: new string[] { "Bukkit" })
                             ),
                             new InstallationConflictResolution()
                         )
@@ -67,14 +83,18 @@ namespace MPM.CLI {
                 }),
                 Side = CompatibilitySide.Universal,
                 GivenVersion = args.ForgeVersion,
-                Version = new SemVersion(args.ForgeVersion.Substring(args.ForgeVersion.IndexOf('.') + 1)), // 12.17.0.1954 => 17.0.1954
+                Version = forgeVersionAsSemVer,
                 Dependencies = new BuildDependencySet(),
                 Interfaces = new List<InterfaceProvision>(new[] {
-                    new InterfaceProvision("Forge", new SemVersion(args.ForgeVersion.Substring(0, args.ForgeVersion.LastIndexOf('.'))))
+                    new InterfaceProvision("Forge", forgeVersionAsSemVer)
                 }),
             };
+
+
+
+            File.WriteAllText(packageDir.SubFile("package.json").FullName, JsonConvert.SerializeObject(buildInfo, Formatting.Indented));
         }
-        
+
         protected class ForgeInstallProfile {
             [JsonProperty(PropertyName = "versionInfo")]
             public ForgeInstallVersionInfo VersionInfo { get; set; }
@@ -121,7 +141,12 @@ namespace MPM.CLI {
             public Dictionary<string, List<ForgeVersionEntry>> Versions { get; set; }
         }
 
-        private string ResolveForgeVersion(SemVersion minecraftVersion, string forgeVersion) {
+        private struct ForgeVersionChoice {
+            public string Url { get; set; }
+            public string Version { get; set; }
+        }
+
+        private ForgeVersionChoice ResolveForgeVersion(SemVersion minecraftVersion, string forgeVersion) {
             ForgeVersionCollection forgeVersions;
             using (var wc = new WebClient()) {
                 var versionsJson = wc.DownloadString("http://thej89.dessix.net/mmdb/forge/versions.json");
@@ -152,7 +177,10 @@ namespace MPM.CLI {
                 throw new ApplicationException("Provided Forge version not found.");
             }
 
-            return $"http://thej89.dessix.net/mmdb/forge/{minecraftVersion}/{forgeVersion}/install_profile.json";
+            return new ForgeVersionChoice {
+                Url = $"http://thej89.dessix.net/mmdb/forge/{minecraftVersion}/{forgeVersion}/install_profile.json",
+                Version = forgeVersion,
+            };
         }
     }
 }

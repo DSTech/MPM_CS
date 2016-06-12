@@ -8,12 +8,18 @@ namespace MPM.Types {
         }
 
         public ForcedDependencySet(IEnumerable<string> packageNames, IEnumerable<string> interfaceNames) {
-            this.PackageNames = packageNames.ToList();
-            this.InterfaceNames = interfaceNames.ToList();
+            this.PackageNames = packageNames.DenullList();
+            this.InterfaceNames = interfaceNames.DenullList();
         }
 
         public List<String> PackageNames { get; set; }
         public List<String> InterfaceNames { get; set; }
+
+        public bool ShouldSerialize() => ShouldSerializeInterfaceNames() || ShouldSerializePackageNames();
+
+        public bool ShouldSerializePackageNames() => PackageNames != null && PackageNames.Count > 0;
+
+        public bool ShouldSerializeInterfaceNames() => InterfaceNames != null && InterfaceNames.Count > 0;
 
         #region Equality members
 

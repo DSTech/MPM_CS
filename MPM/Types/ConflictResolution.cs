@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public class ConflictResolution : IEquatable<ConflictResolution> {
@@ -11,7 +12,14 @@ namespace MPM.Types {
         }
 
         public DependencyConflictResolution Dependency { get; set; }
+
         public InstallationConflictResolution Installation { get; set; }
+
+        public bool ShouldSerializeDependency() => Dependency?.ShouldSerialize() == true;
+
+        public bool ShouldSerializeInstallation() => Installation?.ShouldSerialize() == true;
+
+        public bool ShouldSerialize() => ShouldSerializeDependency() || ShouldSerializeInstallation();
 
         #region Equality members
 

@@ -29,10 +29,10 @@ namespace MPM.Types {
 
         #endregion
 
-        [JsonProperty("interfaces")]
+        [JsonProperty("interfaces", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<InterfaceDependency> Interfaces { get; set; }
 
-        [JsonProperty("packages")]
+        [JsonProperty("packages", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<PackageDependency> Packages { get; set; }
     }
 }

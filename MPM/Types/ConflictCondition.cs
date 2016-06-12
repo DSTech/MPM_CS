@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace MPM.Types {
     public class ConflictCondition : IEquatable<ConflictCondition> {
@@ -18,10 +19,23 @@ namespace MPM.Types {
             this.Or = (or ?? Enumerable.Empty<ConflictCondition>()).ToList();
         }
 
+        [JsonProperty(PropertyName = "And", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<ConflictCondition> And { get; set; }
+
+        [JsonProperty(PropertyName = "Or", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public List<ConflictCondition> Or { get; set; }
+
+        [JsonProperty(PropertyName = "InterfaceName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public String InterfaceName { get; set; }
+
+        [JsonProperty(PropertyName = "PackageName", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public String PackageName { get; set; }
+
+        public bool ShouldSerializeAnd() => And != null && And.Count > 0;
+
+        public bool ShouldSerializeOr() => And != null && And.Count > 0;
+
+        public bool ShouldSerialize() => ShouldSerializeAnd() || ShouldSerializeOr() || InterfaceName != null || PackageName != null;
 
         #region Equality members
 

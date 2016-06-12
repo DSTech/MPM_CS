@@ -16,9 +16,9 @@ namespace MPM.CLI {
         public DirectoryInfo PackageDirectory { get; set; }
 
         [ArgDescription("Version of Minecraft to use.")]
-        [ArgDefaultValue("latest")]
+        [ArgDefaultValue("1.9.4")]
         [ArgPosition(2), ArgShortcut("-m"), ArgShortcut("--mc"), ArgShortcut("--minecraft"), ArgShortcut("--minecraftversion")]
-        public SemVersion MinecraftVersion { get; set; }
+        public string MinecraftVersion { get; set; }
 
         [ArgDescription("Version of Forge to use.")]
         [ArgDefaultValue("latest")]
