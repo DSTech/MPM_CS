@@ -57,7 +57,7 @@ namespace MPM.Core.Dependency {
 
         public static IFileMap GenerateFileMap(this InstanceConfiguration instanceConfigurationWithInstallation, ICacheManager cache, IProtocolResolver protocolResolver) {
             foreach (var package in instanceConfigurationWithInstallation.Packages) {
-                var nameForArchive = cache.NamingProvider.GetNameForPackageArchive(package);
+                var nameForArchive = cache.NamingProvider.GetNameForPackageUnarchived(package);
                 foreach (var step in package.Installation) {
                     step.EnsureCached(nameForArchive, cache, protocolResolver);
                 }

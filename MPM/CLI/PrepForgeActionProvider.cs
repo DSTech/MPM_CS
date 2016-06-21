@@ -98,6 +98,7 @@ namespace MPM.CLI {
                 Interfaces = new List<InterfaceProvision>(new[] {
                     new InterfaceProvision("Forge", forgeVersionAsSemVer)
                 }),
+                TweakClass = "net.minecraftforge.fml.common.launcher.FMLTweaker",
             };
             return buildInfo;
         }
@@ -269,6 +270,7 @@ namespace MPM.CLI {
                     };
 
                     installation.Add(fileDec);
+                    Console.WriteLine(fileDec.Description);
                     if (lib.Name.StartsWith("net.minecraftforge:forge") && (side == CompatibilitySide.Server || side == CompatibilitySide.Universal)) {
                         fileDec.Targets = fileDec.Targets.Concat(new[] { "minecraftforge.jar" }).ToArray();
                     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using MPM.Data.Repository;
 using MPM.Types;
 using QuickGraph;
@@ -10,7 +11,9 @@ using QuickGraph.Algorithms.Search;
 
 namespace MPM.Core.Dependency {
     public class DependencyResolver : IDependencyResolver {
-        public InstanceConfiguration Resolve(Configuration target, IPackageRepository repository) {
+        public InstanceConfiguration Resolve([NotNull] Configuration target, [NotNull] IPackageRepository repository) {
+            if (target == null) throw new ArgumentNullException(nameof(target));
+            if (repository == null) throw new ArgumentNullException(nameof(repository));
             //Packages which exist in the resultant configuration- Only one version of a package may exist in the result
             var output = new List<Build>();
 
@@ -37,7 +40,9 @@ namespace MPM.Core.Dependency {
             return new InstanceConfiguration(output);
         }
 
-        public IReadOnlyCollection<Build> ResolveDependency(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
+        public IReadOnlyCollection<Build> ResolveDependency([NotNull] PackageSpec packageSpec, [NotNull] IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
+            if (packageSpec == null) throw new ArgumentNullException(nameof(packageSpec));
+            if (repository == null) throw new ArgumentNullException(nameof(repository));
             var constraintsArr = constraints?.ToArray() ?? new DependencyConstraint[0];
             var namedBuilds = repository.LookupSpec(packageSpec).ToArray();
             var result = namedBuilds
@@ -51,7 +56,9 @@ namespace MPM.Core.Dependency {
             return result;
         }
 
-        public IReadOnlyCollection<Build> ResolveRecursive(PackageSpec packageSpec, IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
+        public IReadOnlyCollection<Build> ResolveRecursive([NotNull] PackageSpec packageSpec, [NotNull] IPackageRepository repository, CompatibilitySide packageSide = CompatibilitySide.Universal, IEnumerable<DependencyConstraint> constraints = null) {
+            if (packageSpec == null) throw new ArgumentNullException(nameof(packageSpec));
+            if (repository == null) throw new ArgumentNullException(nameof(repository));
             var dependencyConstraints = constraints as DependencyConstraint[] ?? constraints?.ToArray() ?? new DependencyConstraint[0];
             var possibleBuilds = ResolveDependency(packageSpec, repository, packageSide, dependencyConstraints);
             Debug.Assert(possibleBuilds != null, "ResolveDependency is not allowed to return null");

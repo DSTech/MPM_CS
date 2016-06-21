@@ -64,10 +64,15 @@ namespace System.IO {
 
         public static ReadOnlyStream ToReadOnly(this Stream stream, bool leaveOpen) => new ReadOnlyStream(stream, leaveOpen);
 
-        public static void SeekToStart(this Stream stream) => stream.Seek(0, SeekOrigin.Begin);
+        public static Stream SeekToStart(this Stream stream) {
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
+        }
 
         public static byte[] ToArrayFromStart(this MemoryStream memoryStream) {
-            memoryStream.SeekToStart();
+            if (memoryStream.Position != 0) {
+                memoryStream.SeekToStart();
+            }
             return memoryStream.ToArray();
         }
 

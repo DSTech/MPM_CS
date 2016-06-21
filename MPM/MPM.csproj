@@ -153,8 +153,8 @@
       <HintPath>..\packages\OctoTorrent.Dht.0.1.6\lib\net40\OctoTorrent.Dht.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform, Version=1.2.1.276, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.2.1.276\lib\net452\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.2.1.279, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.2.1.279\lib\net452\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.2.1.124, Culture=neutral, processorArchitecture=MSIL">
@@ -165,8 +165,8 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.2.1.124\lib\net452\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.2.1.276, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.2.1.276\lib\net452\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.2.1.279, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.2.1.279\lib\net452\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerArgs, Version=2.7.1.0, Culture=neutral, PublicKeyToken=26a276264bbd55b8, processorArchitecture=MSIL">
@@ -193,8 +193,8 @@
       <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SemVer, Version=0.6.15.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SemanticVersioning.0.6.15.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
+    <Reference Include="SemVer, Version=0.6.17.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SemanticVersioning.0.6.17.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -231,6 +231,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\InstallActionProvider.cs" />
+    <Compile Include="CLI\InstallArgs.cs" />
     <Compile Include="CLI\PrepForgeActionProvider.cs" />
     <Compile Include="CLI\PrepForgeArgs.cs" />
     <Compile Include="CLI\ScriptActionProvider.cs" />

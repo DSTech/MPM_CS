@@ -38,7 +38,7 @@ namespace MPM.ActionProviders {
                 mutableProfile = null;//Server launcher does not require a profile
             }
 
-            var packagesByName = instance.Configuration.Packages.ToDictionary(p => p.PackageName);
+            var packagesByName = instance.InstalledConfiguration.Packages.ToDictionary(p => p.PackageName);
             var hasMinecraft = packagesByName.ContainsKey("minecraft");
             var hasForge = packagesByName.ContainsKey("minecraftforge");
             if (!hasMinecraft) {
@@ -104,7 +104,10 @@ namespace MPM.ActionProviders {
             javaLauncher.LaunchClass = versionDetails.MainClass;
 
             if (hasForge) {
-                launchArgsBuilder.TweakClass = "net.minecraftforge.fml.common.launcher.FMLTweaker";
+                string tweakClass;
+                if ((tweakClass = instance.InstalledConfiguration.Packages.LastOrDefault(p => p.TweakClass != null)?.TweakClass) != null) {
+                    launchArgsBuilder.TweakClass = tweakClass;
+                }
             }
 
             return launchArgsBuilder.Build(versionDetails.MinecraftArguments).ToList();
@@ -145,8 +148,8 @@ namespace MPM.ActionProviders {
             }
         }
 
-        private static void LaunchJava(JavaLauncher javaLauncher, List<string> launchArgs) {
-            using (var javaProc = javaLauncher.Launch(launchArgs)) {
+        private static void LaunchJava(JavaLauncher javaLauncher, IEnumerable<string> launchArgs, bool showConsole = true) {
+            using (var javaProc = javaLauncher.Launch(launchArgs, showConsole)) {
                 Console.WriteLine();
                 Console.WriteLine(javaProc.StartInfo.Arguments);
                 Console.WriteLine();

@@ -73,6 +73,9 @@ namespace MPM.Types {
         [JsonProperty("conflicts")]
         public List<Conflict> Conflicts { get; set; } = new List<Conflict>();
 
+        [JsonProperty("tweakClass", DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
+        public String TweakClass { get; set; } = null;
+
         [JsonProperty("hashes", NullValueHandling = NullValueHandling.Ignore)]
         public List<Hash> Hashes { get; set; }
 
@@ -101,6 +104,7 @@ namespace MPM.Types {
             }
         }
 
+        [JsonIgnore]
         private List<IFileDeclaration> _installation = null;
 
         public bool IdentityMatch(Build other) => true

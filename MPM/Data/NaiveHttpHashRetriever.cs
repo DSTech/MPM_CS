@@ -2,21 +2,22 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using MPM.Types;
 using MPM.Util;
 
 namespace MPM.Data {
     public class NaiveHttpHashRetriever : IHashRetriever {
         public NaiveHttpHashRetriever(string hash, Uri uri)
-            : this(Convert.FromBase64String(hash), uri) {
+            : this(Hash.Parse(hash), uri) {
         }
 
-        public NaiveHttpHashRetriever(byte[] hash, Uri uri) {
-            Hash = hash;
+        public NaiveHttpHashRetriever(Hash hash, Uri uri) {
+            this.Hash = hash;
             this.@Uri = uri;
         }
 
         public Uri @Uri { get; }
-        public byte[] Hash { get; }
+        public Hash Hash { get; }
 
         public async Task<byte[]> Retrieve() {
             using (var stream = await RetrieveStream()) {

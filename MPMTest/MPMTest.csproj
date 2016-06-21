@@ -138,8 +138,8 @@
       <HintPath>..\packages\NServiceKit.Text.1.0.10\lib\net35\NServiceKit.Text.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform, Version=1.2.1.276, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.NET.1.2.1.276\lib\net452\Platform.dll</HintPath>
+    <Reference Include="Platform, Version=1.2.1.279, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.NET.1.2.1.279\lib\net452\Platform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Platform.VirtualFileSystem, Version=1.2.1.124, Culture=neutral, processorArchitecture=MSIL">
@@ -150,12 +150,13 @@
       <HintPath>..\packages\Platform.VirtualFileSystem.Providers.Zip.1.2.1.124\lib\net452\Platform.VirtualFileSystem.Providers.Zip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Platform.Xml.Serialization, Version=1.2.1.276, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Platform.Xml.Serialization.1.2.1.276\lib\net452\Platform.Xml.Serialization.dll</HintPath>
+    <Reference Include="Platform.Xml.Serialization, Version=1.2.1.279, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Xml.Serialization.1.2.1.279\lib\net452\Platform.Xml.Serialization.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SemVer">
-      <HintPath>..\packages\SemanticVersioning.0.6.9.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
+    <Reference Include="SemVer, Version=0.6.17.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SemanticVersioning.0.6.17.0\lib\portable-net40+sl50+MonoAndroid10+xamarinios10+MonoTouch10\SemVer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -181,14 +182,6 @@
     </Reference>
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
-    <Reference Include="Xbehave.Core, Version=2.0.1.0, Culture=neutral, PublicKeyToken=e4957f48888f9fe8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xbehave.Core.2.0.1\lib\portable-net45\Xbehave.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Xbehave.Execution.desktop, Version=2.0.1.0, Culture=neutral, PublicKeyToken=e4957f48888f9fe8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Xbehave.Core.2.0.1\lib\portable-net45\Xbehave.Execution.desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
       <Private>True</Private>
@@ -224,7 +217,7 @@
     <Compile Include="Types\HashTests.cs" />
     <Compile Include="Util\ConsoleIndenterTests.cs" />
     <Compile Include="Util\IndentedTextWriterTests.cs" />
-    <None Include="ArchiveTests.cs" />
+    <Compile Include="ArchiveTests.cs" />
     <Compile Include="Core\FileSystemTests.cs" />
     <None Include="Core\Dependency\ResolverTests.cs" />
     <Compile Include="Core\Dependency\PackageSpecTests.cs" />

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using LiteDB;
+using MPM.Types;
 
 namespace MPM.Data.Repository {
     static class HexStrings {
@@ -36,26 +37,26 @@ namespace MPM.Data.Repository {
             }
         }
 
-        public IEnumerable<IHashRetriever> Resolve(IEnumerable<byte[]> hashes) {
-            return CreateRetrievers(hashes);
+        public IEnumerable<IHashRetriever> Resolve(IEnumerable<Hash> hashes) {
+            return CreateRetrievers(hashes.ToArray());
         }
 
-        public static string HashToId(byte[] hash) {
-            return hash.ToHex();//$"{ID_PREFIX}{hash.ToHex()}";
+        public static string HashToId(Hash hash) {
+            return hash.ToString();//$"{Algorithm}:{SafeB64}";
         }
 
-        private IHashRetriever CreateRetriever(byte[] hash) {
+        private IHashRetriever CreateRetriever(Hash hash) {
             return new LiteDbHashRetriever(HashFileStorage, hash);
         }
 
-        private IEnumerable<IHashRetriever> CreateRetrievers(IEnumerable<byte[]> hashes) {
+        private IEnumerable<IHashRetriever> CreateRetrievers(params Hash[] hashes) {
             return hashes.Select(CreateRetriever).ToArray();
         }
 
-        public byte[] Register(byte[] hash, Stream content) {
+        public Hash Register(Hash hash, Stream content) {
             var id = HashToId(hash);
             using (content) {
-                HashFileStorage.Upload(HashToId(hash), content);
+                HashFileStorage.Upload(id, content);
             }
             return hash;
         }

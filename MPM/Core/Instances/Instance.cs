@@ -13,6 +13,7 @@ using Platform.VirtualFileSystem;
 namespace MPM.Core.Instances {
     public class Instance : ICancelable {
         private const string MpmDirectoryName = ".mpm";
+        private const string BaseConfigurationMetaKey = "baseConfiguration";
         private const string ConfigurationMetaKey = "configuration";
         private const string MetaName = "meta";
         private const string PackageName = "packages";
@@ -55,7 +56,15 @@ namespace MPM.Core.Instances {
             set { FetchDbMeta().Set<Type>("launcherType", value); }
         }
 
-        public InstanceConfiguration @Configuration {
+        public Configuration BaseConfiguration {
+            get {
+                var conf = FetchDbMeta().Get<Configuration>(BaseConfigurationMetaKey);
+                return conf ?? Configuration.Empty;
+            }
+            set { FetchDbMeta().Set<Configuration>(BaseConfigurationMetaKey, value); }
+        }
+
+        public InstanceConfiguration InstalledConfiguration {
             get {
                 var conf = FetchDbMeta().Get<InstanceConfiguration>(ConfigurationMetaKey);
                 return conf ?? InstanceConfiguration.Empty;

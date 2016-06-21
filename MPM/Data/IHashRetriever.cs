@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Tasks;
+using MPM.Types;
 
 namespace MPM.Data {
     /// <summary>
@@ -10,7 +11,7 @@ namespace MPM.Data {
         /// <summary>
         ///     The hash that will be retrieved by this instance.
         /// </summary>
-        byte[] Hash { get; }
+        Hash Hash { get; }
 
         Task<byte[]> Retrieve();
 

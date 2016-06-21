@@ -42,13 +42,14 @@ namespace Repository.Types.Packages {
         static BuildListRequest() {
             JsonSetup.Setup();
         }
+
         [DataMember(Name = "updatedAfter", IsRequired = false)]
         public String UpdatedAfterString { get; set; }
 
         [IgnoreDataMember]
         public DateTime? UpdatedAfter {
             get {
-                if(UpdatedAfterString == null) {
+                if (UpdatedAfterString == null) {
                     return null;
                 }
                 return DateTime.SpecifyKind(long.Parse(this.UpdatedAfterString).FromUnixTimeStamp(), DateTimeKind.Utc);

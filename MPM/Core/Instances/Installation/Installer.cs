@@ -39,17 +39,17 @@ namespace MPM.Core.Instances.Installation {
 
             //Download all packages if not cached
             foreach (var package in configuration.Packages) {
-                var cacheEntryName = cacheManager.NamingProvider.GetNameForPackageArchive(package);
-                if (cacheManager.Contains(cacheEntryName)) {
+                var unarchivedName = cacheManager.NamingProvider.GetNameForPackageUnarchived(package);
+                if (cacheManager.Contains(unarchivedName)) {
                     Console.WriteLine($"Package {package.PackageName} already cached.");
                     continue;
                 }
                 Console.WriteLine($"Downloading package {package.PackageName} to cache...");
                 if (package.Hashes == null || package.Hashes.Count == 0) {
-                    break;
+                    continue;
                 }
                 var packageArchive = hashRepository.RetrieveArchive(package.PackageName, package.Hashes).WaitAndUnwrapException();
-                cacheManager.Store(cacheEntryName, packageArchive);
+                cacheManager.Store(unarchivedName, packageArchive);
             }
 
             var packageExtractor = new MPM.Archival.PackageExtractor(cacheManager);
@@ -58,11 +58,10 @@ namespace MPM.Core.Instances.Installation {
                     continue;
                 }
 
-                //Cache unarchived packages if they are not already extracted
-                var entry = packageExtractor.ExtractToCacheIfNotExists(package);
+                var unarchivedName = cacheManager.NamingProvider.GetNameForPackageUnarchived(package);
 
                 //Load installation scripts from embedded package.json files in downloaded packages
-                using (var zip = new StreamingZipFetcher(entry.FetchStream())) {
+                using (var zip = new StreamingZipFetcher(cacheManager.Fetch(unarchivedName).FetchStream())) {
                     package.Installation = JsonConvert.DeserializeObject<Build>(Encoding.UTF8.GetString(zip.FetchFile("package.json"))).Installation;
                 }
             }
@@ -92,7 +91,7 @@ namespace MPM.Core.Instances.Installation {
 
             Console.WriteLine("Done in {0:0.00}s.", duration.TotalSeconds);
 
-            instance.Configuration = configuration;
+            instance.InstalledConfiguration = configuration;
         }
     }
 }

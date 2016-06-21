@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MPM.Core.Dependency;
 
 namespace MPM.Util {
     public static class Huminz {
@@ -40,7 +41,7 @@ namespace MPM.Util {
             return $"{dec:0.00} {prefix}bytes";
         }
 
-        public static string ByteSizeShort(int bytes) => ByteSizeShort((long) bytes);
+        public static string ByteSizeShort(int bytes) => ByteSizeShort((long)bytes);
 
         public static string ByteSizeShort(long bytes) {
             if (bytes == 0) {
@@ -68,6 +69,25 @@ namespace MPM.Util {
                     return $"{bytes}b";
             }
             return $"{dec:0.00}{suffix}";
+        }
+
+        public static void DisplayException(Exception ex) {
+            using (ConsoleColorZone.Error) {
+                Console.WriteLine(ex.ToString());
+                var inner = ex.InnerException;
+                if (inner == null) {
+                    return;
+                }
+                Console.WriteLine("Error: {0}", inner.Message);
+                var depinner = inner as DependencyException;
+                if (depinner == null) {
+                    return;
+                }
+                Console.WriteLine("Details:");
+                using (new ConsoleIndenter()) {
+                    Console.WriteLine(depinner.PackageSpec.ToString());
+                }
+            }
         }
     }
 }

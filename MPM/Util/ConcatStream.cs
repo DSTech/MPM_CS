@@ -55,10 +55,10 @@ namespace MPM.Util {
 
         public override void Close() {
             if (!_leaveOpen) {
-                if(_didMoveNext) {
+                if (_didMoveNext) {
                     _streams.Current?.Dispose();
                 }
-                while((_didMoveNext = _streams.MoveNext()) == true) {
+                while ((_didMoveNext = _streams.MoveNext()) == true) {
                     _streams.Current?.Dispose();
                 }
             }

@@ -30,9 +30,36 @@ namespace MPM.Types {
         #endregion
 
         [JsonProperty("interfaces", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<InterfaceDependency> Interfaces { get; set; }
+        private List<InterfaceDependency> _interfaces;
+
+        [JsonIgnore]
+        public List<InterfaceDependency> Interfaces {
+            get {
+                return _interfaces ?? new List<InterfaceDependency>();
+            }
+            set {
+                if (value == null || value.Count == 0) {
+                    _interfaces = null;
+                }
+                _interfaces = value;
+            }
+        }
 
         [JsonProperty("packages", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public List<PackageDependency> Packages { get; set; }
+        private List<PackageDependency> _packages;
+
+        [JsonIgnore]
+        public List<PackageDependency> Packages {
+            get {
+                return _packages ?? new List<PackageDependency>();
+            }
+            set {
+                if (value == null || value.Count == 0) {
+                    _packages = null;
+                }
+                _packages = value;
+            }
+        }
+
     }
 }

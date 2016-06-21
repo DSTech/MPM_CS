@@ -72,7 +72,7 @@ namespace MPM.CLI {
             using (var instance = new Instance(instanceDirectory) {
                 Name = $"{instanceArch}_{instanceSide}",//TODO: make configurable and able to be immediately registered upon creation
                 LauncherType = typeof(MinecraftLauncher),//TODO: make configurable via instanceSide/instanceArch and able to be overridden
-                Configuration = InstanceConfiguration.Empty,
+                InstalledConfiguration = InstanceConfiguration.Empty,
                 Side = instanceSide,
             }) {
                 var resolver = factory.Resolve<IDependencyResolver>();
@@ -81,24 +81,14 @@ namespace MPM.CLI {
                 Console.WriteLine("Generating configuration...");
                 var archConfiguration = GenerateArchConfiguration(instanceArch, instanceSide);
 
+                instance.BaseConfiguration = archConfiguration;
+
                 Console.WriteLine("Attempting to resolve packages...");
                 InstanceConfiguration resolvedArchConfiguration;
                 try {
                     resolvedArchConfiguration = resolver.Resolve(archConfiguration, repository);
                 } catch (DependencyException e) {
-                    using (ConsoleColorZone.Error) {
-                        var inner = e.InnerException;
-                        if (inner != null) {
-                            Console.WriteLine("Error: {0}", inner.Message);
-                            var depinner = inner as DependencyException;
-                            if (depinner != null) {
-                                Console.WriteLine("Details:");
-                                using (new ConsoleIndenter()) { Console.WriteLine(depinner.PackageSpec.ToString()); }
-                            }
-                        } else {
-                            Console.WriteLine(e.Message);
-                        }
-                    }
+                    Huminz.DisplayException(e);
                     return;
                 }
                 Console.WriteLine("Configuration resolved.");
@@ -107,8 +97,6 @@ namespace MPM.CLI {
                 var cacheManager = globalStorage.FetchGlobalCache();
                 var hashRepository = factory.Resolve<IHashRepository>();
                 var protocolResolver = factory.Resolve<IProtocolResolver>();
-
-                instance.Configuration = resolvedArchConfiguration;
                 
                 var installer = new Installer(
                     instance,
@@ -119,6 +107,7 @@ namespace MPM.CLI {
                     );
 
                 installer.Install(resolvedArchConfiguration);
+                instance.InstalledConfiguration = resolvedArchConfiguration;
             }
         }
     }
